@@ -11,13 +11,17 @@ st_erase <- function(x, y) st_difference(x, st_union(st_combine(y)))
 # v17 <- load_variables(2017, "acs5", cache = TRUE)
 
 
+
+
+
 ## Import station and subway data
 
-stations <-
-  read_csv("data/stations.csv") %>%
-  st_as_sf(coords = c("lon","lat")) %>%
-  st_set_crs(4326) %>% 
-  st_transform(26918)
+station_list <-
+  st_read("data/station_list.csv") %>%
+  as_tibble() %>%
+  st_as_sf() %>% 
+  select(-WKT) %>% 
+  st_set_crs(26918)
 
 subway <-
   st_read("data", "nyc_subway") %>%
