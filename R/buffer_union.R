@@ -15,12 +15,13 @@ st_erase <- function(x, y) st_difference(x, st_union(st_combine(y)))
 ## Create buffers of stations and intersect with data
 
 
-buffer_intersect <- 
+buffer_union <- 
   suppressWarnings(station_list %>%
   filter(Year == 2018) %>%
   st_buffer(300) %>%
-  st_union() %>%
-  st_intersection(data, .))
+  st_union())
+  
+buffer_intersect <- st_intersection(data, buffer_union)
 
 ## Mutate new population estimates by intersect polygon
 
@@ -37,20 +38,37 @@ access <-
   buffer_intersect %>% 
   summarize(pop_total  = sum(int_pop_total),
             pop_white  = sum(int_pop_white),
-            med_income = sum(med_income * int_pop_total) / pop_total,
+            med_income = sum((med_income * int_pop_total) / pop_total, na.rm = TRUE),
             immigrant  = sum(int_immigrant),
             education  = sum(int_education),
             geometry   = st_union(st_set_precision(geometry, 0)))
 
-
-## Create acess and noaccess areas, then rbind() into one df
-
+## Repeat for noaccess
 
 noaccess <- 
   data %>% 
   st_erase(buffer_union)
 
-rbind(access, noaccess)
+noaccess <- 
+  noaccess %>%
+  mutate(int_pop_total = pop_total * st_area(.) / CT_area,
+         int_pop_white = pop_white * st_area(.) / CT_area,
+         int_immigrant = immigrant * st_area(.) / CT_area,
+         int_education = education * st_area(.) / CT_area)
+
+## Summarize by variables, union by geometry
+
+noaccess <- 
+  noaccess %>% 
+  summarize(pop_total  = sum(int_pop_total),
+            pop_white  = sum(int_pop_white),
+            med_income = sum((med_income * int_pop_total) / pop_total, na.rm = TRUE),
+            immigrant  = sum(int_immigrant),
+            education  = sum(int_education),
+            geometry   = st_union(st_set_precision(geometry, 0)))
+
+total_accesss_noaccess <- rbind(access, noaccess)
+
 
 ## Recalculate bounding box
 
@@ -63,17 +81,15 @@ rm(bboxes, bbox) # Cleanup
 
 ## Create station and subway variables
 
-buffer_union <- 
-  buffer_union %>% 
+total_pct <- 
+  total_accesss_noaccess %>% 
   mutate(
     white_pct = pop_white / pop_total,
     immigrant_pct = immigrant / pop_total,
     education_pct = education / pop_total,
-    station_list = st_contains(buffer_union, stations), 
-    station_count = map_int(station_list, length),
-    subway_list = st_contains(buffer_union, subway), 
-    subway_count = map_int(subway_list, length)
   )
+
+
 
 ## Plot the results
 
