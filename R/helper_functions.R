@@ -6,11 +6,13 @@ library(sf)
 library(units)
 library(tigris)
 
-## Helper functions
+
+## st_erase helper function
 
 st_erase <- function(x, y) st_difference(x, st_union(st_combine(y)))
 
 
+## st_intersect_summarize helper function
 
 st_intersect_summarize <- function(x, y, population, sum_vars, mean_vars,
                                    precision) {
