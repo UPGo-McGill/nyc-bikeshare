@@ -70,18 +70,9 @@ noaccess <-
 total_accesss_noaccess <- rbind(access, noaccess)
 
 
-## Recalculate bounding box
-
-bboxes <- sapply(buffer$geometry, st_bbox)
-bbox <- c(apply(bboxes[1:2,], 1, min), apply(bboxes[3:4,], 1, max))
-attr(bbox, "class") <- "bbox"
-attr(st_geometry(buffer), "bbox") <- bbox
-rm(bboxes, bbox) # Cleanup
-
-
 ## Create station and subway variables
 
-total_pct <- 
+total_pct2018 <- 
   total_accesss_noaccess %>% 
   mutate(
     white_pct = pop_white / pop_total,
@@ -89,6 +80,16 @@ total_pct <-
     education_pct = education / pop_total,
   )
 
+all_pct <- rbind(total_pct2013, total_pct2014, total_pct2015, total_pct2016, total_pct2017, total_pct2018) %>% 
+  mutate(Year = )
+
+## Recalculate bounding box
+
+bboxes <- sapply(buffer$geometry, st_bbox)
+bbox <- c(apply(bboxes[1:2,], 1, min), apply(bboxes[3:4,], 1, max))
+attr(bbox, "class") <- "bbox"
+attr(st_geometry(buffer), "bbox") <- bbox
+rm(bboxes, bbox) # Cleanup
 
 
 ## Plot the results
