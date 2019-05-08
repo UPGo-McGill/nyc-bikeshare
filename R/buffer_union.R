@@ -84,11 +84,10 @@ data <-
 
 ## Create buffers of stations and intersect with data
 
-buffer <- st_buffer(stations, 300)
+buffer <- st_buffer(station_list, 300)
 buffer_union <- st_union(buffer)
 
 buffer_intersect <- st_intersection(data, buffer_union) #Why are we doing these two steps? 
-buffer_intersect <- st_intersection(data, buffer)
 
 ## Mutate new population estimates by intersect polygon
 
@@ -110,11 +109,11 @@ buffer_union <-
             med_income = sum(med_income * int_pop_total) / pop_total,
             immigrant  = sum(int_immigrant),
             education  = sum(int_education),
-            geometry   = st_union(geometry))
+            geometry   = st_union(st_set_precision(geometry, 30)))
+
 
 ## Create acess and noaccess areas, then rbind() into one df
 
-access <- buffer_intersect
 access <- buffer_union
 
 noaccess <- 
