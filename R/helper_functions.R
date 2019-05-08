@@ -12,9 +12,14 @@ st_erase <- function(x, y) st_difference(x, st_union(st_combine(y)))
 
 
 
-st_intersect_summarize <- function(x, y, sum_vars) {
+st_intersect_summarize <- function(x, y, population, sum_vars, mean_vars,
+                                   precision) {
+  
+  population <- enquo(population)
   
   intersects <- suppressWarnings(st_intersection(x, y))
+  
+  cols <- length(intersects)
   
   intersects <- 
     intersects %>% 
@@ -22,7 +27,8 @@ st_intersect_summarize <- function(x, y, sum_vars) {
           . * st_area(.data$geometry) / .data$CT_area
           }))
 
-  intersects
+  intersects %>% 
+    summarize_at(sum_vars, list())
   
 }
 
