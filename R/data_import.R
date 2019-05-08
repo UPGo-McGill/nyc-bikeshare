@@ -1,20 +1,14 @@
-## Load packages, census API key, and helper functions
+### DATA IMPORT ################################################################
 
-library(tidycensus)
-library(tidyverse)
-library(sf)
-library(units)
-library(tigris)
-Sys.getenv("CENSUS_API_KEY")
+## Load libraries and helper functions
 
-st_erase <- function(x, y) st_difference(x, st_union(st_combine(y)))
-# v17 <- load_variables(2017, "acs5", cache = TRUE)
+source("R/helper_functions.R")
 
 
-## Import station and subway data
+## Import and clean up station data
 
 station_list <-
-  st_read("data/station_list.csv") %>%
+  st_read("data/station_list.csv", stringsAsFactors = FALSE) %>%
   as_tibble() %>%
   st_as_sf() %>% 
   select(-WKT) %>% 
@@ -22,7 +16,11 @@ station_list <-
 
 station_list <- 
   station_list %>% 
-  mutate(ID = as.numeric(as.character(ID)), Year = as.numeric(as.character(Year)))
+  mutate(ID = as.numeric(ID),
+         Year = as.numeric(Year))
+
+
+## Import subway data
 
 subway <-
   st_read("data", "nyc_subway") %>%
@@ -41,14 +39,15 @@ si_water <- area_water("NY", "Richmond", class = "sf")
 
 ny_water <-
   rbind(mh_water, bk_water, qn_water, bx_water, si_water) %>% 
-  st_transform(26918)
+  st_transform(26918) %>% 
+  st_union()
 
 rm(mh_water, bk_water, qn_water, bx_water, si_water)
 
 
 ## Import, clean up and spread census data
 
-data <- get_acs(
+CTs <- get_acs(
   geography = "tract", 
   variables = c(pop_white = "B02001_002", 
                 pop_hisp_white = "B03002_013",
@@ -63,16 +62,16 @@ data <- get_acs(
              "Bronx County",
              "Richmond County"),
   summary_var = "B01003_001",
-  geometry = TRUE)
-
-names(data) <- c("GEOID", "NAME", "Variable", "Estimate", "MOE", "pop_total",
-                 "pop_total_MOE", "geometry")
-
-data <-
-  data %>%
+  geometry = TRUE) %>% 
   as_tibble() %>%
   st_as_sf() %>% 
-  st_transform(26918) %>%
+  st_transform(26918)
+
+names(CTs) <- c("GEOID", "NAME", "Variable", "Estimate", "MOE", "pop_total",
+                 "pop_total_MOE", "geometry")
+
+CTs <-
+  CTs %>%
   select(-MOE, -pop_total_MOE) %>% 
   spread(key = Variable, value = Estimate) %>% 
   mutate(pop_white = pop_white - pop_hisp_white) %>% 
@@ -81,7 +80,7 @@ data <-
 
 ## Clip data to water and add CT_area
 
-data <-
-  data %>%
-  #st_erase(ny_water) %>%
-  mutate(CT_area = st_area(.))
+CTs <-
+  suppressWarnings(
+    st_erase(CTs, ny_water) %>%
+      mutate(CT_area = st_area(.)))
