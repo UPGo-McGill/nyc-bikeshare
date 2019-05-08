@@ -20,6 +20,10 @@ station_list <-
   select(-WKT) %>% 
   st_set_crs(26918)
 
+station_list <- 
+  station_list %>% 
+  mutate(ID = as.numeric(as.character(ID)), Year = as.numeric(as.character(Year)))
+
 subway <-
   st_read("data", "nyc_subway") %>%
   st_transform(26918) %>% 

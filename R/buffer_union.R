@@ -14,10 +14,13 @@ st_erase <- function(x, y) st_difference(x, st_union(st_combine(y)))
 
 ## Create buffers of stations and intersect with data
 
-buffer <- st_buffer(station_list, 300)
-buffer_union <- st_union(buffer)
 
-buffer_intersect <- st_intersection(data, buffer_union) #Why are we doing these two steps? 
+buffer_intersect <- 
+  suppressWarnings(station_list %>%
+  filter(Year == 2018) %>%
+  st_buffer(300) %>%
+  st_union() %>%
+  st_intersection(data, .))
 
 ## Mutate new population estimates by intersect polygon
 
@@ -28,11 +31,9 @@ buffer_intersect <-
          int_immigrant = immigrant * st_area(.) / CT_area,
          int_education = education * st_area(.) / CT_area)
 
-
 ## Summarize by variables, union by geometry
-# What's the purpose having buffer_union and buffer_intersect?
 
-buffer_union <- 
+access <- 
   buffer_intersect %>% 
   summarize(pop_total  = sum(int_pop_total),
             pop_white  = sum(int_pop_white),
@@ -44,7 +45,6 @@ buffer_union <-
 
 ## Create acess and noaccess areas, then rbind() into one df
 
-access <- buffer_union
 
 noaccess <- 
   data %>% 
