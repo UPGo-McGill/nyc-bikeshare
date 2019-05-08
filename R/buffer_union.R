@@ -40,7 +40,7 @@ access <-
             med_income = sum(med_income * int_pop_total) / pop_total,
             immigrant  = sum(int_immigrant),
             education  = sum(int_education),
-            geometry   = st_union(st_set_precision(geometry, 30)))
+            geometry   = st_union(st_set_precision(geometry, 0)))
 
 
 ## Create acess and noaccess areas, then rbind() into one df
