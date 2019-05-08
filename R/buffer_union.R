@@ -21,7 +21,7 @@ buffer_union <-
   st_buffer(300) %>%
   st_union())
   
-buffer_intersect <- st_intersection(data, buffer_union)
+buffer_intersect <- st_intersection(CTs, buffer_union)
 
 ## Mutate new population estimates by intersect polygon
 
@@ -46,7 +46,7 @@ access <-
 ## Repeat for noaccess
 
 noaccess <- 
-  data %>% 
+  CTs %>% 
   st_erase(buffer_union)
 
 noaccess <- 
