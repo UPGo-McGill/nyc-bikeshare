@@ -11,9 +11,6 @@ st_erase <- function(x, y) st_difference(x, st_union(st_combine(y)))
 # v17 <- load_variables(2017, "acs5", cache = TRUE)
 
 
-
-
-
 ## Import station and subway data
 
 station_list <-
