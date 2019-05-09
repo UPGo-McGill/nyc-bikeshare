@@ -112,42 +112,55 @@ CTs$immigrant_percent <- (CTs$immigrant/ CTs$pop_total) * 100
 
 
 tm_shape(CTs) +
-  tm_borders(alpha = 0) +
-  tm_polygons("med_income", text = "No Data", title = "Median Household Income") +
+  tm_polygons("med_income", 
+              text = "No Data", 
+              title = "Median Household Income", 
+              border.alpha = 0) +
   tm_shape(servicearea_2018) +
   tm_borders(col = "#327A00", lwd = 2) + 
-  tm_polygons(title = "2018 Service Area", alpha = 0) +
-  tm_layout(title = "Income and 2018 Bikeshare Coverage", inner.margins = .1)+
+  tm_layout(main.title = "Income and 2018 Bikeshare Coverage", 
+            inner.margins = .05, 
+            frame = F,
+            legend.outside = T) +
   tm_compass()
 
 tm_shape(CTs) +
-  tm_borders(alpha = 0) +
-  tm_polygons ("white_percent", text = "No Data", title = "White Population (%)") +
+  tm_polygons ("white_percent", 
+               textNA = "No Data", 
+               title = "White Population (%)", 
+               border.alpha = 0) +
   tm_shape(servicearea_2018) +
   tm_borders(col = "#327A00", lwd = 2) + 
-  tm_polygons(title = "2018 Service Area", alpha = 0) +
-  tm_layout(title = "White Population and 2018 Bikeshare Coverage", inner.margins = .1)+
+  tm_layout(main.title = "White Population and 2018 Bikeshare Coverage",
+            inner.margins = 0.05, 
+            frame = F,
+            legend.outside = T) +
   tm_compass()
 
 tm_shape(CTs) +
-  tm_borders(alpha = 0) +
-  tm_polygons ("education_percent", text = "No Data", title = "Population with Post-Secondary Degree (%)") +
+  tm_polygons ("education_percent", 
+               textNA = "No Data", 
+               title = "Population with Post-Secondary Degree (%)", 
+               border.alpha = 0) +
   tm_shape(servicearea_2018) +
   tm_borders(col = "#327A00", lwd = 2) + 
-  tm_polygons(title = "2018 Service Area", alpha = 0) +
-  tm_layout(title = "Education and Bikeshare Coverage", inner.margins = .1)+
+  tm_layout(main.title = "Education and Bikeshare Coverage", 
+            inner.margins = .05, 
+            frame = F,
+            legend.outside = T) +
   tm_compass()
 
 tm_shape(CTs) +
-  tm_borders(alpha = 0) +
-  tm_polygons ("immigrant_percent", text = "No Data", title = "Immigrants (%)") +
+  tm_polygons ("immigrant_percent", 
+               textNA = "No Data", 
+               title = "Immigrants (%)", 
+               border.alpha = 0) +
   tm_shape(servicearea_2018) +
-  tm_borders(col = "#327A00", lwd = 2) + 
-  tm_polygons(title = "2018 Service Area", alpha = 0) +
-  tm_layout(title = "Immigrant Population and Bikeshare Coverage", inner.margins = .1)+
+  tm_borders(col = "#327A00", lwd = 2) +
+  tm_layout(main.title = "Immigrant Population and Bikeshare Coverage", 
+            inner.margins = .05, 
+            frame = F,
+            legend.outside = T) +
   tm_compass()
-  tm_legend()
-
-
 
 
