@@ -1,30 +1,4 @@
-install.packages("tmap")
-library(tmap)
-
-#get basemap files
-
-{ nyc_counties <- get_acs(
-  geography = "county", 
-  variables = c(pop_white = "B02001_002"),
-  year = 2017, 
-  state = "36",
-  county = c("New York County",
-             "Kings County",
-             "Queens County",
-             "Bronx County",
-             "Richmond County"),
-  geometry = TRUE)
-
-nyc_counties <-
-  nyc_counties %>%
-  st_transform(26918) %>% 
-  st_erase(ny_water) 
-
-
-nyc_city <- 
-  st_union(nyc_counties)
-
-}
+### MAP MAKING #################################################################
 
 
 #serviceareaboundaries through time
