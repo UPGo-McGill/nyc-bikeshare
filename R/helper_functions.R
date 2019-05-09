@@ -44,7 +44,7 @@ st_intersect_summarize <- function(x, y, population, sum_vars, mean_vars) {
     summarize_at(
       (cols + 2 + length(sum_vars)):
         (cols + 1 + length(sum_vars) + length(mean_vars)),
-      list(~{sum(., na.rm = TRUE) / sum(!! population, na.rm = TRUE)}))
+      ~{sum(., na.rm = TRUE) / pull(population, 1)})
   
   reduce(list(population, sums, means), st_join)
 }
