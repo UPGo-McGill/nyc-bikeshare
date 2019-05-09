@@ -92,7 +92,8 @@ service_2018 <-
   suppressWarnings(station_list %>%
                      filter(Year == 2018) %>%
                      st_buffer(300) %>%
-                     st_union())
+                     st_union() %>%
+                     st_erase(ny_water) )
 
 no_service_2018 <- 
   CTs %>%
@@ -108,7 +109,8 @@ service_2013 <-
   suppressWarnings(station_list %>%
                      filter(Year == 2013) %>%
                      st_buffer(300) %>%
-                     st_union())
+                     st_union() %>%
+                     st_erase(ny_water) )
 
 no_service_2013 <- 
   CTs %>%
@@ -121,3 +123,25 @@ service_areas_2013 <-
   st_as_sf()
 
 rm(service_2018, no_service_2018, service_2013, no_service_2013)
+
+
+## Create subway service and subway no-service areaa
+
+subway_service <- 
+  suppressWarnings(subway %>%
+                     st_buffer(800) %>%
+                     st_union() %>%
+                     st_erase(ny_water)) 
+
+subway_no_service <- 
+  CTs %>%
+  st_union() %>%
+  st_erase(subway_service)
+
+subway_service_areas <-
+  tibble(service = c("subway_service", "subway_no_service"), 
+         geom=c(subway_service, subway_no_service)) %>%
+  st_as_sf()
+
+
+rm(subway_no_service)
