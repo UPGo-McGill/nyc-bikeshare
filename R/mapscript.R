@@ -94,9 +94,7 @@ tm_fill(col = "#E8E8E8") +
       tm_fill(col = "#B1DA94") +
   tm_shape(servicearea_2013)+
       tm_fill(col = "#D1F2BA") +
-  tmap_mode(mode = "view") +
-  tm_add_legend()
-
+  tmap_mode(mode = "plot") 
 
 #median income map
 
