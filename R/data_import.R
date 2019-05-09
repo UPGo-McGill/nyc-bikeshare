@@ -85,6 +85,25 @@ CTs <-
     st_erase(CTs, ny_water) %>%
       mutate(CT_area = st_area(.)))
 
+## Get counties and city
+
+counties <- get_acs(
+  geography = "county", 
+  variables = c(pop_white = "B02001_002"),
+  year = 2017, 
+  state = "36",
+  county = c("New York County",
+             "Kings County",
+             "Queens County",
+             "Bronx County",
+             "Richmond County"),
+  geometry = TRUE) %>%
+  st_transform(26918) %>% 
+  st_erase(ny_water) 
+
+city <- 
+  st_union(counties)
+
 
 ## Create service and no-service areas for 2018 and 2013
 
@@ -101,7 +120,7 @@ no_service_2018 <-
   st_erase(service_2018)
 
 service_areas_2018 <-
-  tibble(service = c("service", "no_service"), 
+  tibble(bike_service = c(TRUE, FALSE), 
          geom=c(service_2018, no_service_2018)) %>%
   st_as_sf()
 
@@ -139,9 +158,8 @@ subway_no_service <-
   st_erase(subway_service)
 
 subway_service_areas <-
-  tibble(service = c("subway_service", "subway_no_service"), 
+  tibble(subway_service = c(TRUE, FALSE), 
          geom=c(subway_service, subway_no_service)) %>%
   st_as_sf()
 
-
-rm(subway_no_service)
+rm(subway_service, subway_no_service)
