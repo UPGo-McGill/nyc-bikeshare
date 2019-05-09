@@ -118,11 +118,16 @@ tm_shape(CTs) +
               border.alpha = 0) +
   tm_shape(servicearea_2018) +
   tm_borders(col = "#327A00", lwd = 2) + 
-  tm_layout(main.title = "Income and 2018 Bikeshare Coverage", 
+  tm_layout(main.title = "Income and 2018 Citibike Service Area", 
             inner.margins = .05, 
             frame = F,
-            legend.outside = T) +
-  tm_compass()
+            legend.outside = F,
+            legend.text.size = .9,
+            legend.title.size = 1.3) +
+  tm_credits("Source: U.S. Census Bureau (2017). American Community Survey.", 
+             position = c("right", "BOTTOM")) +
+  tm_compass(position = c(.9, .05))
+
 
 tm_shape(CTs) +
   tm_polygons ("white_percent", 
@@ -131,11 +136,16 @@ tm_shape(CTs) +
                border.alpha = 0) +
   tm_shape(servicearea_2018) +
   tm_borders(col = "#327A00", lwd = 2) + 
-  tm_layout(main.title = "White Population and 2018 Bikeshare Coverage",
+  tm_layout(main.title = "White Population and 2018 Citibike Service Area",
             inner.margins = 0.05, 
             frame = F,
-            legend.outside = T) +
-  tm_compass()
+            legend.outside = F,
+            legend.text.size = .9,
+            legend.title.size = 1.3) +
+  tm_credits("Source: U.S. Census Bureau (2017). American Community Survey.", 
+             position = c("right", "BOTTOM")) +
+  tm_compass(position = c(.9, .05))
+
 
 tm_shape(CTs) +
   tm_polygons ("education_percent", 
@@ -144,11 +154,16 @@ tm_shape(CTs) +
                border.alpha = 0) +
   tm_shape(servicearea_2018) +
   tm_borders(col = "#327A00", lwd = 2) + 
-  tm_layout(main.title = "Education and Bikeshare Coverage", 
+  tm_layout(main.title = "Education and 2018 Citibike Service Area", 
             inner.margins = .05, 
             frame = F,
-            legend.outside = T) +
-  tm_compass()
+            legend.outside = F,
+            legend.text.size = .9,
+            legend.title.size = 1.3) +
+  tm_credits("Source: U.S. Census Bureau (2017). American Community Survey.", 
+             position = c("right", "BOTTOM")) +
+  tm_compass(position = c(.9, .05))
+
 
 tm_shape(CTs) +
   tm_polygons ("immigrant_percent", 
@@ -157,10 +172,14 @@ tm_shape(CTs) +
                border.alpha = 0) +
   tm_shape(servicearea_2018) +
   tm_borders(col = "#327A00", lwd = 2) +
-  tm_layout(main.title = "Immigrant Population and Bikeshare Coverage", 
+  tm_layout(main.title = "Immigrant Population and 2018 Citibike Service Area", 
             inner.margins = .05, 
             frame = F,
-            legend.outside = T) +
-  tm_compass()
+            legend.outside = F,
+            legend.text.size = .9,
+            legend.title.size = 1.3) +
+  tm_credits("Source: U.S. Census Bureau (2017). American Community Survey.", 
+             position = c("right", "BOTTOM")) +
+  tm_compass(position = c(.9, .05))
 
 
