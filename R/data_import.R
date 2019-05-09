@@ -84,3 +84,40 @@ CTs <-
   suppressWarnings(
     st_erase(CTs, ny_water) %>%
       mutate(CT_area = st_area(.)))
+
+
+## Create service and no-service areas for 2018 and 2013
+
+service_2018 <- 
+  suppressWarnings(station_list %>%
+                     filter(Year == 2018) %>%
+                     st_buffer(300) %>%
+                     st_union())
+
+no_service_2018 <- 
+  CTs %>%
+  st_union %>%
+  st_erase(service_2018)
+
+service_areas_2018 <-
+  tibble(service = c("service", "no_service"), 
+         geom=c(service_2018, no_service_2018)) %>%
+  st_as_sf()
+
+service_2013 <- 
+  suppressWarnings(station_list %>%
+                     filter(Year == 2013) %>%
+                     st_buffer(300) %>%
+                     st_union())
+
+no_service_2013 <- 
+  CTs %>%
+  st_union %>%
+  st_erase(service_2013)
+
+service_areas_2013 <-
+  tibble(service = c("service", "no_service"), 
+         geom=c(service_2013, no_service_2013)) %>%
+  st_as_sf()
+
+rm(service_2018, no_service_2018, service_2013, no_service_2013)
