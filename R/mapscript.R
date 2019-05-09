@@ -89,14 +89,67 @@ tm_fill(col = "#E8E8E8") +
   tm_shape(servicearea_2016)+
       tm_fill(col = "#71AA4A") +
   tm_shape(servicearea_2015)+
-      tm_fill(col = "#91C26F") +
+      tm_fill(col = "#91C2F") +
   tm_shape(servicearea_2014)+
       tm_fill(col = "#B1DA94") +
   tm_shape(servicearea_2013)+
       tm_fill(col = "#D1F2BA") +
-  tmap_mode(mode = "plot") 
+  tmap_mode(mode = "plot") +
+  tm_layout(title = "Bikeshare Service Area Growth, 2013-2018", inner.margins = .1)
+     
+#station map with markers
 
-#median income map
+#demographic maps
+
+CTs$white_percent <- NA
+CTs$white_percent <- (CTs$pop_white/ CTs$pop_total) * 100
+
+CTs$education_percent <- NA
+CTs$education_percent <- (CTs$education/ CTs$pop_total) * 100
+
+CTs$immigrant_percent <- NA
+CTs$immigrant_percent <- (CTs$immigrant/ CTs$pop_total) * 100
+
+
+tm_shape(CTs) +
+  tm_borders(alpha = 0) +
+  tm_polygons("med_income", text = "No Data", title = "Median Household Income") +
+  tm_shape(servicearea_2018) +
+  tm_borders(col = "#327A00", lwd = 2) + 
+  tm_polygons(title = "2018 Service Area", alpha = 0) +
+  tm_layout(title = "Income and 2018 Bikeshare Coverage", inner.margins = .1)+
+  tm_compass()
+
+tm_shape(CTs) +
+  tm_borders(alpha = 0) +
+  tm_polygons ("white_percent", text = "No Data", title = "White Population (%)") +
+  tm_shape(servicearea_2018) +
+  tm_borders(col = "#327A00", lwd = 2) + 
+  tm_polygons(title = "2018 Service Area", alpha = 0) +
+  tm_layout(title = "White Population and 2018 Bikeshare Coverage", inner.margins = .1)+
+  tm_compass()
+
+tm_shape(CTs) +
+  tm_borders(alpha = 0) +
+  tm_polygons ("education_percent", text = "No Data", title = "Population with Post-Secondary Degree (%)") +
+  tm_shape(servicearea_2018) +
+  tm_borders(col = "#327A00", lwd = 2) + 
+  tm_polygons(title = "2018 Service Area", alpha = 0) +
+  tm_layout(title = "Education and Bikeshare Coverage", inner.margins = .1)+
+  tm_compass()
+
+tm_shape(CTs) +
+  tm_borders(alpha = 0) +
+  tm_polygons ("immigrant_percent", text = "No Data", title = "Immigrants (%)") +
+  tm_shape(servicearea_2018) +
+  tm_borders(col = "#327A00", lwd = 2) + 
+  tm_polygons(title = "2018 Service Area", alpha = 0) +
+  tm_layout(title = "Immigrant Population and Bikeshare Coverage", inner.margins = .1)+
+  tm_compass()
+  tm_legend()
+
+?tm_compass()
+
 
 
 
