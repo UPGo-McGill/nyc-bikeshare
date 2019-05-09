@@ -148,8 +148,6 @@ tm_shape(CTs) +
   tm_compass()
   tm_legend()
 
-?tm_compass()
-
 
 
 
