@@ -119,11 +119,6 @@ no_service_2018 <-
   st_union %>%
   st_erase(service_2018)
 
-service_areas_2018 <-
-  tibble(bike_service = c(TRUE, FALSE), 
-         geom=c(service_2018, no_service_2018)) %>%
-  st_as_sf()
-
 service_2013 <- 
   suppressWarnings(station_list %>%
                      filter(Year == 2013) %>%
@@ -136,9 +131,10 @@ no_service_2013 <-
   st_union %>%
   st_erase(service_2013)
 
-service_areas_2013 <-
-  tibble(service = c("service", "no_service"), 
-         geom=c(service_2013, no_service_2013)) %>%
+service_areas <-
+  tibble(year = c(2013, 2013, 2018, 2018),
+         bike_service = c(TRUE, FALSE, TRUE, FALSE), 
+         geometry = c(service_2013, no_service_2013, service_2018, no_service_2018)) %>%
   st_as_sf()
 
 rm(service_2018, no_service_2018, service_2013, no_service_2013)
@@ -157,9 +153,14 @@ subway_no_service <-
   st_union() %>%
   st_erase(subway_service)
 
+geom <- c(subway_service, subway_no_service)
+
 subway_service_areas <-
   tibble(subway_service = c(TRUE, FALSE), 
-         geom=c(subway_service, subway_no_service)) %>%
+         geometry = geom) %>% 
   st_as_sf()
 
-rm(subway_service, subway_no_service)
+rm(subway_service, subway_no_service, geom)
+
+
+
