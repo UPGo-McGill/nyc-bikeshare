@@ -17,7 +17,7 @@ st_erase <- function(x, y) st_difference(x, st_union(st_combine(y)))
 st_intersect_summarize <- function(x, y, population, sum_vars, mean_vars) {
   
   population <- enquo(population)
-  population_int <- paste0(quo_name(population),"_int")
+  #population_int <- paste0(quo_name(population),"_int")
   
   intersects <- suppressWarnings(st_intersection(x, y))
   cols <- length(intersects)
@@ -25,35 +25,37 @@ st_intersect_summarize <- function(x, y, population, sum_vars, mean_vars) {
   intersects <- 
     intersects %>% 
     mutate(
-      !! population_int := !! population * st_area(.data$geometry) /
-        .data$CT_area
+      population_int = !! population * st_area(.data$geometry) / .data$CT_area
     ) %>%
-    mutate_at(sum_vars, list(`int` =  ~{
+    mutate_at(sum_vars, list(`int` = ~{
           . * st_area(.data$geometry) / .data$CT_area
-          }))
+          })) %>% 
+    mutate_at(mean_vars, list(`int` = ~{
+      . * population_int
+      }))
 
-  sums <- intersects %>% 
-    summarize_at(c((cols):(cols + length(sum_vars) - 1)), sum, na.rm = TRUE)
+  population <- intersects %>% 
+    summarize(!! population := sum(!! population, na.rm = TRUE))
   
-  population_int <- enquo(population_int)
+  sums <- intersects %>% 
+    summarize_at((cols + 2):(cols + 1 + length(sum_vars)), sum, na.rm = TRUE)
   
   means <- intersects %>% 
-    #summarize(sum = sum(!! population))
-    summarize_at(mean_vars, list(~{
-     sum(., na.rm = TRUE)
-      #sum((. * (!! population_int) / (!! population)), na.rm = TRUE)
-    }))
+    summarize_at(
+      (cols + 2 + length(sum_vars)):
+        (cols + 1 + length(sum_vars) + length(mean_vars)),
+      list(~{sum(., na.rm = TRUE) / sum(!! population, na.rm = TRUE)}))
   
-  st_join(sums, means)
+  reduce(list(population, sums, means), st_join)
 }
 
 
 st_intersect_summarize(
   CTs,
   buffer_union,
-  pop_total,
-  vars(pop_white, immigrant, education),
-  vars(med_income)
+  population = pop_total,
+  sum_vars = vars(pop_white, immigrant, education),
+  mean_vars = vars(med_income)
   )
 
 
