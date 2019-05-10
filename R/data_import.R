@@ -12,12 +12,8 @@ station_list <-
   as_tibble() %>%
   st_as_sf() %>% 
   select(-WKT) %>% 
-  st_set_crs(26918)
-
-station_list <- 
-  station_list %>% 
-  mutate(ID = as.numeric(ID),
-         Year = as.numeric(Year))
+  st_set_crs(26918) %>% 
+  mutate(ID = as.numeric(ID), Year = as.numeric(Year))
 
 
 ## Import subway data
@@ -78,12 +74,10 @@ CTs <-
   select(-pop_hisp_white)
 
 
-## Clip data to water and add CT_area
+## Clip data to water
 
-CTs <-
-  suppressWarnings(
-    st_erase(CTs, ny_water) %>%
-      mutate(CT_area = st_area(.)))
+CTs <- st_erase(CTs, ny_water)
+    
 
 ## Get counties and city
 
@@ -131,7 +125,7 @@ no_service_2013 <-
   st_union %>%
   st_erase(service_2013)
 
-service_areas <-
+bike_service_areas <-
   tibble(year = c(2013, 2013, 2018, 2018),
          bike_service = c(TRUE, FALSE, TRUE, FALSE), 
          geometry = c(service_2013, no_service_2013, service_2018, no_service_2018)) %>%
@@ -161,6 +155,3 @@ subway_service_areas <-
   st_as_sf()
 
 rm(subway_service, subway_no_service, geom)
-
-
-
