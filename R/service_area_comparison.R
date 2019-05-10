@@ -83,11 +83,10 @@ expansion_subway_service_areas <-
 
 expansion_bike_service_areas <- 
   suppressWarnings(bike_service_areas[3,] %>% 
-                     st_buffer(1600) %>% 
+                     st_buffer(2000) %>% 
                      st_union() %>% 
                      st_erase(bike_service_areas[3,]) %>% 
                      st_erase(ny_water)) # includes some water in the Hudson not removed as part of ny_water 
-
 
 
 
