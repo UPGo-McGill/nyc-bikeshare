@@ -19,7 +19,7 @@ station_list <-
 ## Import subway data
 
 subway <-
-  st_read("data", "nyc_subway") %>%
+  st_read("data", "stops_nyc_subway_nov2018") %>%  
   st_transform(26918) %>% 
   as_tibble() %>% 
   st_as_sf()
