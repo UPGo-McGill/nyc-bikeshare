@@ -95,18 +95,21 @@ tm_shape(CTs) +
               breaks = c(0, 40000, 80000, 120000, 160000, 200000, 260000)) +
   tm_shape(servicearea_2018) +
   tm_borders(col = "black", lwd = 2) + 
-  tm_layout(main.title = "Median Household Income and Citibike Service Area", 
-            inner.margins = .05, 
+  tm_layout(inner.margins = .05, 
             frame = F,
             legend.outside = F,
-            legend.text.size = .9,
+            main.title = "Median Household Income and Citibike Service Area", 
+            main.title.size = 1.5,
             legend.title.size = 1.2,
+            legend.text.size = .8,
             legend.format = list(fun = function(x) paste0("$", formatC(x, digits = 0, format = "f"))),
-            legend.position = c(0.1, 0.6)) +
+            legend.position = c(0, 0.7)) +
   tm_compass(position = c(.9, .05)) +
-  tm_credits("Average inside service area:\nAverage outside service area:",
-             size = .8,
-             position = c(0.007,.94))
+  tm_credits("Average inside service area: $90000\nAverage outside service area: $55000",
+             size = 1,
+             position = c(0,.94))
+
+?formatC
 
 
 tm_shape(CTs) +
