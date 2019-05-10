@@ -53,16 +53,13 @@ transit_access2018 <-
 
 transit_access2018 <- st_intersect_summarize(
   CTs,
-  transitaccess2018,
+  transit_access2018,
   group_vars = vars(subway_service, bike_service),
   population = pop_total,
   sum_vars = vars(pop_white, immigrant, education),
   mean_vars = vars(med_income)
 )
 
-transit_access2018 <- 
-  transitaccess2018 %>% 
-  filter((subway_service ==TRUE & bike_service == TRUE) | (subway_service == FALSE & bike_service == FALSE))
 
 # Identify possible locations for future Citibike expansion
 
