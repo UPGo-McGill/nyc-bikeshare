@@ -27,7 +27,7 @@ st_intersect_summarize <- function(data, poly, group_vars, population, sum_vars,
   intersects <- suppressWarnings(st_intersection(data, poly)) %>%
     mutate(int_area_pct = st_area(.data$geometry) / .data$CT_area,
            population_int = !! pop * int_area_pct) %>%
-    group_by(!!! ID_vars)
+    group_by(!!! group_vars)
   
   population <- intersects %>% 
     summarize(!! pop := sum(population_int, na.rm = TRUE))
