@@ -12,12 +12,8 @@ station_list <-
   as_tibble() %>%
   st_as_sf() %>% 
   select(-WKT) %>% 
-  st_set_crs(26918)
-
-station_list <- 
-  station_list %>% 
-  mutate(ID = as.numeric(ID),
-         Year = as.numeric(Year))
+  st_set_crs(26918) %>% 
+  mutate(ID = as.numeric(ID), Year = as.numeric(Year))
 
 
 ## Import subway data
@@ -92,32 +88,53 @@ service_2018 <-
   suppressWarnings(station_list %>%
                      filter(Year == 2018) %>%
                      st_buffer(300) %>%
-                     st_union())
+                     st_union() %>%
+                     st_erase(ny_water) )
 
 no_service_2018 <- 
   CTs %>%
   st_union %>%
   st_erase(service_2018)
 
-service_areas_2018 <-
-  tibble(service = c("service", "no_service"), 
-         geom=c(service_2018, no_service_2018)) %>%
-  st_as_sf()
-
 service_2013 <- 
   suppressWarnings(station_list %>%
                      filter(Year == 2013) %>%
                      st_buffer(300) %>%
-                     st_union())
+                     st_union() %>%
+                     st_erase(ny_water) )
 
 no_service_2013 <- 
   CTs %>%
   st_union %>%
   st_erase(service_2013)
 
-service_areas_2013 <-
-  tibble(service = c("service", "no_service"), 
-         geom=c(service_2013, no_service_2013)) %>%
+bike_service_areas <-
+  tibble(year = c(2013, 2013, 2018, 2018),
+         bike_service = c(TRUE, FALSE, TRUE, FALSE), 
+         geometry = c(service_2013, no_service_2013, service_2018, no_service_2018)) %>%
   st_as_sf()
 
 rm(service_2018, no_service_2018, service_2013, no_service_2013)
+
+
+## Create subway service and subway no-service areaa
+
+subway_service <- 
+  suppressWarnings(subway %>%
+                     st_buffer(800) %>%
+                     st_union() %>%
+                     st_erase(ny_water)) 
+
+subway_no_service <- 
+  CTs %>%
+  st_union() %>%
+  st_erase(subway_service)
+
+geom <- c(subway_service, subway_no_service)
+
+subway_service_areas <-
+  tibble(subway_service = c(TRUE, FALSE), 
+         geometry = geom) %>% 
+  st_as_sf()
+
+rm(subway_service, subway_no_service, geom)
