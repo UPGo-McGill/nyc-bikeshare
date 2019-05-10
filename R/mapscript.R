@@ -115,7 +115,7 @@ bivariate_2018$service <- c("Both", "Bike", "Subway", "Neither")
 
 tm_shape(bivariate_2018) +
   tm_polygons("service",
-              palette = c("#a6f72e", "#71aa3b", "#E6E6E6", "#f4fc88"),
+              palette = c("#a6f72e", "#71aa3b", "#E6E6E6", "#fffaa3"),
               title = "",
               border.alpha = 0) +
   tm_layout(title = "Bike and Subway Service, 2018",
