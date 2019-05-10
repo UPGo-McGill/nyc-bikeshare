@@ -42,3 +42,29 @@ bike_comparison2018 <- st_intersect_summarize(
   sum_vars = vars(pop_white, immigrant, education),
   mean_vars = vars(med_income)
 )
+
+# 2. For people who did gain bike access, what are those variables (is that a privileged/not privileged group of people?)
+
+# compare bikeshare access and subway access together as people who got some sort of access and compare that with people who don’t have access
+
+transitaccess2018 <- 
+  bike_service_added <-
+  st_intersection(
+    filter(bike_service_areas, year == 2018),
+    subway_service_areas)
+
+transitaccess2018 <- st_intersect_summarize(
+  CTs,
+  transitaccess2018,
+  group_vars = vars(subway_service, bike_service),
+  population = pop_total,
+  sum_vars = vars(pop_white, immigrant, education),
+  mean_vars = vars(med_income)
+)
+
+notransitaccess 
+
+
+
+
+
