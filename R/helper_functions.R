@@ -5,6 +5,7 @@ library(tidyverse)
 library(sf)
 library(units)
 library(tigris)
+library(tmap)
 
 
 ## st_erase helper function
@@ -14,42 +15,30 @@ st_erase <- function(x, y) st_difference(x, st_union(st_combine(y)))
 
 ## st_intersect_summarize helper function
 
-st_intersect_summarize <- function(data, poly, population, sum_vars,
+st_intersect_summarize <- function(data, poly, ID_vars, population, sum_vars,
                                    mean_vars) {
   
   population <- enquo(population)
-
-  intersects <- suppressWarnings(st_intersection(data, poly))
-  cols <- length(intersects)
   
-  intersects <- 
-    intersects %>% 
-    mutate(
-      population_int = !! population * st_area(.data$geometry) / .data$CT_area
-    ) %>%
-    mutate_at(sum_vars, list(`int` = ~{
-          . * st_area(.data$geometry) / .data$CT_area
-          })) %>% 
-    mutate_at(mean_vars, list(`int` = ~{
-      . * population_int
-      }))
-
+  data <- data %>% 
+    mutate(CT_area = st_area(.))
+  
+  intersects <- suppressWarnings(st_intersection(data, poly)) %>%
+    mutate(int_area_pct = st_area(.data$geometry) / .data$CT_area,
+           population_int = !! population * int_area_pct) %>%
+    group_by(!!! ID_vars)
+  
   population <- intersects %>% 
-    summarize(!! population := sum(!! population, na.rm = TRUE))
+    summarize(!! population := sum(population_int, na.rm = TRUE))
   
   sums <- intersects %>%
-    st_drop_geometry() %>%
-    summarize_at((cols + 1):(cols + length(sum_vars)), sum, na.rm = TRUE)
+    summarize_at(sum_vars, ~{sum(. * int_area_pct, na.rm = TRUE)})
   
   means <- intersects %>% 
-    st_drop_geometry() %>%
-    summarize_at(
-      (cols + 1 + length(sum_vars)):
-        (cols + length(sum_vars) + length(mean_vars)),
-      ~{sum(., na.rm = TRUE) / pull(population, 1)})
+    summarize_at(mean_vars, ~{
+      sum(. * population_int, na.rm = TRUE) / sum(population_int, na.rm = TRUE)
+    })
   
-  sums <- st_as_sf(sums, geometry = population$geometry)
-  means <- st_as_sf(means, geometry = population$geometry)
-  
-  reduce(list(population, sums, means), st_join)
+  reduce(list(population, st_drop_geometry(sums), st_drop_geometry(means)),
+         full_join)
 }

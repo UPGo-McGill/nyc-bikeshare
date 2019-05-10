@@ -74,13 +74,10 @@ CTs <-
   select(-pop_hisp_white)
 
 
-## Clip data to water and add CT_area
+## Clip data to water
 
-CTs <-
-  suppressWarnings(
-    st_erase(CTs, ny_water) %>%
-      mutate(CT_area = st_area(.)))
-
+CTs <- st_erase(CTs, ny_water)
+    
 
 ## Create service and no-service areas for 2018 and 2013
 
@@ -109,7 +106,8 @@ no_service_2013 <-
   st_erase(service_2013)
 
 bike_service_areas <-
-  tibble(year = c(2013, 2013, 2018, 2018),
+  tibble(ID = 1:4,
+         year = c(2013, 2013, 2018, 2018),
          bike_service = c(TRUE, FALSE, TRUE, FALSE), 
          geometry = c(service_2013, no_service_2013, service_2018, no_service_2018)) %>%
   st_as_sf()
@@ -133,7 +131,8 @@ subway_no_service <-
 geom <- c(subway_service, subway_no_service)
 
 subway_service_areas <-
-  tibble(subway_service = c(TRUE, FALSE), 
+  tibble(ID = 1:2,
+         subway_service = c(TRUE, FALSE), 
          geometry = geom) %>% 
   st_as_sf()
 
