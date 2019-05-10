@@ -10,7 +10,7 @@ source("R/helper_functions.R")
 bike_service_comparison <- st_intersect_summarize(
   CTs,
   bike_service_areas,
-  ID_vars = vars(year, bike_service),
+  group_vars = vars(year, bike_service),
   population = pop_total,
   sum_vars = vars(pop_white, immigrant, education),
   mean_vars = vars(med_income)
@@ -19,7 +19,25 @@ bike_service_comparison <- st_intersect_summarize(
 subway_service_comparison <- st_intersect_summarize(
   CTs,
   subway_service_areas,
-  ID_vars = vars(subway_service),
+  group_vars = vars(subway_service),
+  population = pop_total,
+  sum_vars = vars(pop_white, immigrant, education),
+  mean_vars = vars(med_income)
+)
+
+
+## Compare areas with/without transit which got bike sharing
+
+bike_service_added <-
+  st_intersection(
+    filter(bike_service_areas, year == 2018),
+    subway_service_areas) %>% 
+  filter(bike_service == TRUE)
+
+bike_comparison2018 <- st_intersect_summarize(
+  CTs,
+  bike_service_added,
+  group_vars = vars(subway_service),
   population = pop_total,
   sum_vars = vars(pop_white, immigrant, education),
   mean_vars = vars(med_income)
