@@ -64,6 +64,9 @@ transit_access2018 <-
   transitaccess2018 %>% 
   filter((subway_service ==TRUE & bike_service == TRUE) | (subway_service == FALSE & bike_service == FALSE))
 
+# Identify possible locations for future Citibike expansion
+
+
 
 
 
