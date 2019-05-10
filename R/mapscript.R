@@ -108,3 +108,22 @@ tm_shape(CTs) +
 
 #bivariateservicemap
 
+service_areas <- st_intersection(subway_service_areas,bike_service_areas)
+bivariate_2018 <- service_areas %>% filter(year == 2018)
+bivariate_2018$service <- c("Both", "Bike", "Subway", "Neither")
+
+
+tm_shape(bivariate_2018) +
+  tm_polygons("service",
+              palette = c("#a6f72e", "#71aa3b", "#E6E6E6", "#f4fc88"),
+              title = "",
+              border.alpha = 0) +
+  tm_layout(title = "Bike and Subway Service, 2018",
+            frame = F,
+            legend.position = c(0.2,.5),
+            legend.text.size = 1) +
+  tm_compass(position = c(.9, .05))
+
+
+
+
