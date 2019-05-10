@@ -6,6 +6,7 @@ library(sf)
 library(units)
 library(tigris)
 library(tmap)
+options(tigris_use_cache = TRUE)
 
 
 ## st_erase helper function
