@@ -66,9 +66,27 @@ transit_access2018 <-
 
 # Identify possible locations for future Citibike expansion
 
+# take subway service area, add buffers for potential expansion, and subtract 800m buffers
 
+subway <-
+  st_read("data", "nyc_subway") %>%
+  st_transform(26918) %>% 
+  as_tibble() %>% 
+  st_as_sf()
 
+expansion_subway_service_areas <- 
+  suppressWarnings(subway %>%
+            st_buffer(2000) %>%
+            st_union() %>% 
+            st_erase(subway_service) %>% 
+            st_erase(ny_water))
 
+expansion_bike_service_areas <- 
+  suppressWarnings(bike_service_areas[3,] %>% 
+                     st_buffer(1600) %>% 
+                     st_union()) %>% 
+                     st_erase(bike_service_areas[3,]) %>% 
+                     st_erase(ny_water))
 
 
 
