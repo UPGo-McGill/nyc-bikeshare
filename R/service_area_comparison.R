@@ -42,3 +42,52 @@ bike_comparison2018 <- st_intersect_summarize(
   sum_vars = vars(pop_white, immigrant, education),
   mean_vars = vars(med_income)
 )
+
+# 2. Compare bikeshare access and subway access together vs people with no access to either
+
+transit_access2018 <- 
+  bike_service_added <-
+  st_intersection(
+    filter(bike_service_areas, year == 2018),
+    subway_service_areas)
+
+transit_access2018 <- st_intersect_summarize(
+  CTs,
+  transitaccess2018,
+  group_vars = vars(subway_service, bike_service),
+  population = pop_total,
+  sum_vars = vars(pop_white, immigrant, education),
+  mean_vars = vars(med_income)
+)
+
+transit_access2018 <- 
+  transitaccess2018 %>% 
+  filter((subway_service ==TRUE & bike_service == TRUE) | (subway_service == FALSE & bike_service == FALSE))
+
+# Identify possible locations for future Citibike expansion
+
+# take subway service area, add buffers for potential expansion, and subtract 800m buffers
+
+subway <-
+  st_read("data", "nyc_subway") %>%
+  st_transform(26918) %>% 
+  as_tibble() %>% 
+  st_as_sf()
+
+expansion_subway_service_areas <- 
+  suppressWarnings(subway %>%
+            st_buffer(2000) %>%
+            st_union() %>% 
+            st_erase(subway_service) %>% 
+            st_erase(ny_water))
+
+expansion_bike_service_areas <- 
+  suppressWarnings(bike_service_areas[3,] %>% 
+                     st_buffer(1600) %>% 
+                     st_union() %>% 
+                     st_erase(bike_service_areas[3,]) %>% 
+                     st_erase(ny_water)) # includes some water in the Hudson not removed as part of ny_water 
+
+
+
+
