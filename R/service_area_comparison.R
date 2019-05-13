@@ -62,25 +62,36 @@ transit_access2018 <- st_intersect_summarize(
 
 # take subway service area, add buffers for potential expansion, and subtract 800m buffers
 
-subway <-
+subway_stops<-
   st_read("data", "stops_nyc_subway_nov2018") %>%
   st_transform(26918) %>% 
   as_tibble() %>% 
   st_as_sf()
 
 expansion_subway_service_areas <- 
-  suppressWarnings(subway %>%
+  suppressWarnings(subway_stops %>%
             st_buffer(2000) %>%
             st_union() %>% 
-            st_erase(subway_service_areas[1,]) %>% 
-            st_erase(ny_water))
+            st_erase(subway_service_areas[1,])) 
+          
 
 expansion_bike_service_areas <- 
   suppressWarnings(bike_service_areas[3,] %>% 
                      st_buffer(2000) %>% 
                      st_union() %>% 
-                     st_erase(bike_service_areas[3,]) %>% 
-                     st_erase(ny_water)) # includes some water in the Hudson not removed as part of ny_water 
+                     st_erase(bike_service_areas[3,]))
 
 
+#create 2000m subway buffers with demographic information for each subway stop
+subway_buffers <- subway_stops %>%
+  st_buffer(2000)
 
+subway_buffer_comparison <- st_intersect_summarize(
+  CTs,
+  subway_buffers,
+  group_vars = vars(stop_name),
+  population = pop_total,
+  sum_vars = vars(pop_white, immigrant, education),
+  mean_vars = vars(med_income) )
+
+rm(subway_buffers, subway_stops)
