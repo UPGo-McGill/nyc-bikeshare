@@ -71,8 +71,8 @@ CTs <-
   select(-MOE, -pop_total_MOE) %>% 
   spread(key = Variable, value = Estimate) %>% 
   mutate(pop_white = pop_white - pop_hisp_white) %>% 
-  select(-pop_hisp_white)
-
+  select(-pop_hisp_white)  %>%
+  mutate(pop_density = pop_total/st_area(.))
 
 ## Clip data to water
 
@@ -160,5 +160,5 @@ subway_service_areas <-
          geometry = geom) %>% 
   st_as_sf()
 
-rm(subway_service, subway_no_service, geom)
+rm(subway_service, subway_no_service, geom, ny_water)
 
