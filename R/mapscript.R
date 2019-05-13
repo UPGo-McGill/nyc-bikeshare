@@ -108,6 +108,7 @@ tm_shape(CTs) +
 
 #bivariateservicemap
 
+{
 service_areas <- st_intersection(subway_service_areas,bike_service_areas)
 bivariate_2018 <- service_areas %>% filter(year == 2018)
 bivariate_2018$service <- c("Both", "Bike", "Subway", "Neither")
@@ -123,6 +124,90 @@ tm_shape(bivariate_2018) +
             legend.position = c(0.2,.5),
             legend.text.size = 1) +
   tm_compass(position = c(.9, .05))
+
+}
+
+######carownership
+
+#data import - TO BE MOVED
+
+
+CTs_vehicles <- get_acs(
+  geography = "tract", 
+  variables = c(household_total = "B08201_001", 
+                household_novehicle = "B08201_002",
+                household_vehicle = c("B08201_003","B08201_004","B08201_005","B08201_006"),
+                male_total = "B08014_008",
+                male_novehicle = "B08014_009",
+                male_vehicle = c("B08014_010","B08014_011","B08014_012","B08014_013", "B08014_014"),
+                female_total = "B08014_015",
+                female_novehicle = "B08014_016",
+                female_vehicle = c("B08014_017","B08014_018","B08014_019","B08014_020", "B08014_021")),
+  year = 2017, 
+  state = "36",
+  county = c("New York County",
+             "Kings County",
+             "Queens County",
+             "Bronx County",
+             "Richmond County"),
+  summary_var = "B01003_001",
+  geometry = TRUE) %>% 
+  as_tibble() %>%
+  st_as_sf() %>% 
+  st_transform(26918)
+
+
+CTs_vehicles <- st_erase(CTs_vehicles, ny_water)
+
+names(CTs_vehicles) <- c("GEOID", "NAME", "Variable", "Estimate", "MOE", "pop_total",
+                "pop_total_MOE", "geometry")
+
+
+CTs_vehicles <-
+  CTs_vehicles %>%
+  select(-MOE, -pop_total_MOE) %>% 
+  spread(key = Variable, value = Estimate)
+
+
+CTs_vehicles$female_vehicle <- ((CTs_vehicles$female_vehicle1 + CTs_vehicles$female_vehicle2 + CTs_vehicles$female_vehicle3 + CTs_vehicles$female_vehicle4 + CTs_vehicles$female_vehicle5) / CTs_vehicles$female_total) * 100
+CTs_vehicles$female_novehicle <- (CTs_vehicles$female_novehicle/CTs_vehicles$female_total)*100
+CTs_vehicles$male_vehicle <- ((CTs_vehicles$male_vehicle1 + CTs_vehicles$male_vehicle2 + CTs_vehicles$male_vehicle3 + CTs_vehicles$male_vehicle4 + CTs_vehicles$male_vehicle5) / CTs_vehicles$male_total) * 100
+CTs_vehicles$male_novehicle <- (CTs_vehicles$male_novehicle/CTs_vehicles$male_total)*100
+CTs_vehicles$household_vehicle <- ((CTs_vehicles$household_vehicle1 + CTs_vehicles$household_vehicle2 + CTs_vehicles$household_vehicle3 + CTs_vehicles$household_vehicle4) / CTs_vehicles$household_total) * 100
+CTs_vehicles$household_novehicle <- (CTs_vehicles$household_novehicle/CTs_vehicles$household_total)*100
+CTs_vehicles$maleminusfemale <- CTs_vehicles$male_vehicle - CTs_vehicles$female_vehicle
+
+CTs_vehicles <- select(CTs_vehicles, -female_vehicle1, -female_vehicle2, -female_vehicle3, -female_vehicle4, -female_vehicle5, 
+                       -male_vehicle1, -male_vehicle2, -male_vehicle3, -male_vehicle4, -male_vehicle5,
+                       -household_vehicle1, -household_vehicle2, -household_vehicle3, -household_vehicle4)
+
+
+tm_shape(CTs_vehicles) +
+  tm_polygons("household_vehicle",
+              border.alpha = 0,
+              title = "Households with Vehicle Access (%)") + 
+  tm_shape(servicearea_2018) +
+  tm_borders(col = "black", lwd = 2) +
+  tm_layout(frame = F)
+
+tm_shape(CTs_vehicles) +
+  tm_polygons("maleminusfemale",
+              border.alpha = 0,
+              breaks = c(-60, -30, -25, -20, -15, -10, -5, 0, 0, 5, 10, 15, 20, 25, 30, 60),
+              title = "Difference between Male and Female Car Ownership (%)", 
+              palette = "RdYlBu") + 
+  tm_shape(servicearea_2018) +
+  tm_borders(col = "black", lwd = 2) + 
+  tm_credits("Rates calculated by subtracting female ownership rates from male ownership rates", 
+             position = c(0.007, 0.98)) +
+  tm_layout(frame = F,
+            main.title = "Vehicle Access Gender Gap",
+            legend.position = c(0.007, 0.6))
+
+
+
+tmaptools::palette_explorer()
+
 
 # Expansion areas for bike service area, med_income
 
