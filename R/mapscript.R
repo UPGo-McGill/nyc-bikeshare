@@ -124,6 +124,89 @@ tm_shape(bivariate_2018) +
             legend.text.size = 1) +
   tm_compass(position = c(.9, .05))
 
+# Expansion areas for bike service area, med_income
 
+tm_shape(CTs) +
+  tm_polygons("med_income", 
+              text = "No Data", 
+              title = " Median Household Income", 
+              border.alpha = 0,
+              palette = "Oranges",
+              breaks = c(0, 40000, 80000, 120000, 160000, 200000, 260000)) +
+  tm_shape(expansion_bike_service_areas) +
+  tm_fill(col = "black", alpha = 0.2) + 
+  tm_layout(inner.margins = .05, 
+            frame = F,
+            legend.outside = F,
+            main.title = "Expansion Area from CitiBike Service Area", 
+            main.title.size = 1.5,
+            legend.title.size = 1.2,
+            legend.text.size = .8,
+            legend.format = list(fun = function(x) paste0("$", formatC(x, digits = 0, format = "f"))),
+            legend.position = c(0.003, 0.7)) +
+  tm_compass(position = c(.9, .05))
 
+# race
+
+tm_shape(CTs) +
+  tm_polygons ("white_percent", 
+               textNA = "No Data", 
+               title = "White Population", 
+               border.alpha = 0,
+               palette = "Oranges") +
+  tm_shape(expansion_bike_service_areas) +
+  tm_fill(col = "black", alpha = 0.2) + 
+  tm_layout(main.title = "Expansion Area from Subway Service Area",
+            inner.margins = 0.05, 
+            frame = F,
+            legend.outside = F,
+            legend.text.size = .9,
+            legend.title.size = 1.3,
+            legend.format = list(fun = function(x) paste0(formatC(x, digits = 0, format = "f"), "%")),
+            legend.position = c(0.003, 0.7)) +
+  tm_compass(position = c(.9, .05))
+
+# Expansion areas for subway service areas, med_income and race
+
+# med_income
+
+tm_shape(CTs) +
+  tm_polygons("med_income", 
+              text = "No Data", 
+              title = " Median Household Income", 
+              border.alpha = 0,
+              palette = "Oranges",
+              breaks = c(0, 40000, 80000, 120000, 160000, 200000, 260000)) +
+  tm_shape(expansion_subway_service_areas) +
+  tm_fill(col = "black", alpha = 0.2) + 
+  tm_layout(inner.margins = .05, 
+            frame = F,
+            legend.outside = F,
+            main.title = "Expansion Area from Subway Service Area", 
+            main.title.size = 1.5,
+            legend.title.size = 1.2,
+            legend.text.size = .8,
+            legend.format = list(fun = function(x) paste0("$", formatC(x, digits = 0, format = "f"))),
+            legend.position = c(0.003, 0.7)) +
+  tm_compass(position = c(.9, .05))
+
+# race
+
+tm_shape(CTs) +
+  tm_polygons ("white_percent", 
+               textNA = "No Data", 
+               title = "White Population", 
+               border.alpha = 0,
+               palette = "Oranges") +
+  tm_shape(expansion_subway_service_areas) +
+  tm_fill(col = "black", alpha = 0.2) + 
+  tm_layout(main.title = "Expansion Area from Subway Service Area",
+            inner.margins = 0.05, 
+            frame = F,
+            legend.outside = F,
+            legend.text.size = .9,
+            legend.title.size = 1.3,
+            legend.format = list(fun = function(x) paste0(formatC(x, digits = 0, format = "f"), "%")),
+            legend.position = c(0.003, 0.7)) +
+  tm_compass(position = c(.9, .05))
 
