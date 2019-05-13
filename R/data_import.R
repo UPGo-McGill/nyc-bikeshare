@@ -125,11 +125,17 @@ no_service_2013 <-
   st_union %>%
   st_erase(service_2013)
 
+
+
 bike_service_areas <-
   tibble(year = c(2013, 2013, 2018, 2018),
          bike_service = c(TRUE, FALSE, TRUE, FALSE), 
          geometry = c(service_2013, no_service_2013, service_2018, no_service_2018)) %>%
   st_as_sf()
+
+bike_expansion_2013to2018 <- service_2018 %>% 
+    st_erase(service_2013)
+
 
 rm(service_2018, no_service_2018, service_2013, no_service_2013)
 
@@ -155,3 +161,4 @@ subway_service_areas <-
   st_as_sf()
 
 rm(subway_service, subway_no_service, geom)
+
