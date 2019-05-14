@@ -295,3 +295,76 @@ tm_shape(CTs) +
             legend.position = c(0.003, 0.7)) +
   tm_compass(position = c(.9, .05))
 
+
+#population density map
+
+
+tm_shape(CTs) +
+  tm_polygons ("pop_density",
+               
+               title = "Population Density", 
+               border.alpha = 0,
+  ) +
+  tm_shape(expansion_subway_service_areas) +
+  tm_fill(col = "black", alpha = 0.1) + 
+  tm_shape(expansion_bike_service_areas) +
+  tm_fill(col = "black", alpha = 0.1) + 
+  tm_layout(main.title = "Population Density",
+            inner.margins = 0.05, 
+            frame = F,
+            legend.outside = F,
+            legend.text.size = .9,
+            legend.title.size = 1.3,
+            legend.position = c(0.003, 0.7)) +
+  tm_compass(position = c(.9, .05))
+
+
+#subway buffer demographics maps
+
+library(smoothr)
+bike_service_filled<- fill_holes(bike_service_areas$geometry[3], 10000000)
+
+
+tm_shape(city) + tm_fill(col = "grey") +
+  tm_shape(subway_buffer_comparison) +
+  tm_polygons("med_income", 
+              text = "No Data", 
+              title = " Median Household Income", 
+              border.alpha = 0,
+              palette = "-Oranges",
+              alpha = .5,
+              breaks = c(20000, 40000, 60000, 80000, 100000, 120000, 140000)) +
+  tm_shape(bike_service_filled) +
+  tm_borders(col = "black", lwd = 3, alpha = 0.5) + 
+  tm_layout(inner.margins = .05, 
+            frame = F,
+            legend.outside = F,
+            main.title = "Vulnerability by Subway Stop", 
+            main.title.size = 1.5,
+            legend.title.size = 1.2,
+            legend.text.size = .8,
+            legend.format = list(fun = function(x) paste0("$", formatC(x, digits = 0, format = "f"))),
+            legend.position = c(0.003, 0.7)) +
+  tm_compass(position = c(.9, .05))
+
+
+tm_shape(city) + tm_fill(col = "grey") +
+  tm_shape(subway_buffer_comparison) +
+  tm_polygons ("pop_white", 
+               textNA = "No Data", 
+               title = "White Population", 
+               border.alpha = 0,
+               alpha = .5,
+               palette = "-Oranges") +
+  tm_shape(bike_service_areas[3,]) +
+  tm_borders(col = "black", lwd = 2) + 
+  tm_layout(main.title = "Race and Citibike Service Area",
+            inner.margins = 0.05, 
+            frame = F,
+            legend.outside = F,
+            legend.text.size = .9,
+            legend.title.size = 1.3,
+            legend.format = list(fun = function(x) paste0(formatC(x, format = "f"), "%")),
+            legend.position = c(0.003, 0.7))+
+  tm_compass(position = c(.9, .05))
+
