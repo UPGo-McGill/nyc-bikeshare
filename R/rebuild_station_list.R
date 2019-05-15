@@ -6,31 +6,60 @@ source("R/helper_functions.R")
 
 
 ## Import CSVs
+temp <- tempfile(fileext = ".zip")
 
-rider_201306 <- 
-  read_csv("data/201306-citibike-tripdata.csv")
-rider_201312 <- 
-  read_csv("data/2013-12 - Citi Bike trip data.csv")
-rider_201406 <- 
-  read_csv("data/2014-06 - Citi Bike trip data.csv")
-rider_201412 <- 
-  read_csv("data/201412-citibike-tripdata.csv")
-rider_201506 <- 
-  read_csv("data/201506-citibike-tripdata.csv")
-rider_201512 <- 
-  read_csv("data/201512-citibike-tripdata.csv")
-rider_201606 <- 
-  read_csv("data/201606-citibike-tripdata.csv")
-rider_201612 <- 
-  read_csv("data/201612-citibike-tripdata.csv")
-rider_201706 <- 
-  read_csv("data/201706-citibike-tripdata.csv")
-rider_201712 <- 
-  read_csv("data/201712-citibike-tripdata.csv")
-rider_201806 <- 
-  read_csv("data/201806-citibike-tripdata.csv")
-rider_201812 <- 
-  read_csv("data/201812-citibike-tripdata.csv")
+download.file(
+  "https://s3.amazonaws.com/tripdata/201306-citibike-tripdata.zip", temp)
+rider_201306 <- read_csv(temp)
+
+download.file(
+  "https://s3.amazonaws.com/tripdata/201312-citibike-tripdata.zip", temp)
+rider_201312 <- read_csv(temp)
+
+download.file(
+  "https://s3.amazonaws.com/tripdata/201406-citibike-tripdata.zip", temp)
+rider_201406 <- read_csv(temp)
+
+download.file(
+  "https://s3.amazonaws.com/tripdata/201412-citibike-tripdata.zip", temp)
+rider_201412 <- read_csv(temp)
+
+download.file(
+  "https://s3.amazonaws.com/tripdata/201506-citibike-tripdata.zip", temp)
+rider_201506 <- read_csv(temp)
+
+download.file(
+  "https://s3.amazonaws.com/tripdata/201512-citibike-tripdata.zip", temp)
+rider_201512 <- read_csv(temp)
+
+download.file(
+  "https://s3.amazonaws.com/tripdata/201606-citibike-tripdata.zip", temp)
+rider_201606 <- read_csv(temp)
+
+download.file(
+  "https://s3.amazonaws.com/tripdata/201612-citibike-tripdata.zip", temp)
+
+rider_201612 <- read_csv(temp)
+
+download.file(
+  "https://s3.amazonaws.com/tripdata/201706-citibike-tripdata.zip", temp)
+rider_201706 <- read_csv(temp)
+
+download.file(
+  "https://s3.amazonaws.com/tripdata/201712-citibike-tripdata.zip", temp)
+rider_201712 <- read_csv(temp)
+
+download.file(
+  "https://s3.amazonaws.com/tripdata/201806-citibike-tripdata.zip", temp)
+rider_201806 <- read_csv(temp)
+
+download.file(
+  "https://s3.amazonaws.com/tripdata/201812-citibike-tripdata.zip", temp)
+rider_201812 <- read_csv(temp)
+
+unlink(temp)
+rm(temp)
+
 
 ## station_maker FUNCTION
 
@@ -80,6 +109,10 @@ stations_2016 <- station_maker(rider_201606, rider_201612, 2016)
 stations_2017 <- station_maker(rider_201706, rider_201712, 2017)
 stations_2018 <- station_maker(rider_201806, rider_201812, 2018)
 
+rm(rider_201306, rider_201312, rider_201406, rider_201412, rider_201506,
+   rider_201512, rider_201606, rider_201612, rider_201706, rider_201712,
+   rider_201806, rider_201812)
+
 
 ## Bind all dfs together and transform from lat long to geometry
 
@@ -117,4 +150,5 @@ station_list <- station_list[which(lengths(predicates)!=0),]
 
 ## Write output to disk
 
-st_write(station_list, "station_list.csv", layer_options = "GEOMETRY=AS_WKT")
+st_write(station_list, "data/station_list.csv",
+         layer_options = "GEOMETRY=AS_WKT")
