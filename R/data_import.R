@@ -49,7 +49,8 @@ CTs <- get_acs(
                 pop_hisp_white = "B03002_013",
                 med_income = "B19013_001",
                 immigrant = "B05001_006",
-                education = "B16010_041"), 
+                education = "B16010_041",
+                poverty = "B17001_002"), 
   year = 2017, 
   state = "36",
   county = c("New York County",
@@ -155,3 +156,4 @@ subway_service_areas <-
   st_as_sf()
 
 rm(subway_service, subway_no_service, geom)
+
