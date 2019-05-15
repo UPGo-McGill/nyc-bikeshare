@@ -72,8 +72,8 @@ CTs <-
   select(-MOE, -pop_total_MOE) %>% 
   spread(key = Variable, value = Estimate) %>% 
   mutate(pop_white = pop_white - pop_hisp_white) %>% 
-  select(-pop_hisp_white)
-
+  select(-pop_hisp_white)  %>%
+  mutate(pop_density = pop_total/st_area(.))
 
 ## Clip data to water
 
@@ -126,11 +126,17 @@ no_service_2013 <-
   st_union %>%
   st_erase(service_2013)
 
+
+
 bike_service_areas <-
   tibble(year = c(2013, 2013, 2018, 2018),
          bike_service = c(TRUE, FALSE, TRUE, FALSE), 
          geometry = c(service_2013, no_service_2013, service_2018, no_service_2018)) %>%
   st_as_sf()
+
+bike_expansion_2013to2018 <- service_2018 %>% 
+    st_erase(service_2013)
+
 
 rm(service_2018, no_service_2018, service_2013, no_service_2013)
 
@@ -155,5 +161,9 @@ subway_service_areas <-
          geometry = geom) %>% 
   st_as_sf()
 
+<<<<<<< HEAD
 rm(subway_service, subway_no_service, geom)
+=======
+rm(subway_service, subway_no_service, geom, ny_water)
+>>>>>>> e95a0425b35edc81ef5f98a6ebba469c77445c27
 
