@@ -90,7 +90,7 @@ expansion_subway_service_areas <- expansion_subway_service_areas %>% st_intersec
 
 
 #remove parks from within bike service area          
-library(smoothr)
+
 bike_service_filled<- fill_holes(bike_service_areas$geometry[3], 10000000)
 
 # Take citibike service area, add buffers for potential expansion, and subtract 300m buffers
