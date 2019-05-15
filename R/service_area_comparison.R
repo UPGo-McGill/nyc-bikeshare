@@ -12,9 +12,10 @@ bike_service_comparison <- st_intersect_summarize(
   bike_service_areas,
   group_vars = vars(year, bike_service),
   population = pop_total,
-  sum_vars = vars(pop_white, immigrant, education),
+  sum_vars = vars(pop_white, immigrant, education, poverty),
   mean_vars = vars(med_income)
 )
+
 
 subway_service_comparison <- st_intersect_summarize(
   CTs,
@@ -26,23 +27,27 @@ subway_service_comparison <- st_intersect_summarize(
 )
 
 
+## Compare areas with/without transit which got bike sharing
 
+bike_service_added <-
+  st_intersection(
+    filter(bike_service_areas, year == 2018),
+    subway_service_areas) %>% 
+  filter(bike_service == TRUE)
 
-#compare demographics of original 2013 citibike service area to areas of recent expansion
-
-bike_expansion_2013to2018 <- st_intersect_summarize(
+bike_comparison2018 <- st_intersect_summarize(
   CTs,
-  bike_expansion_2013to2018,
-  group_vars = vars("2013 to 2018"),
+  bike_service_added,
+  group_vars = vars(subway_service),
   population = pop_total,
   sum_vars = vars(pop_white, immigrant, education),
   mean_vars = vars(med_income)
 )
 
-
-## Compare areas with/without transit which got bike sharing
+# 2. Compare bikeshare access and subway access together vs people with no access to either
 
 transit_access2018 <- 
+  bike_service_added <-
   st_intersection(
     filter(bike_service_areas, year == 2018),
     subway_service_areas)
@@ -57,18 +62,29 @@ transit_access2018 <- st_intersect_summarize(
 )
 
 
+# Identify possible locations for future Citibike expansion
 
+# take subway service area, add buffers for potential expansion, and subtract 800m buffers
 
-##### Identify possible locations for future Citibike expansion #########
-
-# Take subway service area, add 2000m buffers for potential expansion, and subtract 800m buffers
+subway <-
+  st_read("data", "stops_nyc_subway_nov2018") %>%
+  st_transform(26918) %>% 
+  as_tibble() %>% 
+  st_as_sf()
 
 expansion_subway_service_areas <- 
   suppressWarnings(subway %>%
-                     st_buffer(2000) %>%
+            st_buffer(2000) %>%
+            st_union() %>% 
+            st_erase(subway_service_areas[1,]) %>% 
+            st_erase(ny_water))
+
+expansion_bike_service_areas <- 
+  suppressWarnings(bike_service_areas[3,] %>% 
+                     st_buffer(2000) %>% 
                      st_union() %>% 
-                     st_erase(subway_service_areas[1,]) %>% 
-                     st_erase(ny_water))
+                     st_erase(bike_service_areas[3,]) %>% 
+                     st_erase(ny_water)) 
 
 expansion_subway_service_areas <- expansion_subway_service_areas %>% st_intersection(city)%>%  st_collection_extract("POLYGON")
 
