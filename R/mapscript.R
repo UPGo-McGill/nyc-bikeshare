@@ -5,31 +5,35 @@
 tm_shape(city) +
   tm_fill(col = "#f0f0f0", 
           title = "Base Map") +
-  tm_shape(service_2018) +
-  tm_fill(col = "#c7e9c0", 
+  tm_shape(growth_2018) +
+  tm_fill(col = "#66c2a5", 
           title = "2018",
           legend.show = TRUE) +
-  tm_shape(service_2017) +
-  tm_fill(col = "#a1d99b", 
+  tm_shape(growth_2017) +
+  tm_fill(col = "#fc8d62", 
           title = "2017") +
-  tm_shape(service_2016) +
-  tm_fill(col = "#74c476", 
+  tm_shape(growth_2016) +
+  tm_fill(col = "#8da0cb", 
           title = "2016") +
-  tm_shape(service_2015) +
-  tm_fill(col = "#41ab5d", 
+  tm_shape(growth_2015) +
+  tm_fill(col = "#e78ac3", 
           title = "2015") +
-  tm_shape(service_2014) +
-  tm_fill(col = "#238b45", 
+  tm_shape(growth_2014) +
+  tm_fill(col = "#a6d854", 
           title = "2014") +
   tm_shape(service_2013) +
-  tm_fill(col = "#005a32", 
+  tm_fill(col = "#ffd92f", 
           title = "2013") +
   tm_layout(frame = F,
             main.title = "Citibike Expansion over Time, 2013-2018",
-            legend.show = T) 
+            legend.text.size = 1) +
+  tm_add_legend(type = "fill",
+                labels = c("2013", "2014", "2015", "2016", "2017", "2018"),
+                col = c("#ffd92f", "#a6d854", "#e78ac3", "#8da0cb", "#fc8d62", "#66c2a5"),
+                )
 
 
-#demographic maps
+v#demographic maps
 
 {
   
@@ -259,7 +263,9 @@ tm_shape(CTs_vehicles) +
 
 }
 
-# Expansion areas for bike service area, med_income
+# Expansion areas for bike service area
+
+#med_income
 
 tm_shape(CTs) +
   tm_polygons("med_income", 

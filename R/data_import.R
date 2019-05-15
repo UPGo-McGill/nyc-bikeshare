@@ -172,6 +172,19 @@ service_2016 <-
                      st_union() %>%
                      st_erase(ny_water) )
 
+service_2017 <- 
+  suppressWarnings(station_list %>%
+                     filter(Year == 2017) %>%
+                     st_buffer(300) %>%
+                     st_union() %>%
+                     st_erase(ny_water) )
+
+growth_2018 <- st_difference(service_2018, service_2017)
+growth_2017 <- st_difference(service_2017, service_2016)
+growth_2016 <- st_difference(service_2016, service_2015)
+growth_2015 <- st_difference(service_2015, service_2014)
+growth_2014 <- st_difference(service_2014, service_2013)
+
 ## Create subway service and subway no-service areaa
 
 subway_service <- 
