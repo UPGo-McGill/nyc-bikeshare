@@ -1,6 +1,5 @@
 ## Load libraries
 
-
 library(smoothr)
 library(tidycensus)
 library(tidyverse)

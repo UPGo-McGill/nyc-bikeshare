@@ -75,14 +75,14 @@ CTs <-
   select(-pop_hisp_white) %>%
   mutate(pop_density = pop_total/st_area(geometry)) 
 
-CTs <- CTs %>% filter(pop_total > 100) %>% na.omit
+CTs <- CTs %>% filter(pop_total > 100) %>% na.omit()
 
 CTs <- CTs %>%
-  mutate(standard_poverty = scale(1 - (poverty/pop_total))) %>%
-  mutate(standard_pop_white = scale(pop_white/pop_total)) %>%
-  mutate(standard_education = scale(education/pop_total)) %>%
-  mutate(standard_med_income = scale(med_income))  %>%
-  mutate(vulnerability_index = (standard_poverty-min(standard_poverty))/(max(standard_poverty)-min(standard_poverty)))
+  mutate(standard_poverty = scale(1 - (poverty/pop_total)),
+         standard_pop_white = scale(pop_white/pop_total),
+         standard_education = scale(education/pop_total),
+         standard_med_income = scale(med_income),
+         vulnerability_index = (standard_poverty-min(standard_poverty))/(max(standard_poverty)-min(standard_poverty)))
 
 
 vulnerability_index = (CTs$standard_poverty-min(CTs$standard_poverty))/(max(CTs$standard_poverty)-min(CTs$standard_poverty))
