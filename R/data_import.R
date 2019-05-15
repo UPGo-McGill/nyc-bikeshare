@@ -72,8 +72,17 @@ CTs <-
   select(-MOE, -pop_total_MOE) %>% 
   spread(key = Variable, value = Estimate) %>% 
   mutate(pop_white = pop_white - pop_hisp_white) %>% 
-  select(-pop_hisp_white)  %>%
-  mutate(pop_density = pop_total/st_area(.))
+  select(-pop_hisp_white) %>%
+  mutate(pop_density = pop_total/st_area(geometry)) 
+
+CTs <- CTs %>% filter(pop_total > 100) %>% na.omit
+
+CTs <- CTs %>%
+  mutate(standard_poverty = scale(poverty/pop_total)) %>%
+  mutate(standard_pop_white = scale(pop_white/pop_total)) %>%
+  mutate(standard_education = scale(education/pop_total)) %>%
+  mutate(standard_med_income = scale(med_income))
+
 
 ## Clip data to water
 

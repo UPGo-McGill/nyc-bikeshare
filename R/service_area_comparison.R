@@ -76,15 +76,13 @@ expansion_subway_service_areas <-
   suppressWarnings(subway %>%
             st_buffer(2000) %>%
             st_union() %>% 
-            st_erase(subway_service_areas[1,]) %>% 
-            st_erase(ny_water))
+            st_erase(subway_service_areas[1,]) )
 
 expansion_bike_service_areas <- 
   suppressWarnings(bike_service_areas[3,] %>% 
                      st_buffer(2000) %>% 
                      st_union() %>% 
-                     st_erase(bike_service_areas[3,]) %>% 
-                     st_erase(ny_water)) 
+                     st_erase(bike_service_areas[3,])) 
 
 expansion_subway_service_areas <- expansion_subway_service_areas %>% st_intersection(city)%>%  st_collection_extract("POLYGON")
 
