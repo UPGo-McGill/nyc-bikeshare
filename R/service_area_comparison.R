@@ -70,6 +70,8 @@ expansion_subway_service_areas <-
                      st_erase(subway_service_areas[1,]) %>% 
                      st_erase(ny_water))
 
+expansion_subway_service_areas <- expansion_subway_service_areas %>% st_intersection(city)%>%  st_collection_extract("POLYGON")
+
 
 #remove parks from within bike service area          
 library(smoothr)
@@ -83,6 +85,7 @@ expansion_bike_service_areas <- station_list %>%
                       st_union() %>%
                       st_erase(bike_service_filled) 
 
+expansion_bike_service_areas <- expansion_bike_service_areas %>% st_intersection(city)%>%  st_collection_extract("POLYGON")
 
 # create 2000m subway buffers with demographic information for each subway stop
 subway_buffers <- subway %>%
