@@ -321,8 +321,6 @@ tm_shape(CTs) +
 
 #subway buffer demographics maps
 
-library(smoothr)
-bike_service_filled<- fill_holes(bike_service_areas$geometry[3], 10000000)
 
 
 tm_shape(city) + tm_fill(col = "grey") +
@@ -346,7 +344,7 @@ tm_shape(city) + tm_fill(col = "grey") +
             legend.format = list(fun = function(x) paste0("$", formatC(x, digits = 0, format = "f"))),
             legend.position = c(0.003, 0.7)) +
   tm_compass(position = c(.9, .05))
-
+  
 
 tm_shape(city) + tm_fill(col = "grey") +
   tm_shape(subway_buffer_comparison) +
