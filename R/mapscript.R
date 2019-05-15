@@ -22,8 +22,8 @@ tm_shape(CTs) +
               border.alpha = 0,
               palette = "Oranges",
               breaks = c(0, 40000, 80000, 120000, 160000, 200000, 260000)) +
-  tm_shape(servicearea_2018) +
-  tm_borders(col = "black", lwd = 2) + 
+  tm_shape(bike_service_filled) +
+  tm_borders(col = "black", lwd = 3, alpha = 0.5) +
   tm_layout(inner.margins = .05, 
             frame = F,
             legend.outside = F,
@@ -45,8 +45,8 @@ tm_shape(CTs) +
                title = "White Population", 
                border.alpha = 0,
                palette = "Oranges") +
-  tm_shape(servicearea_2018) +
-  tm_borders(col = "black", lwd = 2) + 
+  tm_shape(bike_service_filled) +
+  tm_borders(col = "black", lwd = 3, alpha = 0.5) +
   tm_layout(main.title = "Race and Citibike Service Area",
             inner.margins = 0.05, 
             frame = F,
@@ -67,7 +67,7 @@ tm_shape(CTs) +
                title = "Population with Bachelor Degree or more", 
                border.alpha = 0,
                palette = "Oranges") +
-  tm_shape(servicearea_2018) +
+  tm_shape(bike_service_filled) +
   tm_borders(col = "black", lwd = 2) + 
   tm_layout(main.title = "Education and Citibike Service Area", 
             inner.margins = .05, 
@@ -89,7 +89,7 @@ tm_shape(CTs) +
                title = "Non-Citizen Population", 
                border.alpha = 0,
                palette = "-Oranges") +
-  tm_shape(servicearea_2018) +
+  tm_shape(bike_service_filled) +
   tm_borders(col = "black", lwd = 2) +
   tm_layout(main.title = "Non-Citizen Population and Citibike Service Area", 
             inner.margins = .05, 
@@ -281,10 +281,13 @@ tm_shape(CTs) +
   tm_polygons ("white_percent", 
                textNA = "No Data", 
                title = "White Population", 
+               alpha = 1,
                border.alpha = 0,
                palette = "Oranges") +
   tm_shape(expansion_subway_service_areas) +
-  tm_fill(col = "black", alpha = 0.2) + 
+  tm_fill(col = "blue3", alpha = 0.07) + 
+  tm_shape(expansion_subway_service_areas) +
+  tm_borders(col = "blue3", lwd = 2, alpha = .3) +
   tm_layout(main.title = "Expansion Area from Subway Service Area",
             inner.margins = 0.05, 
             frame = F,
@@ -305,9 +308,7 @@ tm_shape(CTs) +
                title = "Population Density", 
                border.alpha = 0,
   ) +
-  tm_shape(expansion_subway_service_areas) +
-  tm_fill(col = "black", alpha = 0.1) + 
-  tm_shape(expansion_bike_service_areas) +
+  tm_shape(subway_service_areas[1,]) +
   tm_fill(col = "black", alpha = 0.1) + 
   tm_layout(main.title = "Population Density",
             inner.margins = 0.05, 
@@ -354,8 +355,8 @@ tm_shape(city) + tm_fill(col = "grey") +
                border.alpha = 0,
                alpha = .5,
                palette = "-Oranges") +
-  tm_shape(bike_service_areas[3,]) +
-  tm_borders(col = "black", lwd = 2) + 
+  tm_shape(bike_service_filled) +
+  tm_borders(col = "black", lwd = 3, alpha = 0.5) +
   tm_layout(main.title = "Race and Citibike Service Area",
             inner.margins = 0.05, 
             frame = F,
