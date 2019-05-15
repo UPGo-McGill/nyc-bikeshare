@@ -12,9 +12,10 @@ bike_service_comparison <- st_intersect_summarize(
   bike_service_areas,
   group_vars = vars(year, bike_service),
   population = pop_total,
-  sum_vars = vars(pop_white, immigrant, education),
+  sum_vars = vars(pop_white, immigrant, education, poverty),
   mean_vars = vars(med_income)
 )
+
 
 subway_service_comparison <- st_intersect_summarize(
   CTs,
