@@ -13,7 +13,8 @@ CTs$education_percent <- (CTs$education/ CTs$pop_total) * 100
 CTs$immigrant_percent <- NA
 CTs$immigrant_percent <- (CTs$immigrant/ CTs$pop_total) * 100
 
-
+CTs$poverty_percent <- NA
+CTs$poverty_percent <- (CTs$poverty/ CTs$pop_total) * 100
 
 tm_shape(CTs) +
   tm_polygons("med_income", 
@@ -37,7 +38,6 @@ tm_shape(CTs) +
   tm_credits("Average inside service area: $90000\nAverage outside service area: $55000",
              size = 1,
              position = c(0.003,.93))
-  
 
 tm_shape(CTs) +
   tm_polygons ("white_percent", 
@@ -60,7 +60,6 @@ tm_shape(CTs) +
              size = 1,
              position = c(0.003,.93))
 
- 
 tm_shape(CTs) +
   tm_polygons ("education_percent", 
                textNA = "No Data", 
@@ -104,17 +103,14 @@ tm_shape(CTs) +
              size = 1,
              position = c(0.003,.93))
 
-}
-
-
-
 tm_shape(CTs) +
-  tm_polygons ("poverty_percent", 
+  tm_polygons("poverty_percent",
                textNA = "No Data", 
                title = "Poverty Level", 
                border.alpha = 0,
-               palette = "-Oranges") +
-  tm_shape(servicearea_2018) +
+               palette = c("#ef6548", "#fdbb84","#fdd49e","#fee8c8"),
+               breaks = c(0,15,30,45,60)) +
+  tm_shape(bike_service_filled) +
   tm_borders(col = "black", lwd = 2) +
   tm_layout(main.title = "Poverty and Citibike Service Area", 
             inner.margins = .05, 
@@ -123,12 +119,13 @@ tm_shape(CTs) +
             legend.text.size = .9,
             legend.title.size = 1.3,
             legend.format = list(fun = function(x) paste0(formatC(x, digits = 0, format = "f"), "%")),
-            legend.position = c(0.003, 0.65)) +
-  tm_compass(position = c(.9, .05)) +
+            legend.position = c(0.007, 0.7)) +
+  tm_compass(position = c(.9, .075)) +
   tm_credits("",
              size = 1,
-             position = c(0.003,.93))
+             position = c(0.007,.93))
 
+}
 
 #bivariateservicemap
 
@@ -149,10 +146,12 @@ tm_shape(bivariate_2018) +
             legend.text.size = 1) +
   tm_compass(position = c(.9, .05))
 
-}
+  }
+
 
 ######carownership
 
+{
 #data import - TO BE MOVED
 
 
@@ -229,9 +228,7 @@ tm_shape(CTs_vehicles) +
             legend.position = c(0.007, 0.6))
 
 
-
-tmaptools::palette_explorer()
-
+}
 
 # Expansion areas for bike service area, med_income
 
