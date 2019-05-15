@@ -140,6 +140,28 @@ bike_expansion_2013to2018 <- service_2018 %>%
 
 rm(service_2018, no_service_2018, service_2013, no_service_2013)
 
+#create service areas for 2014-2016 for service area growth
+
+service_2014 <- 
+  suppressWarnings(station_list %>%
+                     filter(Year == 2014) %>%
+                     st_buffer(300) %>%
+                     st_union() %>%
+                     st_erase(ny_water) )
+
+service_2015 <- 
+  suppressWarnings(station_list %>%
+                     filter(Year == 2015) %>%
+                     st_buffer(300) %>%
+                     st_union() %>%
+                     st_erase(ny_water) )
+
+service_2016 <- 
+  suppressWarnings(station_list %>%
+                     filter(Year == 2016) %>%
+                     st_buffer(300) %>%
+                     st_union() %>%
+                     st_erase(ny_water) )
 
 ## Create subway service and subway no-service areaa
 
