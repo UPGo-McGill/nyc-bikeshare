@@ -106,6 +106,30 @@ tm_shape(CTs) +
 
 }
 
+
+
+tm_shape(CTs) +
+  tm_polygons ("poverty_percent", 
+               textNA = "No Data", 
+               title = "Poverty Level", 
+               border.alpha = 0,
+               palette = "-Oranges") +
+  tm_shape(servicearea_2018) +
+  tm_borders(col = "black", lwd = 2) +
+  tm_layout(main.title = "Poverty and Citibike Service Area", 
+            inner.margins = .05, 
+            frame = F,
+            legend.outside = F,
+            legend.text.size = .9,
+            legend.title.size = 1.3,
+            legend.format = list(fun = function(x) paste0(formatC(x, digits = 0, format = "f"), "%")),
+            legend.position = c(0.003, 0.65)) +
+  tm_compass(position = c(.9, .05)) +
+  tm_credits("",
+             size = 1,
+             position = c(0.003,.93))
+
+
 #bivariateservicemap
 
 {
