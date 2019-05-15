@@ -1,5 +1,34 @@
 ### MAP MAKING #################################################################
 
+#servicearea expansion time-lapse map
+
+tm_shape(city) +
+  tm_fill(col = "#f0f0f0", 
+          title = "Base Map") +
+  tm_shape(service_2018) +
+  tm_fill(col = "#c7e9c0", 
+          title = "2018",
+          legend.show = TRUE) +
+  tm_shape(service_2017) +
+  tm_fill(col = "#a1d99b", 
+          title = "2017") +
+  tm_shape(service_2016) +
+  tm_fill(col = "#74c476", 
+          title = "2016") +
+  tm_shape(service_2015) +
+  tm_fill(col = "#41ab5d", 
+          title = "2015") +
+  tm_shape(service_2014) +
+  tm_fill(col = "#238b45", 
+          title = "2014") +
+  tm_shape(service_2013) +
+  tm_fill(col = "#005a32", 
+          title = "2013") +
+  tm_layout(frame = F,
+            main.title = "Citibike Expansion over Time, 2013-2018",
+            legend.show = T) 
+
+
 #demographic maps
 
 {
@@ -24,7 +53,7 @@ tm_shape(CTs) +
               palette = "Oranges",
               breaks = c(0, 40000, 80000, 120000, 160000, 200000, 260000)) +
   tm_shape(bike_service_filled) +
-  tm_borders(col = "black", lwd = 3, alpha = 0.5) +
+  tm_borders(col = "black", lwd = 2) +
   tm_layout(inner.margins = .05, 
             frame = F,
             legend.outside = F,
@@ -32,12 +61,12 @@ tm_shape(CTs) +
             main.title.size = 1.5,
             legend.title.size = 1.2,
             legend.text.size = .8,
-            legend.format = list(fun = function(x) paste0("$", formatC(x, digits = 0, format = "f"))),
-            legend.position = c(0.003, 0.7)) +
+            legend.format = list(fun = function(x) paste0("$", formatC(x, digits = 0, format = "f", big.mark = ","))),
+            legend.position = c(0.006, 0.68)) +
   tm_compass(position = c(.9, .05)) +
-  tm_credits("Average inside service area: $90000\nAverage outside service area: $55000",
+  tm_credits("Average inside service area: $90,000\nAverage outside service area: $55,000",
              size = 1,
-             position = c(0.003,.93))
+             position = c(0.006,.92))
 
 tm_shape(CTs) +
   tm_polygons ("white_percent", 
@@ -46,7 +75,7 @@ tm_shape(CTs) +
                border.alpha = 0,
                palette = "Oranges") +
   tm_shape(bike_service_filled) +
-  tm_borders(col = "black", lwd = 3, alpha = 0.5) +
+  tm_borders(col = "black", lwd = 2) +
   tm_layout(main.title = "Race and Citibike Service Area",
             inner.margins = 0.05, 
             frame = F,
@@ -137,7 +166,7 @@ bivariate_2018$service <- c("Both", "Bike", "Subway", "Neither")
 
 tm_shape(bivariate_2018) +
   tm_polygons("service",
-              palette = c("#a6f72e", "#71aa3b", "#E6E6E6", "#fffaa3"),
+              palette = c("#ffb41e", "#9ce25f", "#E6E6E6", "#fffaa3"),
               title = "",
               border.alpha = 0) +
   tm_layout(title = "Bike and Subway Service, 2018",
