@@ -269,7 +269,7 @@ tm_shape(CTs) +
               palette = "Oranges",
               breaks = c(0, 40000, 80000, 120000, 160000, 200000, 260000)) +
   tm_shape(expansion_bike_service_areas) +
-  tm_fill(col = "black", alpha = 0.2) + 
+  tm_fill(col = "black", alpha = 0.2)+ 
   tm_layout(inner.margins = .05, 
             frame = F,
             legend.outside = F,
@@ -280,6 +280,8 @@ tm_shape(CTs) +
             legend.format = list(fun = function(x) paste0("$", formatC(x, digits = 0, format = "f"))),
             legend.position = c(0.003, 0.7)) +
   tm_compass(position = c(.9, .05))
+  
+
 
 # race
 
@@ -291,7 +293,7 @@ tm_shape(CTs) +
                palette = "Oranges") +
   tm_shape(expansion_bike_service_areas) +
   tm_fill(col = "black", alpha = 0.2) + 
-  tm_layout(main.title = "Expansion Area from Subway Service Area",
+  tm_layout(main.title = "Expansion Area from CitiBike Service Area",
             inner.margins = 0.05, 
             frame = F,
             legend.outside = F,
@@ -335,9 +337,7 @@ tm_shape(CTs) +
                border.alpha = 0,
                palette = "Oranges") +
   tm_shape(expansion_subway_service_areas) +
-  tm_fill(col = "blue3", alpha = 0.07) + 
-  tm_shape(expansion_subway_service_areas) +
-  tm_borders(col = "blue3", lwd = 2, alpha = .3) +
+  tm_fill(col = "black", alpha = 0.2) + 
   tm_layout(main.title = "Expansion Area from Subway Service Area",
             inner.margins = 0.05, 
             frame = F,
