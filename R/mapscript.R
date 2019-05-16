@@ -6,17 +6,17 @@ tm_shape(city) +
   tm_fill(col = "#f0f0f0", 
           title = "Base Map") +
   tm_shape(growth_2018) +
-  tm_fill(col = "#66c2a5", 
+  tm_fill(col = "#ff9b30", 
           title = "2018",
           legend.show = TRUE) +
   tm_shape(growth_2017) +
-  tm_fill(col = "#fc8d62", 
+  tm_fill(col = "#db5727", 
           title = "2017") +
   tm_shape(growth_2016) +
-  tm_fill(col = "#8da0cb", 
+  tm_fill(col = "#4fa35f", 
           title = "2016") +
   tm_shape(growth_2015) +
-  tm_fill(col = "#e78ac3", 
+  tm_fill(col = "#6bb2db", 
           title = "2015") +
   tm_shape(growth_2014) +
   tm_fill(col = "#a6d854", 
@@ -26,10 +26,11 @@ tm_shape(city) +
           title = "2013") +
   tm_layout(frame = F,
             main.title = "Citi Bike Expansion over Time, 2013-2018",
-            legend.text.size = 1) +
+            legend.text.size = 1.2,
+            main.title.size = 2) +
   tm_add_legend(type = "fill",
                 labels = c("2013", "2014", "2015", "2016", "2017", "2018"),
-                col = c("#ffd92f", "#a6d854", "#e78ac3", "#8da0cb", "#fc8d62", "#66c2a5"),
+                col = c("#ffd92f", "#a6d854", "#6bb2db", "#4fa35f", "#db5727", "#ff9b30"),
                 )
 
 
@@ -52,7 +53,7 @@ tm_shape(CTs) +
             main.title = "Median Household Income and Citi Bike Service Area", 
             main.title.size = 2,
             legend.text.size = 1.1,
-            legend.title.size = 1.4,
+            legend.title.size = 1.5,
             legend.format = list(fun = function(x) paste0("$", formatC(x, digits = 0, format = "f", big.mark = ","))),
             legend.position = c(0.006, 0.62)) +
   tm_compass(position = c(.9, .05)) +
@@ -100,9 +101,9 @@ tm_shape(CTs) +
             legend.outside = F,
             main.title.size = 2,
             legend.title.size = 1.5,
-            legend.text.size = 1.1,
+            legend.text.size = 1,
             legend.format = list(fun = function(x) paste0(formatC(x, digits = 0, format = "f"), "%")),
-            legend.position = c(0.003, 0.65)) +
+            legend.position = c(0.003, 0.69)) +
   tm_compass(position = c(.9, .05)) + 
   tm_credits("Average inside service area: 48%\nAverage outside service area: 19%",
              size = 1.2,
@@ -275,7 +276,7 @@ tm_shape(CTs) +
               text = "No Data", 
               title = " Median Household Income", 
               border.alpha = 0,
-              palette = "Oranges",
+              palette = "Greens",
               breaks = c(0, 40000, 80000, 120000, 160000, 200000, 260000)) +
   tm_shape(expansion_bike_service_areas) +
   tm_fill(col = "black", alpha = 0.2)+ 
