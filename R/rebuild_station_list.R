@@ -1,11 +1,15 @@
 ### REBUILD STATION LIST #######################################################
 
+## Untested, but in theory should rebuild the station list from raw data online
+
+
 ## Load libraries and helper functions
 
 source("R/helper_functions.R")
 
 
 ## Import CSVs
+
 temp <- tempfile(fileext = ".zip")
 
 download.file(
