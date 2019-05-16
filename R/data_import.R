@@ -85,6 +85,21 @@ CTs <- CTs %>%
   mutate(vulnerability_index = (standard_poverty-min(standard_poverty))/(max(standard_poverty)-min(standard_poverty)))
 
 
+#add additional variables
+
+CTs$white_percent <- NA
+CTs$white_percent <- (CTs$pop_white/ CTs$pop_total) * 100
+
+CTs$education_percent <- NA
+CTs$education_percent <- (CTs$education/ CTs$pop_total) * 100
+
+CTs$immigrant_percent <- NA
+CTs$immigrant_percent <- (CTs$immigrant/ CTs$pop_total) * 100
+
+CTs$poverty_percent <- NA
+CTs$poverty_percent <- (CTs$poverty/ CTs$pop_total) * 100
+
+
 vulnerability_index = (CTs$standard_poverty-min(CTs$standard_poverty))/(max(CTs$standard_poverty)-min(CTs$standard_poverty))
 
 
