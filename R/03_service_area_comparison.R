@@ -2,7 +2,7 @@
 
 ## Load libraries and helper functions
 
-source("R/helper_functions.R")
+source("R/01_helper_functions.R")
 
 
 ## Intersect CTs with service areas
@@ -74,9 +74,9 @@ subway <-
 
 expansion_subway_service_areas <- 
   suppressWarnings(subway %>%
-            st_buffer(2000) %>%
-            st_union() %>% 
-            st_erase(subway_service_areas[1,]) )
+                     st_buffer(2000) %>%
+                     st_union() %>% 
+                     st_erase(subway_service_areas[1,]) )
 
 expansion_bike_service_areas <- 
   suppressWarnings(bike_service_areas[3,] %>% 
@@ -94,25 +94,27 @@ bike_service_filled<- fill_holes(bike_service_areas$geometry[3], 10000000)
 # Take citibike service area, add buffers for potential expansion, and subtract 300m buffers
 
 expansion_bike_service_areas <- station_list %>%
-                      filter(Year == 2018) %>%
-                      st_buffer(2000)%>%
-                      st_union() %>%
-                      st_erase(bike_service_filled) 
+  filter(Year == 2018) %>%
+  st_buffer(2000)%>%
+  st_union() %>%
+  st_erase(bike_service_filled) 
 
 expansion_bike_service_areas <- expansion_bike_service_areas %>% st_intersection(city)%>%  st_collection_extract("POLYGON")
 
 # create 2000m subway buffers with demographic information for each subway stop
 subway_buffers <- subway %>%
   st_buffer(2000)  %>%
-  mutate(bike_service_proximity = st_distance(subway, bike_service_filled)) # adds column of distance between metro station and the 2018 citibike service area
+  mutate(bike_service_proximity = st_distance(subway, bike_service_filled), borough = NAMELSAD) # adds column of distance between metro station and the 2018 citibike service area
 
 subway_buffer_comparison <- st_intersect_summarize(
   CTs,
   subway_buffers,
-  group_vars = vars(stop_name, bike_service_proximity),
+  group_vars = vars(stop_name, bike_service_proximity, borough),
   population = pop_total,
   sum_vars = vars(pop_white, immigrant, education),
-  mean_vars = vars(med_income) )
+  mean_vars = vars(med_income, vulnerability_index))
 
-rm(subway_buffers, subway_stops)
+subway_buffer_comparison <- subway_buffer_comparison %>% mutate (vulnerability_index = as.double(vulnerability_index))
 
+
+rm(subway_buffers)
