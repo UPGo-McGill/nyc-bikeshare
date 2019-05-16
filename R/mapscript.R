@@ -25,7 +25,7 @@ tm_shape(city) +
   tm_fill(col = "#ffd92f", 
           title = "2013") +
   tm_layout(frame = F,
-            main.title = "Citibike Expansion over Time, 2013-2018",
+            main.title = "Citi Bike Expansion over Time, 2013-2018",
             legend.text.size = 1) +
   tm_add_legend(type = "fill",
                 labels = c("2013", "2014", "2015", "2016", "2017", "2018"),
@@ -33,44 +33,34 @@ tm_shape(city) +
                 )
 
 
-v#demographic maps
+#demographic maps
 
 {
   
-CTs$white_percent <- NA
-CTs$white_percent <- (CTs$pop_white/ CTs$pop_total) * 100
-
-CTs$education_percent <- NA
-CTs$education_percent <- (CTs$education/ CTs$pop_total) * 100
-
-CTs$immigrant_percent <- NA
-CTs$immigrant_percent <- (CTs$immigrant/ CTs$pop_total) * 100
-
-CTs$poverty_percent <- NA
-CTs$poverty_percent <- (CTs$poverty/ CTs$pop_total) * 100
-
 tm_shape(CTs) +
   tm_polygons("med_income", 
               text = "No Data", 
               title = " Median Household Income", 
               border.alpha = 0,
-              palette = "Oranges",
+              palette = "Greens",
               breaks = c(0, 40000, 80000, 120000, 160000, 200000, 260000)) +
   tm_shape(bike_service_filled) +
   tm_borders(col = "black", lwd = 2) +
   tm_layout(inner.margins = .05, 
             frame = F,
             legend.outside = F,
-            main.title = "Median Household Income and Citibike Service Area", 
-            main.title.size = 1.5,
-            legend.title.size = 1.2,
-            legend.text.size = .8,
+            main.title = "Median Household Income and Citi Bike Service Area", 
+            main.title.size = 2,
+            legend.text.size = 1.1,
+            legend.title.size = 1.4,
             legend.format = list(fun = function(x) paste0("$", formatC(x, digits = 0, format = "f", big.mark = ","))),
-            legend.position = c(0.006, 0.68)) +
+            legend.position = c(0.006, 0.62)) +
   tm_compass(position = c(.9, .05)) +
   tm_credits("Average inside service area: $90,000\nAverage outside service area: $55,000",
-             size = 1,
-             position = c(0.006,.92))
+             size = 1.2,
+             position = c(0.006,.92))   +
+  tm_add_legend(type = "fill", labels = "2018 Citi Bike Service Area", col = "white", border.lwd = 2) 
+
 
 tm_shape(CTs) +
   tm_polygons ("white_percent", 
@@ -80,39 +70,44 @@ tm_shape(CTs) +
                palette = "Oranges") +
   tm_shape(bike_service_filled) +
   tm_borders(col = "black", lwd = 2) +
-  tm_layout(main.title = "Race and Citibike Service Area",
+  tm_layout(main.title = "Race and Citi Bike Service Area",
             inner.margins = 0.05, 
             frame = F,
             legend.outside = F,
-            legend.text.size = .9,
-            legend.title.size = 1.3,
+            main.title.size = 2,
+            legend.title.size = 1.5,
+            legend.text.size = 1.1,
             legend.format = list(fun = function(x) paste0(formatC(x, digits = 0, format = "f"), "%")),
-            legend.position = c(0.003, 0.7)) +
+            legend.position = c(0.007, 0.65)) +
   tm_compass(position = c(.9, .05))+
   tm_credits("White population inside service area: 52%\nWhite population outside service area: 26%",
-             size = 1,
-             position = c(0.003,.93))
+             size = 1.2,
+             position = c(0.007,.93))  +
+  tm_add_legend(type = "fill", labels = "2018 Citi Bike Service Area", col = "white", border.lwd = 2) 
+
 
 tm_shape(CTs) +
   tm_polygons ("education_percent", 
                textNA = "No Data", 
-               title = "Population with Bachelor Degree or more", 
+               title = "Population with Bachelor's Degree or higher", 
                border.alpha = 0,
-               palette = "Oranges") +
+               palette = "Blues") +
   tm_shape(bike_service_filled) +
   tm_borders(col = "black", lwd = 2) + 
-  tm_layout(main.title = "Education and Citibike Service Area", 
+  tm_layout(main.title = "Education and Citi Bike Service Area", 
             inner.margins = .05, 
             frame = F,
             legend.outside = F,
-            legend.text.size = .9,
-            legend.title.size = 1.3,
+            main.title.size = 2,
+            legend.title.size = 1.5,
+            legend.text.size = 1.1,
             legend.format = list(fun = function(x) paste0(formatC(x, digits = 0, format = "f"), "%")),
-            legend.position = c(0.003, 0.7)) +
+            legend.position = c(0.003, 0.65)) +
   tm_compass(position = c(.9, .05)) + 
   tm_credits("Average inside service area: 48%\nAverage outside service area: 19%",
-             size = 1,
-             position = c(0.003,.93))
+             size = 1.2,
+             position = c(0.003,.93))  +
+  tm_add_legend(type = "fill", labels = "2018 Citi Bike Service Area", col = "white", border.lwd = 2) 
 
 
 tm_shape(CTs) +
@@ -123,40 +118,46 @@ tm_shape(CTs) +
                palette = "-Oranges") +
   tm_shape(bike_service_filled) +
   tm_borders(col = "black", lwd = 2) +
-  tm_layout(main.title = "Non-Citizen Population and Citibike Service Area", 
+  tm_layout(main.title = "Non-Citizen Population and Citi Bike Service Area", 
             inner.margins = .05, 
             frame = F,
             legend.outside = F,
-            legend.text.size = .9,
-            legend.title.size = 1.3,
+            main.title.size = 2,
+            legend.text.size = 1.1,
+            legend.title.size = 1.5,
             legend.format = list(fun = function(x) paste0(formatC(x, digits = 0, format = "f"), "%")),
             legend.position = c(0.003, 0.65)) +
   tm_compass(position = c(.9, .05)) +
   tm_credits("Non-citizen population inside service area: 13%\nNon-citizen population outside service area: 18%",
              size = 1,
-             position = c(0.003,.93))
+             position = c(0.003,.93)) +
+  tm_add_legend(type = "fill", labels = "2018 Citi Bike Service Area", col = "white", border.lwd = 2) 
 
 tm_shape(CTs) +
   tm_polygons("poverty_percent",
                textNA = "No Data", 
-               title = "Poverty Level", 
+               title = "Population Meeting Poverty Threshold", 
                border.alpha = 0,
                palette = c("#ef6548", "#fdbb84","#fdd49e","#fee8c8"),
                breaks = c(0,15,30,45,60)) +
   tm_shape(bike_service_filled) +
   tm_borders(col = "black", lwd = 2) +
-  tm_layout(main.title = "Poverty and Citibike Service Area", 
+  tm_layout(main.title = "Poverty and Citi Bike Service Area", 
             inner.margins = .05, 
             frame = F,
             legend.outside = F,
-            legend.text.size = .9,
-            legend.title.size = 1.3,
+            main.title.size = 2,
+            legend.text.size = 1.1,
+            legend.title.size = 1.5,
             legend.format = list(fun = function(x) paste0(formatC(x, digits = 0, format = "f"), "%")),
-            legend.position = c(0.007, 0.7)) +
+            legend.position = c(0.007, 0.76)) +
   tm_compass(position = c(.9, .075)) +
   tm_credits("",
              size = 1,
-             position = c(0.007,.93))
+             position = c(0.007,.93)) +
+  tm_add_legend(type = "fill", labels = "2018 Citi Bike Service Area", col = "white", border.lwd = 2) 
+
+
 
 }
 
@@ -174,9 +175,11 @@ tm_shape(bivariate_2018) +
               title = "",
               border.alpha = 0) +
   tm_layout(title = "Bike and Subway Service, 2018",
+            main.title.size = 3,
+            legend.text.size = 1.1,
+            legend.title.size = 1.5,
             frame = F,
-            legend.position = c(0.2,.5),
-            legend.text.size = 1) +
+            legend.position = c(0.007,.8)) +
   tm_compass(position = c(.9, .05))
 
   }
@@ -279,15 +282,15 @@ tm_shape(CTs) +
   tm_layout(inner.margins = .05, 
             frame = F,
             legend.outside = F,
-            main.title = "Expansion Area from CitiBike Service Area", 
-            main.title.size = 1.5,
-            legend.title.size = 1.2,
-            legend.text.size = .8,
-            legend.format = list(fun = function(x) paste0("$", formatC(x, digits = 0, format = "f"))),
-            legend.position = c(0.003, 0.7)) +
-  tm_compass(position = c(.9, .05))
+            main.title = "Income and Possible Expansion Areas", 
+            main.title.size = 2,
+            legend.title.size = 1.5,
+            legend.text.size = 1.1,
+            legend.format = list(fun = function(x) paste0("$", formatC(x, digits = 0, format = "f", big.mark = ","))),
+            legend.position = c(0.003, 0.72)) +
+  tm_compass(position = c(.9, .05)) +
+  tm_add_legend(type = "fill", labels = "2km buffer from Citi Bike stations", col = "#cccccc", border.col = "#cccccc") 
   
-
 
 # race
 
@@ -299,15 +302,17 @@ tm_shape(CTs) +
                palette = "Oranges") +
   tm_shape(expansion_bike_service_areas) +
   tm_fill(col = "black", alpha = 0.2) + 
-  tm_layout(main.title = "Expansion Area from CitiBike Service Area",
+  tm_layout(main.title = "Race and Possible Expansion Areas",
             inner.margins = 0.05, 
             frame = F,
             legend.outside = F,
-            legend.text.size = .9,
-            legend.title.size = 1.3,
+            main.title.size = 2,
+            legend.title.size = 1.5,
+            legend.text.size = 1.1,
             legend.format = list(fun = function(x) paste0(formatC(x, digits = 0, format = "f"), "%")),
-            legend.position = c(0.003, 0.7)) +
-  tm_compass(position = c(.9, .05))
+            legend.position = c(0.003, 0.75)) +
+  tm_compass(position = c(.9, .05))  +
+  tm_add_legend(type = "fill", labels = "2km buffer from Citi Bike stations", col = "#cccccc", border.col = "#cccccc") 
 
 # Expansion areas for subway service areas, med_income and race
 
@@ -318,7 +323,7 @@ tm_shape(CTs) +
               text = "No Data", 
               title = " Median Household Income", 
               border.alpha = 0,
-              palette = "Oranges",
+              palette = "Greens",
               breaks = c(0, 40000, 80000, 120000, 160000, 200000, 260000)) +
   tm_shape(expansion_subway_service_areas) +
   tm_fill(col = "black", alpha = 0.2) + 
@@ -326,12 +331,13 @@ tm_shape(CTs) +
             frame = F,
             legend.outside = F,
             main.title = "Expansion Area from Subway Service Area", 
-            main.title.size = 1.5,
-            legend.title.size = 1.2,
-            legend.text.size = .8,
-            legend.format = list(fun = function(x) paste0("$", formatC(x, digits = 0, format = "f"))),
-            legend.position = c(0.003, 0.7)) +
-  tm_compass(position = c(.9, .05))
+            main.title.size = 2,
+            legend.title.size = 1.5,
+            legend.text.size = 1.1,
+            legend.format = list(fun = function(x) paste0("$", formatC(x, digits = 0, format = "f", big.mark = ","))),
+            legend.position = c(0.007, 0.7)) +
+  tm_compass(position = c(.9, .05)) +
+  tm_add_legend(type = "fill", labels = "2km buffer from subway stations", col = "#cccccc", border.col = "#cccccc") 
 
 # race
 
@@ -344,15 +350,17 @@ tm_shape(CTs) +
                palette = "Oranges") +
   tm_shape(expansion_subway_service_areas) +
   tm_fill(col = "black", alpha = 0.2) + 
-  tm_layout(main.title = "Expansion Area from Subway Service Area",
-            inner.margins = 0.05, 
+  tm_layout(inner.margins = 0.05, 
             frame = F,
-            legend.outside = F,
-            legend.text.size = .9,
-            legend.title.size = 1.3,
+            main.title = "Expansion Area from Subway Service Area", 
+            main.title.size = 2,
+            legend.title.size = 1.5,
+            legend.text.size = 1.1,
             legend.format = list(fun = function(x) paste0(formatC(x, digits = 0, format = "f"), "%")),
-            legend.position = c(0.003, 0.7)) +
-  tm_compass(position = c(.9, .05))
+            legend.position = c(0.003, 0.75)) +
+  tm_compass(position = c(.9, .05))  +
+  tm_add_legend(type = "fill", labels = "2km buffer from subway stations", col = "#cccccc", border.col = "#cccccc") 
+
 
 
 #population density map
@@ -370,8 +378,9 @@ tm_shape(CTs) +
             inner.margins = 0.05, 
             frame = F,
             legend.outside = F,
-            legend.text.size = .9,
-            legend.title.size = 1.3,
+            main.title.size = 2,
+            legend.title.size = 1.5,
+            legend.text.size = 1.1,
             legend.position = c(0.003, 0.7)) +
   tm_compass(position = c(.9, .05))
 
@@ -413,7 +422,7 @@ tm_shape(city) + tm_fill(col = "grey") +
                palette = "-Oranges") +
   tm_shape(bike_service_filled) +
   tm_borders(col = "black", lwd = 3, alpha = 0.5) +
-  tm_layout(main.title = "Race and Citibike Service Area",
+  tm_layout(main.title = "Race and Citi Bike Service Area",
             inner.margins = 0.05, 
             frame = F,
             legend.outside = F,
