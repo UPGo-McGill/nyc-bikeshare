@@ -86,9 +86,9 @@ CTs <-
          std_white = scale(pop_white/pop_total),
          std_ed = scale(education/pop_total),
          std_inc = scale(med_income),
-         vulnerability_index = index_create(std_pov) + 
+         vulnerability_index = 4 - (index_create(std_pov) + 
            index_create(std_white) + index_create(std_ed) + 
-           index_create(std_inc)) %>% 
+           index_create(std_inc))) %>% 
   select(-std_pov, -std_white, -std_ed, -std_inc)
 
 

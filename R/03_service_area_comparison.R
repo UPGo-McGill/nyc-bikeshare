@@ -111,8 +111,8 @@ subway_buffer_comparison <- st_intersect_summarize(
   subway_buffers,
   group_vars = vars(stop_name, bike_service_proximity),
   population = pop_total,
-  sum_vars = vars(pop_white, immigrant, education, vulnerability_index),
-  mean_vars = vars(med_income) )
+  sum_vars = vars(pop_white, immigrant, education),
+  mean_vars = vars(med_income, vulnerability_index) )
 
 rm(subway_buffers)
 
