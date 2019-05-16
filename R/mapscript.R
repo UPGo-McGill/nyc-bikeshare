@@ -191,7 +191,6 @@ tm_shape(bivariate_2018) +
 {
 #data import - TO BE MOVED
 
-
 CTs_vehicles <- get_acs(
   geography = "tract", 
   variables = c(household_total = "B08201_001", 
@@ -216,6 +215,8 @@ CTs_vehicles <- get_acs(
   st_as_sf() %>% 
   st_transform(26918)
 
+  
+CTs_vehicles <- CTs_vehicles %>% filter(pop_total > 100) %>% na.omit()
 
 CTs_vehicles <- st_erase(CTs_vehicles, ny_water)
 
@@ -253,7 +254,7 @@ tm_shape(CTs_vehicles) +
 tm_shape(CTs_vehicles) +
   tm_polygons("maleminusfemale",
               border.alpha = 0,
-              breaks = c(-60, -30, -25, -20, -15, -10, -5, 0, 0, 5, 10, 15, 20, 25, 30, 60),
+              breaks = c(-60, -30, -15,  0, 0, 15, 30, 60),
               title = "Difference between Male and Female Car Ownership (%)", 
               palette = "RdYlBu") + 
   tm_shape(servicearea_2018) +
@@ -283,8 +284,8 @@ tm_shape(CTs) +
   tm_layout(inner.margins = .05, 
             frame = F,
             legend.outside = F,
-            main.title = "Income and Possible Expansion Areas", 
-            main.title.size = 2,
+            main.title = "Income & Possible Expansion from Citi Bike Service Area", 
+            main.title.size = 1.8,
             legend.title.size = 1.5,
             legend.text.size = 1.1,
             legend.format = list(fun = function(x) paste0("$", formatC(x, digits = 0, format = "f", big.mark = ","))),
@@ -303,11 +304,11 @@ tm_shape(CTs) +
                palette = "Oranges") +
   tm_shape(expansion_bike_service_areas) +
   tm_fill(col = "black", alpha = 0.2) + 
-  tm_layout(main.title = "Race and Possible Expansion Areas",
+  tm_layout(main.title = "Race & Possible Expansion from Citi Bike Service Area",
             inner.margins = 0.05, 
             frame = F,
             legend.outside = F,
-            main.title.size = 2,
+            main.title.size = 1.8,
             legend.title.size = 1.5,
             legend.text.size = 1.1,
             legend.format = list(fun = function(x) paste0(formatC(x, digits = 0, format = "f"), "%")),
@@ -331,8 +332,8 @@ tm_shape(CTs) +
   tm_layout(inner.margins = .05, 
             frame = F,
             legend.outside = F,
-            main.title = "Expansion Area from Subway Service Area", 
-            main.title.size = 2,
+            main.title = "Income & Possible Expansion from Subway Service Area", 
+            main.title.size = 1.8,
             legend.title.size = 1.5,
             legend.text.size = 1.1,
             legend.format = list(fun = function(x) paste0("$", formatC(x, digits = 0, format = "f", big.mark = ","))),
@@ -353,7 +354,7 @@ tm_shape(CTs) +
   tm_fill(col = "black", alpha = 0.2) + 
   tm_layout(inner.margins = 0.05, 
             frame = F,
-            main.title = "Expansion Area from Subway Service Area", 
+            main.title = "Race & Possible Expansion from Subway Service Area", 
             main.title.size = 2,
             legend.title.size = 1.5,
             legend.text.size = 1.1,
