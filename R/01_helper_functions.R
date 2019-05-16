@@ -47,3 +47,10 @@ st_intersect_summarize <- function(data, poly, group_vars, population, sum_vars,
                    full_join))
   
 }
+
+
+## index_create helper function
+
+index_create <- function(var) {
+  (var - min(var)) / (max(var) - min(var))
+}

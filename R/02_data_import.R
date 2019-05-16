@@ -2,7 +2,7 @@
 
 ## Load libraries and helper functions
 
-source("R/helper_functions.R")
+source("R/01_helper_functions.R")
 
 
 ## Import and clean up station data
@@ -77,15 +77,19 @@ CTs <-
 
 CTs <- CTs %>% filter(pop_total > 100) %>% na.omit()
 
-CTs <- CTs %>%
-  mutate(standard_poverty = scale(1 - (poverty/pop_total)),
-         standard_pop_white = scale(pop_white/pop_total),
-         standard_education = scale(education/pop_total),
-         standard_med_income = scale(med_income),
-         vulnerability_index = (standard_poverty-min(standard_poverty))/(max(standard_poverty)-min(standard_poverty)))
 
+## Create vulnerability index
 
-vulnerability_index = (CTs$standard_poverty-min(CTs$standard_poverty))/(max(CTs$standard_poverty)-min(CTs$standard_poverty))
+CTs <- 
+  CTs %>%
+  mutate(std_pov = scale(1 - (poverty/pop_total)),
+         std_white = scale(pop_white/pop_total),
+         std_ed = scale(education/pop_total),
+         std_inc = scale(med_income),
+         vulnerability_index = index_create(std_pov) + 
+           index_create(std_white) + index_create(std_ed) + 
+           index_create(std_inc)) %>% 
+  select(-std_pov, -std_white, -std_ed, -std_inc)
 
 
 ## Clip data to water
@@ -139,21 +143,20 @@ no_service_2013 <-
   st_union %>%
   st_erase(service_2013)
 
-
-
 bike_service_areas <-
   tibble(year = c(2013, 2013, 2018, 2018),
          bike_service = c(TRUE, FALSE, TRUE, FALSE), 
-         geometry = c(service_2013, no_service_2013, service_2018, no_service_2018)) %>%
+         geometry = 
+           c(service_2013, no_service_2013, service_2018, no_service_2018)) %>%
   st_as_sf()
 
 bike_expansion_2013to2018 <- service_2018 %>% 
-    st_erase(service_2013)
-
+  st_erase(service_2013)
 
 rm(service_2018, no_service_2018, service_2013, no_service_2013)
 
-#create service areas for 2014-2016 for service area growth
+
+## Create service areas for 2014-2016 for service area growth
 
 service_2014 <- 
   suppressWarnings(station_list %>%
@@ -188,6 +191,7 @@ growth_2017 <- st_difference(service_2017, service_2016)
 growth_2016 <- st_difference(service_2016, service_2015)
 growth_2015 <- st_difference(service_2015, service_2014)
 growth_2014 <- st_difference(service_2014, service_2013)
+
 
 ## Create subway service and subway no-service areaa
 
