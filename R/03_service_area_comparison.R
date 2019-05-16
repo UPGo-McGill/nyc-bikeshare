@@ -66,11 +66,6 @@ transit_access2018 <- st_intersect_summarize(
 
 # take subway service area, add buffers for potential expansion, and subtract 800m buffers
 
-subway <-
-  st_read("data", "stops_nyc_subway_nov2018") %>%
-  st_transform(26918) %>% 
-  as_tibble() %>% 
-  st_as_sf()
 
 expansion_subway_service_areas <- 
   suppressWarnings(subway %>%
@@ -104,7 +99,7 @@ expansion_bike_service_areas <- expansion_bike_service_areas %>% st_intersection
 # create 2000m subway buffers with demographic information for each subway stop
 subway_buffers <- subway %>%
   st_buffer(2000)  %>%
-  mutate(bike_service_proximity = st_distance(subway, bike_service_filled), borough = NAMELSAD) # adds column of distance between metro station and the 2018 citibike service area
+  mutate(bike_service_proximity = st_distance(subway, bike_service_filled)) # adds column of distance between metro station and the 2018 citibike service area
 
 subway_buffer_comparison <- st_intersect_summarize(
   CTs,
@@ -115,6 +110,23 @@ subway_buffer_comparison <- st_intersect_summarize(
   mean_vars = vars(med_income, vulnerability_index))
 
 subway_buffer_comparison <- subway_buffer_comparison %>% mutate (vulnerability_index = as.double(vulnerability_index))
+
+subway_buffer_vulnerability2.75 <- subway_buffer_comparison %>% filter(vulnerability_index > 2.75) %>%  st_union 
+
+subway_buffer_vulnerability2.75 <- st_intersection(NY_pumas, subway_buffer_vulnerability2.75)
+
+subway_buffer_vulnerability2.75 <- st_intersect_summarize(
+  CTs,
+  subway_buffer_vulnerability2.75,
+  group_vars = vars(PUMA_name, PUMACE10),
+  population = pop_total,
+  sum_vars = vars(pop_white, education),
+  mean_vars = vars(med_income, vulnerability_index))
+
+subway_buffer_vulnerability2.75 <- subway_buffer_vulnerability2.75 %>% mutate (vulnerability_index = as.double(vulnerability_index), pop_total = as.double(pop_total)) %>% st_erase(bike_service_filled)
+
+subway_buffer_vulnerability2.75 <-  subway_buffer_vulnerability2.75 %>% filter(pop_total>50000)
+
 
 
 rm(subway_buffers)

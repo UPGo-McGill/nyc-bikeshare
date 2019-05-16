@@ -16,13 +16,21 @@ station_list <-
   mutate(ID = as.numeric(ID), Year = as.numeric(Year))
 
 
-## Import subway data
+## Import subway data and Public Use Microdata Areas
+
+NY_pumas <- pumas(36) %>% 
+  st_as_sf() %>% 
+  st_transform(26918) %>%
+  mutate(PUMA_name = NAMELSAD10) %>% 
+  select(-GEOID, -NAMELSAD10, -STATEFP10, -MTFCC10, -FUNCSTAT10, -ALAND10, -AWATER10, -INTPTLAT10, -INTPTLON10)
 
 subway <-
   st_read("data", "stops_nyc_subway_nov2018") %>%  
   st_transform(26918) %>% 
   as_tibble() %>% 
-  st_as_sf()
+  st_as_sf() %>%
+  mutate(borough = NAMELSAD) %>% 
+  select(-NAMELSAD, -stop_id2, -GEOID, -stop_lat, -stop_lon)
 
 
 ## Import water
