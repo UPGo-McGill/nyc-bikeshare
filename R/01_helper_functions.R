@@ -1,5 +1,6 @@
-## Load libraries
+### HELPER FUNCTIONS
 
+## Load libraries
 
 library(smoothr)
 library(tidycensus)
@@ -43,8 +44,15 @@ st_intersect_summarize <- function(data, poly, group_vars, population, sum_vars,
     })
   
   suppressMessages(reduce(list(population,
-                        st_drop_geometry(sums),
-                        st_drop_geometry(means)),
-                   full_join))
+                               st_drop_geometry(sums),
+                               st_drop_geometry(means)),
+                          full_join))
   
+}
+
+
+## index_create helper function
+
+index_create <- function(var) {
+  (var - min(var)) / (max(var) - min(var))
 }
