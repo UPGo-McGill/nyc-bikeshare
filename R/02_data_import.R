@@ -208,6 +208,68 @@ growth_2016 <- st_difference(service_2016, service_2015)
 growth_2015 <- st_difference(service_2015, service_2014)
 growth_2014 <- st_difference(service_2014, service_2013)
 
+growth_2017 <- st_erase(growth_2017, (filter(counties, NAME == "Bronx County, New York")))
+
+
+service_2013 <- st_intersection(CTs, service_2013)
+service_2013 <- st_intersect_summarize(
+  CTs,
+  service_2013,
+  group_vars = ,
+  population = pop_total,
+  sum_vars = vars(pop_white, immigrant, education),
+  mean_vars = vars(med_income))
+
+service_2014 <- st_intersection(CTs, service_2014)
+service_2014 <- st_intersect_summarize(
+  CTs,
+  service_2014,
+  group_vars = NA,
+  population = pop_total,
+  sum_vars = vars(pop_white, immigrant, education),
+  mean_vars = vars(med_income))
+
+service_2015 <- st_intersection(CTs, service_2015)
+service_2015 <- st_intersect_summarize(
+  CTs,
+  service_2015,
+  group_vars = NA,
+  population = pop_total,
+  sum_vars = vars(pop_white, immigrant, education),
+  mean_vars = vars(med_income))
+
+service_2016 <- st_intersection(CTs, service_2016)
+service_2016 <- st_intersect_summarize(
+  CTs,
+  service_2016,
+  group_vars = NA,
+  population = pop_total,
+  sum_vars = vars(pop_white, immigrant, education),
+  mean_vars = vars(med_income))
+
+service_2017 <- st_intersection(CTs, service_2017)
+service_2017 <- st_intersect_summarize(
+  CTs,
+  service_2017,
+  group_vars = NA,
+  population = pop_total,
+  sum_vars = vars(pop_white, immigrant, education),
+  mean_vars = vars(med_income))
+
+service_2018 <- st_intersection(CTs, service_2018)
+service_2018 <- st_intersect_summarize(
+  CTs,
+  service_2018,
+  group_vars = NA,
+  population = pop_total,
+  sum_vars = vars(pop_white, immigrant, education),
+  mean_vars = vars(med_income))
+
+summary_serviceareas <- rbind(service_2013,service_2014,service_2015,service_2016,service_2017,service_2018)
+summary_serviceareas$year <- c("2013", "2014", "2015", "2016", "2017", "2018")
+
+st_area(service_2018)/1000000
+
 
 ## Create subway service and subway no-service areaa
 

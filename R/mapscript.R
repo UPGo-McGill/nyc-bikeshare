@@ -7,23 +7,28 @@ tm_shape(city) +
           title = "Base Map") +
   tm_shape(growth_2018) +
   tm_fill(col = "#ff9b30", 
-          title = "2018",
-          legend.show = TRUE) +
+          title = "2018",) +
+  tm_borders(col = "#f0f0f0") +
   tm_shape(growth_2017) +
   tm_fill(col = "#db5727", 
           title = "2017") +
+  tm_borders(col = "#f0f0f0") +
   tm_shape(growth_2016) +
   tm_fill(col = "#4fa35f", 
           title = "2016") +
+  tm_borders(col = "#f0f0f0") +
   tm_shape(growth_2015) +
   tm_fill(col = "#6bb2db", 
           title = "2015") +
+  tm_borders(col = "#f0f0f0") +
   tm_shape(growth_2014) +
   tm_fill(col = "#a6d854", 
           title = "2014") +
+  tm_borders(col = "#f0f0f0") +
   tm_shape(service_2013) +
   tm_fill(col = "#ffd92f", 
           title = "2013") +
+  tm_borders(col = "#f0f0f0") +
   tm_layout(frame = F,
             main.title = "Citi Bike Expansion over Time, 2013-2018",
             legend.text.size = 1.2,
@@ -33,6 +38,15 @@ tm_shape(city) +
                 col = c("#ffd92f", "#a6d854", "#6bb2db", "#4fa35f", "#db5727", "#ff9b30"),
                 )
 
+
+
+service_2013 <- st_intersection(CTs, service_2013)
+
+view(service_2013)
+
+?st_intersection
+                         
+       
 
 #demographic maps
 
