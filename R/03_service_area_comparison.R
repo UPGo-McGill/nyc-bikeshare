@@ -104,15 +104,18 @@ expansion_bike_service_areas <- expansion_bike_service_areas %>% st_intersection
 # create 2000m subway buffers with demographic information for each subway stop
 subway_buffers <- subway %>%
   st_buffer(2000)  %>%
-  mutate(bike_service_proximity = st_distance(subway, bike_service_filled)) # adds column of distance between metro station and the 2018 citibike service area
+  mutate(bike_service_proximity = st_distance(subway, bike_service_filled), borough = NAMELSAD) # adds column of distance between metro station and the 2018 citibike service area
 
 subway_buffer_comparison <- st_intersect_summarize(
   CTs,
   subway_buffers,
-  group_vars = vars(stop_name, bike_service_proximity),
+  group_vars = vars(stop_name, bike_service_proximity, borough),
   population = pop_total,
   sum_vars = vars(pop_white, immigrant, education),
-  mean_vars = vars(med_income, vulnerability_index) )
+  mean_vars = vars(med_income, vulnerability_index))
+
+subway_buffer_comparison <- subway_buffer_comparison %>% mutate (vulnerability_index = as.double(vulnerability_index))
+
 
 rm(subway_buffers)
 
