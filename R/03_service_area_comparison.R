@@ -104,14 +104,14 @@ subway_buffers <- subway %>%
 subway_buffer_comparison <- st_intersect_summarize(
   CTs,
   subway_buffers,
-  group_vars = vars(stop_name, bike_service_proximity, borough),
+  group_vars = vars(stop_name, borough),
   population = pop_total,
   sum_vars = vars(pop_white, immigrant, education),
   mean_vars = vars(med_income, vulnerability_index))
 
 subway_buffer_comparison <- subway_buffer_comparison %>% mutate (vulnerability_index = as.double(vulnerability_index))
 
-subway_buffer_vulnerability2.75 <- subway_buffer_comparison %>% filter(vulnerability_index > 2.75) %>%  st_union 
+subway_buffer_vulnerability2.75 <- subway_buffer_comparison %>% filter(vulnerability_index > 2.75) %>% group_by(stop_name)
 
 subway_buffer_vulnerability2.75 <- st_intersection(NY_pumas, subway_buffer_vulnerability2.75)
 
@@ -125,7 +125,7 @@ subway_buffer_vulnerability2.75 <- st_intersect_summarize(
 
 subway_buffer_vulnerability2.75 <- subway_buffer_vulnerability2.75 %>% mutate (vulnerability_index = as.double(vulnerability_index), pop_total = as.double(pop_total)) %>% st_erase(bike_service_filled)
 
-subway_buffer_vulnerability2.75 <-  subway_buffer_vulnerability2.75 %>% filter(pop_total>50000)
+subway_buffer_vulnerability2.75 <-  subway_buffer_vulnerability2.75 %>% filter(pop_total>1000)
 
 
 
