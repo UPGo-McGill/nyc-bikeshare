@@ -22,7 +22,7 @@ NY_pumas <- pumas(36) %>%
   st_as_sf() %>% 
   st_transform(26918) %>%
   mutate(PUMA_name = NAMELSAD10) %>% 
-  select(-GEOID, -NAMELSAD10, -STATEFP10, -MTFCC10, -FUNCSTAT10, -ALAND10, -AWATER10, -INTPTLAT10, -INTPTLON10)
+  select(-GEOID10, -NAMELSAD10, -STATEFP10, -MTFCC10, -FUNCSTAT10, -ALAND10, -AWATER10, -INTPTLAT10, -INTPTLON10)
 
 subway <-
   st_read("data", "stops_nyc_subway_nov2018") %>%  
@@ -217,7 +217,6 @@ growth_2014 <- st_difference(service_2014, service_2013)
 growth_2017 <- st_erase(growth_2017, (filter(counties, NAME == "Bronx County, New York")))
 
 
-service_2013 <- st_intersection(CTs, service_2013)
 service_2013 <- st_intersect_summarize(
   CTs,
   service_2013,
@@ -226,7 +225,7 @@ service_2013 <- st_intersect_summarize(
   sum_vars = vars(pop_white, immigrant, education),
   mean_vars = vars(med_income))
 
-service_2014 <- st_intersection(CTs, service_2014)
+
 service_2014 <- st_intersect_summarize(
   CTs,
   service_2014,
@@ -235,7 +234,7 @@ service_2014 <- st_intersect_summarize(
   sum_vars = vars(pop_white, immigrant, education),
   mean_vars = vars(med_income))
 
-service_2015 <- st_intersection(CTs, service_2015)
+
 service_2015 <- st_intersect_summarize(
   CTs,
   service_2015,
@@ -244,7 +243,7 @@ service_2015 <- st_intersect_summarize(
   sum_vars = vars(pop_white, immigrant, education),
   mean_vars = vars(med_income))
 
-service_2016 <- st_intersection(CTs, service_2016)
+
 service_2016 <- st_intersect_summarize(
   CTs,
   service_2016,
@@ -253,7 +252,7 @@ service_2016 <- st_intersect_summarize(
   sum_vars = vars(pop_white, immigrant, education),
   mean_vars = vars(med_income))
 
-service_2017 <- st_intersection(CTs, service_2017)
+
 service_2017 <- st_intersect_summarize(
   CTs,
   service_2017,
@@ -262,7 +261,7 @@ service_2017 <- st_intersect_summarize(
   sum_vars = vars(pop_white, immigrant, education),
   mean_vars = vars(med_income))
 
-service_2018 <- st_intersection(CTs, service_2018)
+
 service_2018 <- st_intersect_summarize(
   CTs,
   service_2018,
@@ -274,6 +273,18 @@ service_2018 <- st_intersect_summarize(
 summary_serviceareas <- rbind(service_2013,service_2014,service_2015,service_2016,service_2017,service_2018)
 summary_serviceareas$year <- c("2013", "2014", "2015", "2016", "2017", "2018")
 
+
+no_service_2018 <- st_intersect_summarize(
+  CTs,
+  no_service_2018,
+  group_vars = NA,
+  population = pop_total,
+  sum_vars = vars(pop_white, immigrant, education),
+  mean_vars = vars(med_income))
+
+
+summary_serviceareas_no_service <-rbind(service_2013, service_2018, no_service_2018)
+summary_serviceareas_no_service <- mutate(summary_serviceareas_no_service, "NA" = c("service_2013", "service_2018", "no_service") )   
 
 ## Create subway service and subway no-service areaa
 
