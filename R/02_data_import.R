@@ -170,34 +170,17 @@ growth_2014 <- st_difference(service_2014, service_2013)
 
 ## Create summary_service_areas
 
-output <- 
-  map(list(service_2013, service_2014, service_2015, service_2016, service_2017,
-           service_2018), ~st_intersect_summarize(
-             CTs,
-             .,
-             group_vars = NA,
-             population = pop_total,
-             sum_vars = vars(pop_white, immigrant, education),
-             mean_vars = vars(med_income)))
-
-summary_service_areas <- do.call(rbind, output) %>% 
-  mutate(year = 2013:2018) %>% 
-  select(year, everything()) %>% 
-  select(-`NA`)
-
-rm(output)
-
-no_service_2018 <- st_intersect_summarize(
+summary_service_areas <- st_intersect_summarize(
   CTs,
-  no_service_2018,
-  group_vars = NA,
+  tibble(
+    service = c("service_2013", "service_2018", "no_service"),
+    geometry = c(service_2013, bike_expansion_2013to2018, no_service_2018))
+  %>% st_as_sf(),
+  group_vars = vars(service),
   population = pop_total,
-  sum_vars = vars(pop_white, immigrant, education),
+  sum_vars = vars(pop_white, immigrant, education, poverty),
   mean_vars = vars(med_income))
 
-summary_serviceareas_no_service <-rbind(service_2018, service_2013, no_service_2018)
-colnames(summary_serviceareas_no_service)[colnames(summary_serviceareas_no_service)=="NA"] <- "service"
-summary_serviceareas_no_service <- mutate(summary_serviceareas_no_service, service = c("service_2013", "service_2018", "no_service") )  
 
 ## Create subway service and subway no-service areaa
 
