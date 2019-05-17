@@ -111,9 +111,10 @@ subway_buffer_comparison <- st_intersect_summarize(
 
 subway_buffer_comparison <- subway_buffer_comparison %>% mutate (vulnerability_index = as.double(vulnerability_index))
 
-subway_buffer_vulnerability2.75 <- subway_buffer_comparison %>% filter(vulnerability_index > 2.75) %>% st_union
+subway_buffer_vulnerability2.75 <- subway_buffer_comparison %>% filter(vulnerability_index > 2.75) %>% group_by(stop_id)
 
 
+subway_buffer_union <- 
 subway_buffer_vulnerability2.75 <- st_intersection(NY_pumas, subway_buffer_vulnerability2.75) 
 
 
