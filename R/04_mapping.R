@@ -482,31 +482,7 @@ tm_shape(CTs) +
   tm_compass(position = c(.9, .05))
 
 
-#subway buffer demographics maps
-
-
-
-tm_shape(city) + tm_fill(col = "grey") +
-  tm_shape(subway_buffer_comparison) +
-  tm_polygons("med_income", 
-              text = "No Data", 
-              title = " Median Household Income", 
-              border.alpha = 0,
-              palette = "-Oranges",
-              alpha = .5,
-              breaks = c(20000, 40000, 60000, 80000, 100000, 120000, 140000)) +
-  tm_shape(bike_service_filled) +
-  tm_borders(col = "black", lwd = 3, alpha = 0.5) + 
-  tm_layout(inner.margins = .05, 
-            frame = F,
-            legend.outside = F,
-            main.title = "Vulnerability by Subway Stop", 
-            main.title.size = 1.5,
-            legend.title.size = 1.2,
-            legend.text.size = .8,
-            legend.format = list(fun = function(x) paste0("$", formatC(x, digits = 0, format = "f"))),
-            legend.position = c(0.003, 0.7)) +
-  tm_compass(position = c(.9, .05))
+#bike expansion map
   
 
 tm_shape(city)+
@@ -525,26 +501,4 @@ tm_shape(city)+
             legend.position = c(0.007,.8)) +
   tm_compass(position = c(.9, .05))
   
-  
-  
-  
-  
-  tm_shape(subway_buffer_comparison) +
-  tm_polygons ("pop_white", 
-               textNA = "No Data", 
-               title = "White Population", 
-               border.alpha = 0,
-               alpha = .5,
-               palette = "-Oranges") +
-  tm_shape(bike_service_filled) +
-  tm_borders(col = "black", lwd = 3, alpha = 0.5) +
-  tm_layout(main.title = "Race and Citi Bike Service Area",
-            inner.margins = 0.05, 
-            frame = F,
-            legend.outside = F,
-            legend.text.size = .9,
-            legend.title.size = 1.3,
-            legend.format = list(fun = function(x) paste0(formatC(x, format = "f"), "%")),
-            legend.position = c(0.003, 0.7))+
-  tm_compass(position = c(.9, .05))
 
