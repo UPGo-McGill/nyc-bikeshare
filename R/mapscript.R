@@ -38,45 +38,54 @@ tm_shape(city) +
                 col = c("#ffd92f", "#a6d854", "#6bb2db", "#4fa35f", "#db5727", "#ff9b30"),
                 )
 
-
-
-service_2013 <- st_intersection(CTs, service_2013)
-
-view(service_2013)
-
-?st_intersection
-                         
-       
-
 #demographic maps
 
 {
-  
-tm_shape(CTs) +
+
+tm_shape(city)+
+  tm_fill(col ="#e0e0e0") +
+  tm_shape(CTs) +
   tm_polygons("med_income", 
               text = "No Data", 
               title = " Median Household Income", 
               border.alpha = 0,
               palette = "Greens",
-              breaks = c(0, 40000, 80000, 120000, 160000, 200000, 260000)) +
+              breaks = c(0, 20000, 40000, 60000, 80000, 100000, 150000, 200000, 260000)) +
   tm_shape(bike_service_filled) +
   tm_borders(col = "black", lwd = 2) +
   tm_layout(inner.margins = .05, 
+            fontfamily = "Georgia",
             frame = F,
             legend.outside = F,
-            main.title = "Median Household Income and Citi Bike Service Area", 
+            main.title = "Income and Citi Bike Service Area", 
             main.title.size = 2,
             legend.text.size = 1.1,
             legend.title.size = 1.5,
             legend.format = list(fun = function(x) paste0("$", formatC(x, digits = 0, format = "f", big.mark = ","))),
-            legend.position = c(0.006, 0.62)) +
+            legend.position = c(0.006, 0.48),
+            legend.width = 1) +
   tm_compass(position = c(.9, .05)) +
   tm_credits("Average inside service area: $90,000\nAverage outside service area: $55,000",
              size = 1.2,
              position = c(0.006,.92))   +
-  tm_add_legend(type = "fill", labels = "2018 Citi Bike Service Area", col = "white", border.lwd = 2) 
+  tm_add_legend(type = "fill", labels = "2018 Citi Bike Service Area", col = "white", border.lwd = 2) +
+  tm_add_legend(type = "fill", labels = "No Data", col = "#e0e0e0") 
+  
+  
+  
+  ggplot(mtcars, aes(x=wt, y=mpg)) + geom_point() +
+    ggtitle("Title text goes here") +
+    theme(plot.title = element_text(size = 16, family="Georgia", face="italic"))
+  
+  
+  library(extrafont)
+  install.packages("extrafont")
+  font_import()
 
-
+  warnings()
+  
+  warnings()
+  
 tm_shape(CTs) +
   tm_polygons ("white_percent", 
                textNA = "No Data", 
@@ -151,7 +160,7 @@ tm_shape(CTs) +
 tm_shape(CTs) +
   tm_polygons("poverty_percent",
                textNA = "No Data", 
-               title = "Population Meeting Poverty Threshold", 
+               title = " Population in Poverty", 
                border.alpha = 0,
                palette = c("#ef6548", "#fdbb84","#fdd49e","#fee8c8"),
                breaks = c(0,15,30,45,60)) +
@@ -165,7 +174,7 @@ tm_shape(CTs) +
             legend.text.size = 1.1,
             legend.title.size = 1.5,
             legend.format = list(fun = function(x) paste0(formatC(x, digits = 0, format = "f"), "%")),
-            legend.position = c(0.007, 0.76)) +
+            legend.position = c(0.007, 0.7)) +
   tm_compass(position = c(.9, .075)) +
   tm_credits("",
              size = 1,
@@ -292,18 +301,18 @@ tm_shape(CTs) +
               title = " Median Household Income", 
               border.alpha = 0,
               palette = "Greens",
-              breaks = c(0, 40000, 80000, 120000, 160000, 200000, 260000)) +
+              breaks = c(0, 20000, 40000, 60000, 80000, 100000, 150000, 200000, 260000)) +
   tm_shape(expansion_bike_service_areas) +
   tm_fill(col = "black", alpha = 0.2)+ 
   tm_layout(inner.margins = .05, 
             frame = F,
             legend.outside = F,
             main.title = "Income & Possible Expansion from Citi Bike Service Area", 
-            main.title.size = 1.8,
+            main.title.size = 1.6,
             legend.title.size = 1.5,
             legend.text.size = 1.1,
             legend.format = list(fun = function(x) paste0("$", formatC(x, digits = 0, format = "f", big.mark = ","))),
-            legend.position = c(0.003, 0.72)) +
+            legend.position = c(0.003, 0.6)) +
   tm_compass(position = c(.9, .05)) +
   tm_add_legend(type = "fill", labels = "2km buffer from Citi Bike stations", col = "#cccccc", border.col = "#cccccc") 
   
@@ -322,7 +331,7 @@ tm_shape(CTs) +
             inner.margins = 0.05, 
             frame = F,
             legend.outside = F,
-            main.title.size = 1.8,
+            main.title.size = 1.6,
             legend.title.size = 1.5,
             legend.text.size = 1.1,
             legend.format = list(fun = function(x) paste0(formatC(x, digits = 0, format = "f"), "%")),
@@ -340,18 +349,18 @@ tm_shape(CTs) +
               title = " Median Household Income", 
               border.alpha = 0,
               palette = "Greens",
-              breaks = c(0, 40000, 80000, 120000, 160000, 200000, 260000)) +
+              breaks = c(0, 20000, 40000, 60000, 80000, 100000, 150000, 200000, 260000)) +
   tm_shape(expansion_subway_service_areas) +
   tm_fill(col = "black", alpha = 0.2) + 
   tm_layout(inner.margins = .05, 
             frame = F,
             legend.outside = F,
             main.title = "Income & Possible Expansion from Subway Service Area", 
-            main.title.size = 1.8,
+            main.title.size = 1.6,
             legend.title.size = 1.5,
             legend.text.size = 1.1,
             legend.format = list(fun = function(x) paste0("$", formatC(x, digits = 0, format = "f", big.mark = ","))),
-            legend.position = c(0.007, 0.7)) +
+            legend.position = c(0.007, 0.6)) +
   tm_compass(position = c(.9, .05)) +
   tm_add_legend(type = "fill", labels = "2km buffer from subway stations", col = "#cccccc", border.col = "#cccccc") 
 
@@ -369,7 +378,7 @@ tm_shape(CTs) +
   tm_layout(inner.margins = 0.05, 
             frame = F,
             main.title = "Race & Possible Expansion from Subway Service Area", 
-            main.title.size = 2,
+            main.title.size = 1.6,
             legend.title.size = 1.5,
             legend.text.size = 1.1,
             legend.format = list(fun = function(x) paste0(formatC(x, digits = 0, format = "f"), "%")),
