@@ -21,8 +21,11 @@ station_list <-
 NY_pumas <- pumas(36) %>% 
   st_as_sf() %>% 
   st_transform(26918) %>%
+  as_tibble() %>% 
+  st_as_sf() %>%
   mutate(PUMA_name = NAMELSAD10) %>% 
-  select(-GEOID10, -NAMELSAD10, -STATEFP10, -MTFCC10, -FUNCSTAT10, -ALAND10, -AWATER10, -INTPTLAT10, -INTPTLON10)
+  select(-GEOID10, -NAMELSAD10, -STATEFP10, -MTFCC10, -FUNCSTAT10, -ALAND10,
+         -AWATER10, -INTPTLAT10, -INTPTLON10)
 
 subway <-
   st_read("data", "stops_nyc_subway_nov2018") %>%  
@@ -90,21 +93,26 @@ CTs <- CTs %>% filter(pop_total > 100) %>% na.omit()
 
 CTs <- 
   CTs %>%
-  mutate(std_pov = scale(1 - (poverty/pop_total)),
-         std_white = scale(pop_white/pop_total),
-         std_ed = scale(education/pop_total),
-         std_inc = scale(med_income),
-         vulnerability_index = 4 - (index_create(std_pov) + 
-                                      index_create(std_white) + index_create(std_ed) + 
-                                      index_create(std_inc))) %>% 
+  mutate(
+    std_pov = scale(1 - (poverty/pop_total)),
+    std_white = scale(pop_white/pop_total),
+    std_ed = scale(education/pop_total),
+    std_inc = scale(med_income),
+    vulnerability_index = 4 - (index_create(std_pov) + index_create(std_white) +
+                                 index_create(std_ed) + index_create(std_inc))
+    ) %>% 
   select(-std_pov, -std_white, -std_ed, -std_inc)
+
 
 # Add additional variables
 
-CTs$white_percent <- (CTs$pop_white/ CTs$pop_total) * 100
-CTs$education_percent <- (CTs$education/ CTs$pop_total) * 100
-CTs$immigrant_percent <- (CTs$immigrant/ CTs$pop_total) * 100
-CTs$poverty_percent <- (CTs$poverty/ CTs$pop_total) * 100
+CTs <- 
+  CTs %>% 
+  mutate(white_percent = pop_white / pop_total * 100,
+         education_percent = education / pop_total * 100,
+         immigrant_percent = immigrant / pop_total * 100,
+         poverty_percent = poverty / pop_total * 100)
+
 
 ## Clip data to water
 
