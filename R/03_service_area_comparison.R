@@ -109,45 +109,61 @@ subway_buffer_comparison <- st_intersect_summarize(
   sum_vars = vars(pop_white, immigrant, education),
   mean_vars = vars(med_income, vulnerability_index))
 
-subway_buffer_comparison <- subway_buffer_comparison %>% mutate (vulnerability_index = as.double(vulnerability_index))
+subway_buffer_comparison <- subway_buffer_comparison %>% 
+  mutate (vulnerability_index = as.double(vulnerability_index))
 
-subway_buffer_vulnerability2.75 <- subway_buffer_comparison %>% filter(vulnerability_index > 2.75) %>% group_by(stop_id)
+subway_buffer_vulnerability2.75 <- subway_buffer_comparison %>% filter(vulnerability_index > 2.75)
 
+subway_buffer_vulnerability2.75 <- subway %>% 
+  filter(stop_id %in% subway_buffer_vulnerability2.75$stop_id) %>%
+  st_buffer(2000) %>% 
+  st_intersection(city) %>% 
+  st_erase(bike_service_filled)
 
-subway_buffer_union <- 
 subway_buffer_vulnerability2.75 <- st_intersection(NY_pumas, subway_buffer_vulnerability2.75) 
+plot(subway_buffer_vulnerability2.75[1])
+
+subway_service <- subway_service_areas[1]
+
+target_neighbourhoods <- subway_buffer_vulnerability2.75 %>% st_union() %>% st_collection_extract("POLYGON")
+
+plot(target_neighbourhoods)
+
+target_neighbourhoods_demographics <- st_intersect_summarize(
+  CTs,
+  target_neighbourhoods,
+  group_vars = vars(NA),
+  population = pop_total,
+  sum_vars = vars(pop_white, education, poverty),
+  mean_vars = vars(med_income, vulnerability_index))
+st_area(target_neighbourhoods_demographics)
+plot(target_neighbourhoods_demographics)
+
+#create target neighbourhood geography
+
+rockaway <- subway_buffer_vulnerability2.75 %>% filter(PUMACE10 == "04114") %>% st_union()
+
+jamaica <- subway_buffer_vulnerability2.75 %>% filter(PUMACE10 == "04112" | PUMACE10 == "04111" |PUMACE10 == "04113"| PUMACE10 == "04106")
+
+flushing <- subway_buffer_vulnerability2.75 %>% filter(PUMACE10 == "04103")
+
+sunset_park_bay_bridge <- subway_buffer_vulnerability2.75 %>% filter(PUMACE10 == "04012" | PUMACE10 == "04013" |PUMACE10 == "04014")
+
+jackson_heights_corona <- subway_buffer_vulnerability2.75 %>% filter(PUMACE10 == "04112" | PUMACE10 == "04111" |PUMACE10 == "04113"| PUMACE10 == "04106")
+
+jackson_heights_corona <- subway_buffer_vulnerability2.75 %>% filter(PUMACE10 == "04112" | PUMACE10 == "04111" |PUMACE10 == "04113"| PUMACE10 == "04106")
 
 
+
+#get demographics by target neighbourhoods
 subway_buffer_vulnerability2.75 <- st_intersect_summarize(
   CTs,
   subway_buffer_vulnerability2.75,
   group_vars = vars(PUMACE10, PUMA_name),
   population = pop_total,
-  sum_vars = vars(pop_white, education),
+  sum_vars = vars(pop_white, education, poverty),
   mean_vars = vars(med_income, vulnerability_index))
 
-subway_buffer_vulnerability2.75 <- subway_buffer_vulnerability2.75 %>% mutate (vulnerability_index = as.double(vulnerability_index), pop_total = as.double(pop_total))  %>% filter(pop_total>1000) %>% st_erase(bike_service_filled)
+subway_buffer_vulnerability2.75 <- subway_buffer_vulnerability2.75 %>% mutate (vulnerability_index = as.double(vulnerability_index), pop_total = as.double(pop_total))  %>% filter(pop_total>1000) 
 
 
-#create target neighbourhood geography
-
-rockaway <- subway_buffer_vulnerability2.75 %>% filter(PUMACE10 == "04114")
-
-jamaica <- subway_buffer_vulnerability2.75 %>% filter(PUMACE10 == "04112" | PUMACE10 == "04111" |PUMACE10 == "04113"| PUMACE10 == "04106")
-
-plot(subway_buffer_vulnerability2.75[1])
-
-
-?filter()
-
-plot(jamaica)
-
-?filter
-plot(subway_buffer_vulnerability2.75[,1])
-
-View(CTs)
-
-service_2018_demographics <- service_2018 %>% st_intersection(CTs) %>% filter(med_income.1 < 20000)
-plot(service_2018_demographics)
-
-rm(subway_buffers)

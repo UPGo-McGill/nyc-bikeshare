@@ -509,7 +509,26 @@ tm_shape(city) + tm_fill(col = "grey") +
   tm_compass(position = c(.9, .05))
   
 
-tm_shape(city) + tm_fill(col = "grey") +
+tm_shape(city)+
+  tm_fill(col ="#b2b2b2") +
+
+  tm_shape(target_neighbourhoods) +
+  tm_fill(col = "#db5727", 
+          title = "Bikeshare Expansion") +
+  tm_shape(bike_service_filled) +
+  tm_fill("#ffd92f") +
+  tm_layout(
+            main.title.size = 3,
+            legend.text.size = 1.1,
+            legend.title.size = 1.5,
+            frame = F,
+            legend.position = c(0.007,.8)) +
+  tm_compass(position = c(.9, .05))
+  
+  
+  
+  
+  
   tm_shape(subway_buffer_comparison) +
   tm_polygons ("pop_white", 
                textNA = "No Data", 
