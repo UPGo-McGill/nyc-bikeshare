@@ -54,9 +54,10 @@ tm_shape(city) +
 
 #service area demographic comparisons by year
 
+
 tm1 <- tm_shape(city)+
   tm_fill(col ="#b2b2b2") +
-  tm_shape(summary_serviceareas_no_service) +  
+  tm_shape(summary_serviceareas) +  
   tm_polygons("med_income",
               title = "",
               palette = "Greens",
@@ -71,7 +72,7 @@ tm1 <- tm_shape(city)+
 
 tm2 <- tm_shape(city)+
   tm_fill(col ="#b2b2b2") +
-  tm_shape(summary_serviceareas_no_service) +  
+  tm_shape(summary_serviceareas) +  
   tm_polygons("education",
               title = "",
               palette = "Blues",
@@ -86,7 +87,7 @@ tm2 <- tm_shape(city)+
 
 tm3 <- tm_shape(city)+
   tm_fill(col ="#b2b2b2") +
-  tm_shape(summary_serviceareas_no_service) +  
+  tm_shape(summary_serviceareas) +  
   tm_polygons("pop_white",
               title = "",
               palette = "Oranges",
@@ -100,7 +101,7 @@ tm3 <- tm_shape(city)+
 
 tm4 <- tm_shape(city)+
   tm_fill(col ="#b2b2b2") +
-  tm_shape(summary_serviceareas_no_service) +  
+  tm_shape(summary_serviceareas) +  
   tm_polygons("poverty",
               title = "",
               palette = c("#fee8c8","#fdbb84","#ef6548"),
@@ -118,9 +119,16 @@ tmap_arrange(tm1, tm2, tm3, tm4)
 
 
 #rockaway
+install.packages("osmdata")
+library(osmdata)
 
 
+plot(rockaway)
 
+tm_shape(rockaway)+
+  tm_fill(col ="#b2b2b2") + 
+  
+??osmdata
 
 
 #demographic maps
@@ -246,9 +254,9 @@ tm_shape(CTs) +
             legend.text.size = 1.1,
             legend.title.size = 1.5,
             legend.format = list(fun = function(x) paste0(formatC(x, digits = 0, format = "f"), "%")),
-            legend.position = c(0.007, 0.7)) +
+            legend.position = c(0.007, 0.65)) +
   tm_compass(position = c(.9, .075)) +
-  tm_credits("",
+  tm_credits("Population in poverty inside service area: 16.9%\nPopulation in poverty outside service area: 20.3%",
              size = 1,
              position = c(0.007,.93)) +
   tm_add_legend(type = "fill", labels = "2018 Citi Bike Service Area", col = "white", border.lwd = 2) 
