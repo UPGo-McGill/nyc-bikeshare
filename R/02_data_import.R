@@ -181,6 +181,8 @@ summary_service_areas <- st_intersect_summarize(
   sum_vars = vars(pop_white, immigrant, education, poverty),
   mean_vars = vars(med_income))
 
+rm(service_2014, service_2015, service_2016, service_2017, no_service_2013,
+   no_service_2018, bike_expansion_2013to2018)
 
 ## Create subway service and subway no-service areaa
 
