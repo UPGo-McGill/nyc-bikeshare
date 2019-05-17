@@ -241,8 +241,9 @@ no_service_2018 <- st_intersect_summarize(
   mean_vars = vars(med_income))
 
 
-summary_serviceareas_no_service <-rbind(service_2013, service_2018, no_service_2018)
-summary_serviceareas_no_service <- mutate(summary_serviceareas_no_service, "NA" = c("service_2013", "service_2018", "no_service") )   
+summary_serviceareas_no_service <-rbind(service_2018, service_2013, no_service_2018)
+colnames(summary_serviceareas_no_service)[colnames(summary_serviceareas_no_service)=="NA"] <- "service"
+summary_serviceareas_no_service <- mutate(summary_serviceareas_no_service, service = c("service_2013", "service_2018", "no_service") )  
 
 ## Create subway service and subway no-service areaa
 
