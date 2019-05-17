@@ -14,7 +14,7 @@ ggplot(mtcars, aes(x=wt, y=mpg)) + geom_point() +
 
 
 #servicearea expansion time-lapse map
-
+{
 tm_shape(city) +
   tm_fill(col = "#f0f0f0", 
           title = "Base Map") +
@@ -50,23 +50,68 @@ tm_shape(city) +
                 labels = c("2013", "2014", "2015", "2016", "2017", "2018"),
                 col = c("#ffd92f", "#a6d854", "#6bb2db", "#4fa35f", "#db5727", "#ff9b30"),
                 )
+  }
 
 #service area demographic comparisons by year
 
-tm_shape(summary_serviceareas_no_service) +  
+tm1 <- tm_shape(summary_serviceareas_no_service) +  
   tm_polygons("med_income",
-              title = "Median Household Income",
+              title = "",
               palette = "Greens",
               breaks = c(0,55000,91000,100000),
-              labels = c("hi","hey","yo")) +
+              labels = c("$99,792","$90,395","$54,688"),
+              border.alpha = 0) +
   tm_legend(position = c("left","top"),
-            text.size = 1.5)
+            text.size =2) +
+  tm_layout(main.title.size = 2.7,
+            main.title = "Median Household Income")
 
-?tm_legend
+tm2 <- tm_shape(summary_serviceareas_no_service) +  
+  tm_polygons("Bachlor's Degree Attainment",
+              title = "",
+              palette = "Blues",
+              border.alpha = 0,
+              breaks = c(0,0.2,0.48,0.55),
+              labels = c("52.1%","47.5%","19.0%")) +
+  tm_legend(position = c("left","top"),
+            text.size =2) +
+  tm_layout(main.title.size = 2.7,
+            main.title = "Education")
 
-#rockway
+tm3 <- tm_shape(summary_serviceareas_no_service) +  
+  tm_polygons("pop_white",
+              title = "",
+              palette = "Oranges",
+              border.alpha = 0,
+              breaks = c(0,0.3,0.52,0.6),
+              labels = c("55.3%","51.8%","26.2%")) +
+  tm_legend(position = c("left","top"),
+            text.size =2) +
+  tm_layout(main.title.size = 2.7,
+            main.title = "White Population")
 
-tm(summary_serviceareas)
+tm4 <- tm_shape(summary_serviceareas_no_service) +  
+  tm_polygons("poverty",
+              title = "",
+              palette = c("#fee8c8", "#fdbb84","#ef6548"),
+              border.alpha = 0,
+              breaks = c(0,0.15,0.2,0.3),
+              labels = c("14.9%","15.9%","20.3%")) +
+  tm_legend(position = c("left","top"),
+            text.size =2) +
+  tm_layout(main.title.size = 2.7,
+            main.title = "Population in Poverty")
+
+
+?tmap_arrange()
+
+tm1
+tmap_arrange(tm1, tm2, tm3, tm4)
+
+
+#rockaway
+
+
 
 
 
