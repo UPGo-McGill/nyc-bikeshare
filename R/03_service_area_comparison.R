@@ -111,7 +111,7 @@ subway_buffer_comparison <- st_intersect_summarize(
 
 subway_buffer_comparison <- subway_buffer_comparison %>% mutate (vulnerability_index = as.double(vulnerability_index))
 
-subway_buffer_vulnerability2.75 <- subway_buffer_comparison %>% filter(vulnerability_index > 2.77) %>% st_union
+subway_buffer_vulnerability2.75 <- subway_buffer_comparison %>% filter(vulnerability_index > 2.75) %>% st_union
 
 
 subway_buffer_vulnerability2.75 <- st_intersection(NY_pumas, subway_buffer_vulnerability2.75) 
@@ -127,7 +127,26 @@ subway_buffer_vulnerability2.75 <- st_intersect_summarize(
 
 subway_buffer_vulnerability2.75 <- subway_buffer_vulnerability2.75 %>% mutate (vulnerability_index = as.double(vulnerability_index), pop_total = as.double(pop_total))  %>% filter(pop_total>1000) %>% st_erase(bike_service_filled)
 
-rockaway <- filter(subway_buffer_vulnerability2.75, PUMACE10 == "04114")
 
+#create target neighbourhood geography
+
+rockaway <- subway_buffer_vulnerability2.75 %>% filter(PUMACE10 == "04114")
+
+jamaica <- subway_buffer_vulnerability2.75 %>% filter(PUMACE10 == "04112" | PUMACE10 == "04111" |PUMACE10 == "04113"| PUMACE10 == "04106")
+
+plot(subway_buffer_vulnerability2.75[1])
+
+
+?filter()
+
+plot(jamaica)
+
+?filter
+plot(subway_buffer_vulnerability2.75[,1])
+
+View(CTs)
+
+service_2018_demographics <- service_2018 %>% st_intersection(CTs) %>% filter(med_income.1 < 20000)
+plot(service_2018_demographics)
 
 rm(subway_buffers)
