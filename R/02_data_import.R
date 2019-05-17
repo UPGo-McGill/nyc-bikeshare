@@ -116,48 +116,39 @@ CTs <-
 
 ## Clip data to water
 
-CTs <- st_erase(CTs, ny_water)
+CTs <- suppressWarnings(st_erase(CTs, ny_water))
+
 
 ## Get counties and city
 
-counties <- get_acs(
+counties <- suppressWarnings(get_acs(
   geography = "county", 
   variables = c(pop_white = "B02001_002"),
   year = 2017, 
   state = "36",
-  county = c("New York County",
-             "Kings County",
-             "Queens County",
-             "Bronx County",
+  county = c("New York County", "Kings County", "Queens County", "Bronx County",
              "Richmond County"),
   geometry = TRUE) %>%
   st_transform(26918) %>% 
-  st_erase(ny_water) 
+  st_erase(ny_water))
 
 city <- 
   st_union(counties)
 
 
-## Create service and no-service areas for 2018 and 2013
+## Create service and no-service areas
 
-service_2018 <- 
-  suppressWarnings(station_list %>%
-                     filter(Year == 2018) %>%
-                     st_buffer(300) %>%
-                     st_union() %>%
-                     st_erase(ny_water) )
+service_2013 <- service_create(2013)
+service_2014 <- service_create(2014)
+service_2015 <- service_create(2015)
+service_2016 <- service_create(2016)
+service_2017 <- service_create(2017)
+service_2018 <- service_create(2018)
 
 no_service_2018 <- 
   CTs %>%
   st_union %>%
   st_erase(service_2018)
-
-service_2013 <- 
-  suppressWarnings(station_list %>%
-                     filter(Year == 2013) %>%
-                     st_buffer(300) %>%
-                     st_union() %>%
-                     st_erase(ny_water) )
 
 no_service_2013 <- 
   CTs %>%
@@ -171,43 +162,14 @@ bike_service_areas <-
            c(service_2013, no_service_2013, service_2018, no_service_2018)) %>%
   st_as_sf()
 
-bike_expansion_2013to2018 <- service_2018 %>% 
-  st_erase(service_2013)
+bike_expansion_2013to2018 <- st_erase(service_2018, service_2013)
 
 
 ## Create service areas for 2014-2016 for service area growth
 
-service_2014 <- 
-  suppressWarnings(station_list %>%
-                     filter(Year == 2014) %>%
-                     st_buffer(300) %>%
-                     st_union() %>%
-                     st_erase(ny_water) )
-
-service_2015 <- 
-  suppressWarnings(station_list %>%
-                     filter(Year == 2015) %>%
-                     st_buffer(300) %>%
-                     st_union() %>%
-                     st_erase(ny_water) )
-
-service_2016 <- 
-  suppressWarnings(station_list %>%
-                     filter(Year == 2016) %>%
-                     st_buffer(300) %>%
-                     st_union() %>%
-                     st_erase(ny_water) )
-
-service_2017 <- 
-  suppressWarnings(station_list %>%
-                     filter(Year == 2017) %>%
-                     st_buffer(300) %>%
-                     st_union() %>%
-                     st_erase(ny_water) )
-
 growth_2018 <- st_difference(service_2018, service_2017)
-growth_2017 <- st_difference(service_2017, service_2016)
-growth_2017 <- st_erase(growth_2017, (filter(counties, NAME == "Bronx County, New York")))
+growth_2017 <- st_difference(service_2017, service_2016) %>%
+  st_erase((filter(counties, NAME == "Bronx County, New York")))
 growth_2016 <- st_difference(service_2016, service_2015)
 growth_2015 <- st_difference(service_2015, service_2014)
 growth_2014 <- st_difference(service_2014, service_2013)
