@@ -99,27 +99,16 @@ CTs <-
                                       index_create(std_inc))) %>% 
   select(-std_pov, -std_white, -std_ed, -std_inc)
 
-
-
 # Add additional variables
 
-CTs$white_percent <- NA
 CTs$white_percent <- (CTs$pop_white/ CTs$pop_total) * 100
-
-CTs$education_percent <- NA
 CTs$education_percent <- (CTs$education/ CTs$pop_total) * 100
-
-CTs$immigrant_percent <- NA
 CTs$immigrant_percent <- (CTs$immigrant/ CTs$pop_total) * 100
-
-CTs$poverty_percent <- NA
 CTs$poverty_percent <- (CTs$poverty/ CTs$pop_total) * 100
-
 
 ## Clip data to water
 
 CTs <- st_erase(CTs, ny_water)
-
 
 ## Get counties and city
 
@@ -210,11 +199,10 @@ service_2017 <-
 
 growth_2018 <- st_difference(service_2018, service_2017)
 growth_2017 <- st_difference(service_2017, service_2016)
+growth_2017 <- st_erase(growth_2017, (filter(counties, NAME == "Bronx County, New York")))
 growth_2016 <- st_difference(service_2016, service_2015)
 growth_2015 <- st_difference(service_2015, service_2014)
 growth_2014 <- st_difference(service_2014, service_2013)
-
-growth_2017 <- st_erase(growth_2017, (filter(counties, NAME == "Bronx County, New York")))
 
 
 service_2013 <- st_intersect_summarize(
