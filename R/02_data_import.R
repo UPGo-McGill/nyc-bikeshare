@@ -177,8 +177,6 @@ bike_service_areas <-
 bike_expansion_2013to2018 <- service_2018 %>% 
   st_erase(service_2013)
 
-rm(service_2018, no_service_2018, service_2013, no_service_2013)
-
 
 ## Create service areas for 2014-2016 for service area growth
 
@@ -223,7 +221,7 @@ service_2013 <- st_intersection(CTs, service_2013)
 service_2013 <- st_intersect_summarize(
   CTs,
   service_2013,
-  group_vars = ,
+  group_vars = NA,
   population = pop_total,
   sum_vars = vars(pop_white, immigrant, education),
   mean_vars = vars(med_income))
@@ -276,8 +274,6 @@ service_2018 <- st_intersect_summarize(
 summary_serviceareas <- rbind(service_2013,service_2014,service_2015,service_2016,service_2017,service_2018)
 summary_serviceareas$year <- c("2013", "2014", "2015", "2016", "2017", "2018")
 
-st_area(service_2018)/1000000
-
 
 ## Create subway service and subway no-service areaa
 
@@ -300,3 +296,4 @@ subway_service_areas <-
   st_as_sf()
 
 rm(subway_service, subway_no_service, geom, ny_water)
+
