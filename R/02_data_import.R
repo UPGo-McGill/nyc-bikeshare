@@ -145,15 +145,8 @@ service_2016 <- service_create(2016)
 service_2017 <- service_create(2017)
 service_2018 <- service_create(2018)
 
-no_service_2018 <- 
-  CTs %>%
-  st_union %>%
-  st_erase(service_2018)
-
-no_service_2013 <- 
-  CTs %>%
-  st_union %>%
-  st_erase(service_2013)
+no_service_2018 <- CTs %>% st_union %>% st_erase(service_2018)
+no_service_2013 <- CTs %>% st_union %>% st_erase(service_2013)
 
 bike_service_areas <-
   tibble(year = c(2013, 2013, 2018, 2018),
@@ -165,7 +158,7 @@ bike_service_areas <-
 bike_expansion_2013to2018 <- st_erase(service_2018, service_2013)
 
 
-## Create service areas for 2014-2016 for service area growth
+## Create growth areas
 
 growth_2018 <- st_difference(service_2018, service_2017)
 growth_2017 <- st_difference(service_2017, service_2016) %>%
@@ -175,62 +168,24 @@ growth_2015 <- st_difference(service_2015, service_2014)
 growth_2014 <- st_difference(service_2014, service_2013)
 
 
-service_2013 <- st_intersect_summarize(
-  CTs,
-  service_2013,
-  group_vars = NA,
-  population = pop_total,
-  sum_vars = vars(pop_white, immigrant, education),
-  mean_vars = vars(med_income))
+## Create summary_service_areas
 
+output <- 
+  map(list(service_2013, service_2014, service_2015, service_2016, service_2017,
+           service_2018), ~st_intersect_summarize(
+             CTs,
+             .,
+             group_vars = NA,
+             population = pop_total,
+             sum_vars = vars(pop_white, immigrant, education),
+             mean_vars = vars(med_income)))
 
-service_2014 <- st_intersect_summarize(
-  CTs,
-  service_2014,
-  group_vars = NA,
-  population = pop_total,
-  sum_vars = vars(pop_white, immigrant, education),
-  mean_vars = vars(med_income))
+summary_service_areas <- do.call(rbind, output) %>% 
+  mutate(year = 2013:2018) %>% 
+  select(year, everything()) %>% 
+  select(-`NA`)
 
-
-service_2015 <- st_intersect_summarize(
-  CTs,
-  service_2015,
-  group_vars = NA,
-  population = pop_total,
-  sum_vars = vars(pop_white, immigrant, education),
-  mean_vars = vars(med_income))
-
-
-service_2016 <- st_intersect_summarize(
-  CTs,
-  service_2016,
-  group_vars = NA,
-  population = pop_total,
-  sum_vars = vars(pop_white, immigrant, education),
-  mean_vars = vars(med_income))
-
-
-service_2017 <- st_intersect_summarize(
-  CTs,
-  service_2017,
-  group_vars = NA,
-  population = pop_total,
-  sum_vars = vars(pop_white, immigrant, education),
-  mean_vars = vars(med_income))
-
-
-service_2018 <- st_intersect_summarize(
-  CTs,
-  service_2018,
-  group_vars = NA,
-  population = pop_total,
-  sum_vars = vars(pop_white, immigrant, education),
-  mean_vars = vars(med_income))
-
-summary_serviceareas <- rbind(service_2013,service_2014,service_2015,service_2016,service_2017,service_2018)
-summary_serviceareas$year <- c("2013", "2014", "2015", "2016", "2017", "2018")
-
+rm(output)
 
 no_service_2018 <- st_intersect_summarize(
   CTs,
@@ -239,7 +194,6 @@ no_service_2018 <- st_intersect_summarize(
   population = pop_total,
   sum_vars = vars(pop_white, immigrant, education),
   mean_vars = vars(med_income))
-
 
 summary_serviceareas_no_service <-rbind(service_2018, service_2013, no_service_2018)
 colnames(summary_serviceareas_no_service)[colnames(summary_serviceareas_no_service)=="NA"] <- "service"
