@@ -56,3 +56,14 @@ st_intersect_summarize <- function(data, poly, group_vars, population, sum_vars,
 index_create <- function(var) {
   (var - min(var)) / (max(var) - min(var))
 }
+
+
+## service_create helper function
+
+service_create <- function(year) {
+  suppressWarnings(station_list %>%
+                     filter(Year == year) %>%
+                     st_buffer(300) %>%
+                     st_union() %>%
+                     st_erase(ny_water))
+}

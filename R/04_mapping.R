@@ -1,5 +1,18 @@
 ### MAP MAKING #################################################################
 
+#trying to figure out fonts
+
+install.packages("extrafont")
+library(extrafont)
+
+font_import()
+
+ggplot(mtcars, aes(x=wt, y=mpg)) + geom_point() +
+  ggtitle("Title text goes here") +
+  theme(plot.title = element_text(size = 16, family="Georgia", face="italic"))
+
+
+
 #servicearea expansion time-lapse map
 
 tm_shape(city) +
@@ -38,6 +51,25 @@ tm_shape(city) +
                 col = c("#ffd92f", "#a6d854", "#6bb2db", "#4fa35f", "#db5727", "#ff9b30"),
                 )
 
+#service area demographic comparisons by year
+
+tm_shape(summary_serviceareas_no_service) +  
+  tm_polygons("med_income",
+              title = "Median Household Income",
+              palette = "Greens",
+              breaks = c(0,55000,91000,100000),
+              labels = c("hi","hey","yo")) +
+  tm_legend(position = c("left","top"),
+            text.size = 1.5)
+
+?tm_legend
+
+#rockway
+
+tm(summary_serviceareas)
+
+
+
 #demographic maps
 
 {
@@ -70,21 +102,8 @@ tm_shape(city)+
              position = c(0.006,.92))   +
   tm_add_legend(type = "fill", labels = "2018 Citi Bike Service Area", col = "white", border.lwd = 2) +
   tm_add_legend(type = "fill", labels = "No Data", col = "#e0e0e0") 
-  
-  
-  
-  ggplot(mtcars, aes(x=wt, y=mpg)) + geom_point() +
-    ggtitle("Title text goes here") +
-    theme(plot.title = element_text(size = 16, family="Georgia", face="italic"))
-  
-  
-  library(extrafont)
-  install.packages("extrafont")
-  font_import()
 
-  warnings()
   
-  warnings()
   
 tm_shape(CTs) +
   tm_polygons ("white_percent", 
