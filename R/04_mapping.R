@@ -54,7 +54,7 @@ tm_shape(city) +
 
 #service area demographic comparisons by year
 
-tm1 <- tm_shape(summary_serviceareas_no_service) +  
+tm_shape(summary_serviceareas_no_service) +  
   tm_polygons("med_income",
               title = "",
               palette = "Greens",
@@ -66,8 +66,9 @@ tm1 <- tm_shape(summary_serviceareas_no_service) +
   tm_layout(main.title.size = 2.7,
             main.title = "Median Household Income")
 
-tm2 <- tm_shape(summary_serviceareas_no_service) +  
-  tm_polygons("Bachlor's Degree Attainment",
+
+tm_shape(summary_serviceareas_no_service) +  
+  tm_polygons("education",
               title = "",
               palette = "Blues",
               border.alpha = 0,
@@ -76,9 +77,10 @@ tm2 <- tm_shape(summary_serviceareas_no_service) +
   tm_legend(position = c("left","top"),
             text.size =2) +
   tm_layout(main.title.size = 2.7,
-            main.title = "Education")
+            main.title = "Bachlor's Degree Attainment")
 
-tm3 <- tm_shape(summary_serviceareas_no_service) +  
+
+tm_shape(summary_serviceareas_no_service) +  
   tm_polygons("pop_white",
               title = "",
               palette = "Oranges",
@@ -90,10 +92,10 @@ tm3 <- tm_shape(summary_serviceareas_no_service) +
   tm_layout(main.title.size = 2.7,
             main.title = "White Population")
 
-tm4 <- tm_shape(summary_serviceareas_no_service) +  
+tm_shape(summary_serviceareas_no_service) +  
   tm_polygons("poverty",
               title = "",
-              palette = c("#fee8c8", "#fdbb84","#ef6548"),
+              palette = c("#fee8c8","#fdbb84","#ef6548"),
               border.alpha = 0,
               breaks = c(0,0.15,0.2,0.3),
               labels = c("14.9%","15.9%","20.3%")) +
@@ -103,10 +105,6 @@ tm4 <- tm_shape(summary_serviceareas_no_service) +
             main.title = "Population in Poverty")
 
 
-?tmap_arrange()
-
-tm1
-tmap_arrange(tm1, tm2, tm3, tm4)
 
 
 #rockaway
