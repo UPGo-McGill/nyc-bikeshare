@@ -87,11 +87,10 @@ figure[[3]] <-
   tm_fill(col = "grey80", title = "Base Map") +
   tm_shape(CTs) +
   tm_polygons("poverty_pct",
-              textNA = "No Data", 
               title = "Inside service area: 16.9%\nOutside service area: 20.3%", 
               border.alpha = 0,
               palette = c("#ef6548", "#fdbb84","#fdd49e","#fee8c8"),
-              breaks = c(0,15,30,45,60)) +
+              breaks = c(0, .15, .30, .45, .60)) +
   tm_shape(bike_service_areas[3,]) +
   tm_borders(col = "black", lwd = 2) +
   tm_layout(frame = TRUE,
@@ -123,12 +122,11 @@ figure[[4]] <-
   tm_shape(nyc_city) +
   tm_fill(col = "grey80", title = "Base Map") +
   tm_shape(CTs) +
-  tm_polygons("white_pct",
-              textNA = "No Data", 
+  tm_polygons("pop_white_pct",
               title = "Inside service area: 52%\nOutside service area: 26%", 
               border.alpha = 0,
               palette = "Oranges",
-              breaks = c(0,15,30,45,60)) +
+              breaks = c(0, .15, .30, .45, .60)) +
   tm_shape(bike_service_areas[3,]) +
   tm_borders(col = "black", lwd = 2) +
   tm_layout(frame = TRUE,
@@ -161,7 +159,6 @@ figure[[5]] <-
   tm_fill(col = "grey80", title = "Base Map") +
   tm_shape(CTs) +
   tm_polygons("education_pct",
-              textNA = "No Data", 
               title = "Inside service area: 48%\nOutside service area: 19%", 
               border.alpha = 0,
               palette = "Blues") +
