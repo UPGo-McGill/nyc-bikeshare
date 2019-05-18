@@ -5,9 +5,74 @@
 source("R/01_helper_functions.R")
 
 
-## Import and clean up station data
 
-station_list <-
+### Import census geographies ####
+
+## Import water
+
+nyc_water <- rbind(
+  area_water("NY", "New York", class = "sf"),
+  area_water("NY", "Kings", class = "sf"),
+  area_water("NY", "Queens", class = "sf"),
+  area_water("NY", "Bronx", class = "sf"),
+  area_water("NY", "Richmond", class = "sf"),
+  area_water("NY", "Nassau", class = "sf"),
+  area_water("NY", "Westchester", class = "sf"),
+  area_water("NJ", "Bergen", class = "sf"),
+  area_water("NJ", "Hudson", class = "sf"),
+  area_water("NJ", "Union", class = "sf"),
+  area_water("NJ", "Middlesex", class = "sf"),
+  area_water("NJ", "Somerset", class = "sf"),
+  area_water("NJ", "Morris", class = "sf"),
+  area_water("NJ", "Monmouth", class = "sf"),
+  area_water("NJ", "Essex", class = "sf"),
+  area_water("NJ", "Passaic", class = "sf")) %>% 
+  st_transform(26918) %>% 
+  st_union()
+
+
+## Import CMA, city and county boundaries
+
+nyc_msa <- suppressWarnings(
+  counties(state = c("New York", "New Jersey"), class = "sf") %>% 
+  as_tibble() %>% 
+  st_as_sf() %>% 
+  st_transform(26918) %>% 
+  filter(NAME %in% c("New York", "Kings", "Queens", "Bronx", "Richmond",
+                     "Nassau", "Westchester", "Bergen", "Hudson", "Monmouth",
+                     "Middlesex", "Somerset", "Morris", "Essex", "Union",
+                     "Passaic"),
+         !(STATEFP == "36" & NAME == "Essex")) %>% 
+  st_erase(nyc_water))
+
+nyc_city <- nyc_msa %>%
+  filter(NAME %in% c("New York", "Kings", "Queens", "Bronx", "Richmond")) %>% 
+  st_union()
+
+bronx <- nyc_msa %>% 
+  filter(NAME == "Bronx")
+
+nyc_msa <- st_union(nyc_msa)
+
+
+## Import PUMAs
+
+nyc_pumas <- pumas(36, class = "sf") %>% 
+  st_transform(26918) %>%
+  as_tibble() %>% 
+  st_as_sf() %>%
+  mutate(PUMA_name = NAMELSAD10) %>% 
+  select(-GEOID10, -NAMELSAD10, -STATEFP10, -MTFCC10, -FUNCSTAT10, -ALAND10,
+         -AWATER10, -INTPTLAT10, -INTPTLON10) %>%
+  filter(str_detect(PUMA_name, "NYC-"))
+
+
+
+### Import bike and subway data ####
+
+## Import bike data
+
+bike_stations <-
   st_read("data/station_list.csv", stringsAsFactors = FALSE) %>%
   as_tibble() %>%
   st_as_sf() %>% 
@@ -16,18 +81,9 @@ station_list <-
   mutate(ID = as.numeric(ID), Year = as.numeric(Year))
 
 
-## Import subway data and Public Use Microdata Areas
+## Import subway data
 
-NY_pumas <- pumas(36) %>% 
-  st_as_sf() %>% 
-  st_transform(26918) %>%
-  as_tibble() %>% 
-  st_as_sf() %>%
-  mutate(PUMA_name = NAMELSAD10) %>% 
-  select(-GEOID10, -NAMELSAD10, -STATEFP10, -MTFCC10, -FUNCSTAT10, -ALAND10,
-         -AWATER10, -INTPTLAT10, -INTPTLON10)
-
-subway <-
+subway_stations <-
   st_read("data", "stops_nyc_subway_nov2018") %>%  
   st_transform(26918) %>% 
   as_tibble() %>% 
@@ -35,22 +91,18 @@ subway <-
   mutate(borough = NAMELSAD) %>% 
   select(-NAMELSAD, -stop_id2, -GEOID, -stop_lat, -stop_lon)
 
+subway_lines <-
+  opq(bbox = "new york city") %>% 
+  add_osm_feature(key = "railway", value = "subway") %>% 
+  osmdata_sf() %>%
+  `$`("osm_lines") %>% 
+  as_tibble() %>% 
+  st_as_sf() %>% 
+  filter(str_detect(name, "Line"))
 
-## Import water
 
-mh_water <- area_water("NY", "New York", class = "sf")
-bk_water <- area_water("NY", "Kings", class = "sf")
-qn_water <- area_water("NY", "Queens", class = "sf")
-bx_water <- area_water("NY", "Bronx", class = "sf")
-si_water <- area_water("NY", "Richmond", class = "sf")
 
-ny_water <-
-  rbind(mh_water, bk_water, qn_water, bx_water, si_water) %>% 
-  st_transform(26918) %>% 
-  st_union()
-
-rm(mh_water, bk_water, qn_water, bx_water, si_water)
-
+### Import census data ####
 
 ## Import, clean up and spread census data
 
@@ -116,25 +168,11 @@ CTs <-
 
 ## Clip data to water
 
-CTs <- suppressWarnings(st_erase(CTs, ny_water))
+CTs <- suppressWarnings(st_erase(CTs, nyc_water))
 
 
-## Get counties and city
 
-counties <- suppressWarnings(get_acs(
-  geography = "county", 
-  variables = c(pop_white = "B02001_002"),
-  year = 2017, 
-  state = "36",
-  county = c("New York County", "Kings County", "Queens County", "Bronx County",
-             "Richmond County"),
-  geometry = TRUE) %>%
-  st_transform(26918) %>% 
-  st_erase(ny_water))
-
-city <- 
-  st_union(counties)
-
+### Create service areas ####
 
 ## Create service and no-service areas
 
@@ -161,36 +199,25 @@ bike_expansion_2013to2018 <- st_erase(service_2018, service_2013)
 ## Create growth areas
 
 growth_2018 <- st_difference(service_2018, service_2017)
-growth_2017 <- st_difference(service_2017, service_2016) %>%
-  st_erase((filter(counties, NAME == "Bronx County, New York")))
+growth_2017 <- st_difference(service_2017, service_2016) %>% st_erase(bronx)
 growth_2016 <- st_difference(service_2016, service_2015)
 growth_2015 <- st_difference(service_2015, service_2014)
 growth_2014 <- st_difference(service_2014, service_2013)
 
+growth <- tibble(
+  year = c("2013", "2014", "2015", "2016", "2017", "2018"),
+  geometry = c(service_2013, growth_2014,growth_2015, growth_2016, growth_2017,
+               growth_2018)) %>% 
+  st_as_sf()
 
-## Create summary_service_areas
-
-summary_service_areas <- st_intersect_summarize(
-  CTs,
-  tibble(
-    service = c("service_2013", "service_2018", "no_service"),
-    geometry = c(service_2013, bike_expansion_2013to2018, no_service_2018))
-  %>% st_as_sf(),
-  group_vars = vars(service),
-  population = pop_total,
-  sum_vars = vars(pop_white, immigrant, education, poverty),
-  mean_vars = vars(med_income))
-
-rm(service_2014, service_2015, service_2016, service_2017, no_service_2013,
-   no_service_2018, bike_expansion_2013to2018)
 
 ## Create subway service and subway no-service areaa
 
 subway_service <- 
-  suppressWarnings(subway %>%
+  suppressWarnings(subway_stations %>%
                      st_buffer(800) %>%
                      st_union() %>%
-                     st_erase(ny_water)) 
+                     st_erase(nyc_water)) 
 
 subway_no_service <- 
   CTs %>%
@@ -204,5 +231,11 @@ subway_service_areas <-
          geometry = geom) %>% 
   st_as_sf()
 
-rm(subway_service, subway_no_service, geom, ny_water)
+
+## Clean up
+
+rm(service_2013, service_2014, service_2015, service_2016, service_2017,
+   service_2018, no_service_2013, no_service_2018, bike_expansion_2013to2018,
+   growth_2014, growth_2015, growth_2016, growth_2017, growth_2018, bronx,
+   subway_service, subway_no_service, geom)
 

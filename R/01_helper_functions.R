@@ -1,6 +1,6 @@
 ### HELPER FUNCTIONS
 
-## Load libraries
+## Load libraries and fonts
 
 library(smoothr)
 library(tidycensus)
@@ -9,8 +9,11 @@ library(sf)
 library(units)
 library(tigris)
 library(tmap)
+library(tmaptools)
+library(extrafont)
+library(osmdata)
 options(tigris_use_cache = TRUE)
-
+suppressWarnings(font_import(paths = "data/fonts", prompt = FALSE))
 
 ## st_erase helper function
 
@@ -61,9 +64,9 @@ index_create <- function(var) {
 ## service_create helper function
 
 service_create <- function(year) {
-  suppressWarnings(station_list %>%
+  suppressWarnings(bike_stations %>%
                      filter(Year == year) %>%
                      st_buffer(300) %>%
                      st_union() %>%
-                     st_erase(ny_water))
+                     st_erase(nyc_water))
 }
