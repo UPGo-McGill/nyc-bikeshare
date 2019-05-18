@@ -86,7 +86,7 @@ figure[[3]] <-
   tm_shape(nyc_city) +
   tm_fill(col = "grey80", title = "Base Map") +
   tm_shape(CTs) +
-  tm_polygons("poverty_percent",
+  tm_polygons("poverty_pct",
               textNA = "No Data", 
               title = "Inside service area: 16.9%\nOutside service area: 20.3%", 
               border.alpha = 0,
@@ -97,7 +97,7 @@ figure[[3]] <-
   tm_layout(frame = TRUE,
             title = "Figure 3. Poverty rate",
             legend.format = list(
-              fun = function(x) paste0(formatC(x, digits = 0, 
+              fun = function(x) paste0(formatC(x * 100, digits = 0, 
                                                format = "f"), "%")),
             main.title.size = 1.5,
             legend.title.size = 1.2,
@@ -123,7 +123,7 @@ figure[[4]] <-
   tm_shape(nyc_city) +
   tm_fill(col = "grey80", title = "Base Map") +
   tm_shape(CTs) +
-  tm_polygons("white_percent",
+  tm_polygons("white_pct",
               textNA = "No Data", 
               title = "Inside service area: 52%\nOutside service area: 26%", 
               border.alpha = 0,
@@ -134,7 +134,7 @@ figure[[4]] <-
   tm_layout(frame = TRUE,
             title = "Figure 4. Non-hispanic white population",
             legend.format = list(
-              fun = function(x) paste0(formatC(x, digits = 0, 
+              fun = function(x) paste0(formatC(x * 100, digits = 0, 
                                                format = "f"), "%")),
             main.title.size = 1.5,
             legend.title.size = 1.2,
@@ -160,7 +160,7 @@ figure[[5]] <-
   tm_shape(nyc_city) +
   tm_fill(col = "grey80", title = "Base Map") +
   tm_shape(CTs) +
-  tm_polygons("education_percent",
+  tm_polygons("education_pct",
               textNA = "No Data", 
               title = "Inside service area: 48%\nOutside service area: 19%", 
               border.alpha = 0,
@@ -170,7 +170,7 @@ figure[[5]] <-
   tm_layout(frame = TRUE,
             title = "Figure 5. Population with a bachelor's degree or more",
             legend.format = list(
-              fun = function(x) paste0(formatC(x, digits = 0, 
+              fun = function(x) paste0(formatC(x * 100, digits = 0, 
                                                format = "f"), "%")),
             main.title.size = 1.5,
             legend.title.size = 1.2,
@@ -413,7 +413,7 @@ tm_shape(rockaway)+
 
 
 tm_shape(CTs) +
-  tm_polygons ("immigrant_percent", 
+  tm_polygons ("immigrant_pct", 
                textNA = "No Data", 
                title = "Non-Citizen Population", 
                border.alpha = 0,
@@ -551,7 +551,7 @@ tm_shape(CTs) +
 # race
 
 tm_shape(CTs) +
-  tm_polygons ("white_percent", 
+  tm_polygons ("white_pct", 
                textNA = "No Data", 
                title = "White Population", 
                border.alpha = 0,
@@ -598,7 +598,7 @@ tm_shape(CTs) +
 # race
 
 tm_shape(CTs) +
-  tm_polygons ("white_percent", 
+  tm_polygons ("white_pct", 
                textNA = "No Data", 
                title = "White Population", 
                alpha = 1,

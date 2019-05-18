@@ -165,14 +165,12 @@ CTs <-
   select(-std_pov, -std_white, -std_ed, -std_inc)
 
 
-# Add additional variables
+# Add percentage variables
 
 CTs <- 
   CTs %>% 
-  mutate(white_percent = pop_white / pop_total * 100,
-         education_percent = education / pop_total * 100,
-         immigrant_percent = immigrant / pop_total * 100,
-         poverty_percent = poverty / pop_total * 100)
+  mutate_at(c("pop_white", "education", "immigrant", "poverty"),
+            list(pct = ~. / CTs$pop_total))
 
 
 ## Clip data to water
