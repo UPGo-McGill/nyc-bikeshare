@@ -76,7 +76,7 @@ subway_service_comparison <-
 ## Take subway service area, add 2000 m buffers, subtract 800m buffers
 
 expansion_subway_service_areas <- 
-  suppressWarnings(subway %>%
+  suppressWarnings(subway_stations %>%
                      st_buffer(2000) %>%
                      st_union() %>% 
                      st_erase(subway_service_areas[1,]) )
@@ -89,7 +89,7 @@ expansion_bike_service_areas <-
 
 expansion_subway_service_areas <-
   expansion_subway_service_areas %>%
-  st_intersection(city) %>% 
+  st_intersection(nyc_city) %>% 
   st_collection_extract("POLYGON")
 
 
@@ -100,7 +100,7 @@ bike_service_filled <- fill_holes(bike_service_areas$geometry[3], 10000000)
 
 ## Take bike service area, add 2000 m buffers, and subtract 300 m buffers
 
-expansion_bike_service_areas <- station_list %>%
+expansion_bike_service_areas <- bike_stations %>%
   filter(Year == 2018) %>%
   st_buffer(2000)%>%
   st_union() %>%
@@ -108,7 +108,7 @@ expansion_bike_service_areas <- station_list %>%
 
 expansion_bike_service_areas <-
   expansion_bike_service_areas %>%
-  st_intersection(city) %>% 
+  st_intersection(nyc_city) %>% 
   st_collection_extract("POLYGON")
 
 
@@ -129,24 +129,27 @@ subway_buffer_comparison <- st_intersect_summarize(
   mean_vars = vars(med_income, vulnerability_index))
 
 subway_buffer_comparison <- subway_buffer_comparison %>% 
-  mutate (vulnerability_index = as.double(vulnerability_index))
+  mutate(vulnerability_index = as.double(vulnerability_index))
 
-subway_buffer_vulnerability2.75 <- subway_buffer_comparison %>% filter(vulnerability_index > 2.75)
+subway_buffer_vulnerability2.75 <-
+  subway_buffer_comparison %>%
+  filter(vulnerability_index > 2.75)
 
 subway_buffer_vulnerability2.75 <- subway_stations %>% 
   filter(stop_id %in% subway_buffer_vulnerability2.75$stop_id) %>%
   st_buffer(2000) %>% 
-  st_intersection(city) %>% 
+  st_intersection(nyc_city) %>% 
   st_erase(bike_service_filled)
 
-subway_buffer_vulnerability2.75 <- st_intersection(nyc_pumas, subway_buffer_vulnerability2.75) 
-plot(subway_buffer_vulnerability2.75[1])
+subway_buffer_vulnerability2.75 <-
+  st_intersection(nyc_pumas, subway_buffer_vulnerability2.75) 
 
 subway_service <- subway_service_areas[1]
 
-target_neighbourhoods <- subway_buffer_vulnerability2.75 %>% st_union() %>% st_collection_extract("POLYGON")
-
-plot(target_neighbourhoods)
+target_neighbourhoods <-
+  subway_buffer_vulnerability2.75 %>%
+  st_union() %>%
+  st_collection_extract("POLYGON")
 
 target_neighbourhoods_demographics <- st_intersect_summarize(
   CTs,

@@ -1,63 +1,232 @@
 ### MAP MAKING #################################################################
 
-#trying to figure out fonts
+## Load libraries and helper functions
 
-install.packages("extrafont")
-library(extrafont)
-
-font_import()
-
-ggplot(mtcars, aes(x=wt, y=mpg)) + geom_point() +
-  ggtitle("Title text goes here") +
-  theme(plot.title = element_text(size = 16, family="Georgia", face="italic"))
+source("R/01_helper_functions.R")
 
 
+## Figure 1. Citi Bike service area expansion 2013-2018
 
-#servicearea expansion time-lapse map
-{
-tm_shape(city) +
-  tm_fill(col = "#f0f0f0", 
-          title = "Base Map") +
-  tm_shape(growth_2018) +
-  tm_fill(col = "#ff9b30", 
-          title = "2018",) +
-  tm_borders(col = "#f0f0f0") +
-  tm_shape(growth_2017) +
-  tm_fill(col = "#db5727", 
-          title = "2017") +
-  tm_borders(col = "#f0f0f0") +
-  tm_shape(growth_2016) +
-  tm_fill(col = "#4fa35f", 
-          title = "2016") +
-  tm_borders(col = "#f0f0f0") +
-  tm_shape(growth_2015) +
-  tm_fill(col = "#6bb2db", 
-          title = "2015") +
-  tm_borders(col = "#f0f0f0") +
-  tm_shape(growth_2014) +
-  tm_fill(col = "#a6d854", 
-          title = "2014") +
-  tm_borders(col = "#f0f0f0") +
-  tm_shape(service_2013) +
-  tm_fill(col = "#ffd92f", 
-          title = "2013") +
-  tm_borders(col = "#f0f0f0") +
-  tm_layout(frame = F,
-            main.title = "Citi Bike Expansion over Time, 2013-2018",
-            legend.text.size = 1.2,
-            main.title.size = 2) +
-  tm_add_legend(type = "fill",
-                labels = c("2013", "2014", "2015", "2016", "2017", "2018"),
-                col = c("#ffd92f", "#a6d854", "#6bb2db", "#4fa35f", "#db5727", "#ff9b30"),
-                )
-  }
+figure_1 <- 
+    tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
+                                xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
+                                relative = TRUE)) +
+    tm_fill(col = "#f0f0f0") +
+    tm_shape(nyc_city) +
+    tm_fill(col = "grey80", title = "Base Map") +
+    tm_shape(growth) +
+    tm_polygons(col = "year", 
+                palette = c("#ffd92f", "#a6d854", "#6bb2db", "#4fa35f",
+                            "#db5727", "#ff9b30"),
+                border.col = "#f0f0f0",
+                title = "") +
+    tm_shape(subway_lines) +
+    tm_lines(col = "grey90", alpha = 0.75) +
+    tm_layout(frame = TRUE,
+              title = "Figure 1. Citi Bike service area expansion, 2013-2018",
+              main.title.size = 1.5,
+              legend.title.size = 1.2,
+              legend.position = c("left", "top"),
+              fontfamily = "Futura-Medium",
+              title.fontfamily = "Futura-CondensedExtraBold") +
+  tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50")
 
-#service area demographic comparisons by year
+tmap_save(figure_1, "output/figure_1.png", width = 2400, height = 2400)
 
 
-tm1 <- tm_shape(city)+
-  tm_fill(col ="#b2b2b2") +
-  tm_shape(summary_serviceareas) +  
+## Figure 2. Median household income
+
+figure_2 <- 
+  tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
+                              xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
+                              relative = TRUE)) +
+  tm_fill(col = "#f0f0f0") +
+  tm_shape(nyc_city) +
+  tm_fill(col = "grey80", title = "Base Map") +
+  tm_shape(CTs) +
+  tm_polygons(
+    "med_income", 
+    text = "No Data", 
+    title = "Inside service area: $90,000\nOutside service area: $55,000", 
+    border.alpha = 0,
+    palette = "Greens",
+    breaks = c(0, 20000, 40000, 60000, 80000, 100000, 150000, 200000, 260000)) +
+  tm_shape(bike_service_areas[3,]) +
+  tm_borders(col = "black", lwd = 2) +
+  tm_layout(frame = TRUE,
+            title = "Figure 2. Median household income",
+            legend.format = list(
+              fun = function(x) paste0("$", formatC(x, digits = 0, format = "f", 
+                                                    big.mark = ","))),
+            main.title.size = 1.5,
+            legend.title.size = 1.2,
+            legend.title.fontfamily = "Futura-CondensedExtraBold",
+            legend.position = c("left", "top"),
+            fontfamily = "Futura-Medium",
+            title.fontfamily = "Futura-CondensedExtraBold") +
+  tm_add_legend(type = "fill", labels = "No data", col = "#e0e0e0") +
+  tm_add_legend(type = "fill", labels = "Citi Bike service area", col = "white",
+                border.lwd = 2) +
+  tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50")
+
+tmap_save(figure_2, "output/figure_2.png", width = 2400, height = 2400)
+
+
+## Figure 3. Poverty rate
+
+figure_3 <- 
+  tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
+                              xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
+                              relative = TRUE)) +
+  tm_fill(col = "#f0f0f0") +
+  tm_shape(nyc_city) +
+  tm_fill(col = "grey80", title = "Base Map") +
+  tm_shape(CTs) +
+  tm_polygons("poverty_percent",
+              textNA = "No Data", 
+              title = "Inside service area: 16.9%\nOutside service area: 20.3%", 
+              border.alpha = 0,
+              palette = c("#ef6548", "#fdbb84","#fdd49e","#fee8c8"),
+              breaks = c(0,15,30,45,60)) +
+  tm_shape(bike_service_areas[3,]) +
+  tm_borders(col = "black", lwd = 2) +
+  tm_layout(frame = TRUE,
+            title = "Figure 3. Poverty rate",
+            legend.format = list(
+              fun = function(x) paste0(formatC(x, digits = 0, 
+                                               format = "f"), "%")),
+            main.title.size = 1.5,
+            legend.title.size = 1.2,
+            legend.title.fontfamily = "Futura-CondensedExtraBold",
+            legend.position = c("left", "top"),
+            fontfamily = "Futura-Medium",
+            title.fontfamily = "Futura-CondensedExtraBold") +
+  tm_add_legend(type = "fill", labels = "No data", col = "#e0e0e0") +
+  tm_add_legend(type = "fill", labels = "Citi Bike service area", col = "white",
+                border.lwd = 2) +
+  tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50")
+
+tmap_save(figure_3, "output/figure_3.png", width = 2400, height = 2400)
+
+
+## Figure 4. Non-hispanic white population
+
+figure_4 <- 
+  tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
+                              xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
+                              relative = TRUE)) +
+  tm_fill(col = "#f0f0f0") +
+  tm_shape(nyc_city) +
+  tm_fill(col = "grey80", title = "Base Map") +
+  tm_shape(CTs) +
+  tm_polygons("white_percent",
+              textNA = "No Data", 
+              title = "Inside service area: 52%\nOutside service area: 26%", 
+              border.alpha = 0,
+              palette = "Oranges",
+              breaks = c(0,15,30,45,60)) +
+  tm_shape(bike_service_areas[3,]) +
+  tm_borders(col = "black", lwd = 2) +
+  tm_layout(frame = TRUE,
+            title = "Figure 4. Non-hispanic white population",
+            legend.format = list(
+              fun = function(x) paste0(formatC(x, digits = 0, 
+                                               format = "f"), "%")),
+            main.title.size = 1.5,
+            legend.title.size = 1.2,
+            legend.title.fontfamily = "Futura-CondensedExtraBold",
+            legend.position = c("left", "top"),
+            fontfamily = "Futura-Medium",
+            title.fontfamily = "Futura-CondensedExtraBold") +
+  tm_add_legend(type = "fill", labels = "No data", col = "#e0e0e0") +
+  tm_add_legend(type = "fill", labels = "Citi Bike service area", col = "white",
+                border.lwd = 2) +
+  tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50")
+
+tmap_save(figure_4, "output/figure_4.png", width = 2400, height = 2400)
+
+
+## Figure 5. Population with a bachelor's degree or more
+
+figure_5 <- 
+  tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
+                              xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
+                              relative = TRUE)) +
+  tm_fill(col = "#f0f0f0") +
+  tm_shape(nyc_city) +
+  tm_fill(col = "grey80", title = "Base Map") +
+  tm_shape(CTs) +
+  tm_polygons("education_percent",
+              textNA = "No Data", 
+              title = "Inside service area: 48%\nOutside service area: 19%", 
+              border.alpha = 0,
+              palette = "Blues") +
+  tm_shape(bike_service_areas[3,]) +
+  tm_borders(col = "black", lwd = 2) +
+  tm_layout(frame = TRUE,
+            title = "Figure 5. Population with a bachelor's degree or more",
+            legend.format = list(
+              fun = function(x) paste0(formatC(x, digits = 0, 
+                                               format = "f"), "%")),
+            main.title.size = 1.5,
+            legend.title.size = 1.2,
+            legend.title.fontfamily = "Futura-CondensedExtraBold",
+            legend.position = c("left", "top"),
+            fontfamily = "Futura-Medium",
+            title.fontfamily = "Futura-CondensedExtraBold") +
+  tm_add_legend(type = "fill", labels = "No data", col = "#e0e0e0") +
+  tm_add_legend(type = "fill", labels = "Citi Bike service area", col = "white",
+                border.lwd = 2) +
+  tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50")
+
+tmap_save(figure_5, "output/figure_5.png", width = 2400, height = 2400)
+
+
+## Figure 6. Bike sharing and subway access
+
+fig_6_data <- st_intersection(subway_service_areas,bike_service_areas) %>% 
+  filter(year == 2018) %>% 
+  mutate(service = c("Both", "Access to bike sharing", "Access to subway",
+                      "Neither"))
+
+figure_6 <- 
+  tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
+                              xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
+                              relative = TRUE)) +
+  tm_fill(col = "#f0f0f0") +
+  tm_shape(nyc_city) +
+  tm_fill(col = "grey80", title = "Base Map") +
+  tm_shape(fig_6_data) +
+  tm_polygons("service",
+              palette = c("#b3cde3", "#decbe4", "#ccebc5", "#fbb4ae"),
+              title = "",
+              border.col = "#f0f0f0") +
+  tm_layout(frame = TRUE,
+            title = "Figure 6. Bike sharing and subway access",
+            legend.format = list(
+              fun = function(x) paste0(formatC(x, digits = 0, 
+                                               format = "f"), "%")),
+            main.title.size = 1.5,
+            legend.title.size = 1.2,
+            legend.title.fontfamily = "Futura-CondensedExtraBold",
+            legend.position = c("left", "top"),
+            fontfamily = "Futura-Medium",
+            title.fontfamily = "Futura-CondensedExtraBold") +
+  tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50")
+
+tmap_save(figure_6, "output/figure_6.png", width = 2400, height = 2400)
+
+
+## Figure 7. 
+
+tm1 <- 
+  tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
+                              xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
+                              relative = TRUE)) +
+  tm_fill(col = "#f0f0f0") +
+  tm_shape(nyc_city) +
+  tm_fill(col = "grey80", title = "Base Map") +
+  tm_shape(bike_service_growth_comparison) +  
   tm_polygons("med_income",
               title = "",
               palette = "Greens",
@@ -66,42 +235,19 @@ tm1 <- tm_shape(city)+
               border.alpha = 0) +
   tm_legend(position = c("left","top"),
             text.size =2) +
-  tm_layout(main.title.size = 2.1,
+  tm_layout(main.title.size = 1.5,
+            fontfamily = "Futura-Medium",
+            title.fontfamily = "Futura-CondensedExtraBold",
             main.title = "Median Household Income")
 
-
-tm2 <- tm_shape(city)+
-  tm_fill(col ="#b2b2b2") +
-  tm_shape(summary_serviceareas) +  
-  tm_polygons("education",
-              title = "",
-              palette = "Blues",
-              border.alpha = 0,
-              breaks = c(0,0.2,0.48,0.55),
-              labels = c("19.0%","47.5%","52.1%")) +
-  tm_legend(position = c("left","top"),
-            text.size =2) +
-  tm_layout(main.title.size = 2.1,
-            main.title = "Bachlor's Degree Attainment")
-
-
-tm3 <- tm_shape(city)+
-  tm_fill(col ="#b2b2b2") +
-  tm_shape(summary_serviceareas) +  
-  tm_polygons("pop_white",
-              title = "",
-              palette = "Oranges",
-              border.alpha = 0,
-              breaks = c(0,0.3,0.52,0.6),
-              labels = c("26.2%","51.8%","55.3%")) +
-  tm_legend(position = c("left","top"),
-            text.size =2) +
-  tm_layout(main.title.size = 2.1,
-            main.title = "White Population")
-
-tm4 <- tm_shape(city)+
-  tm_fill(col ="#b2b2b2") +
-  tm_shape(summary_serviceareas) +  
+tm2 <-
+  tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
+                              xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
+                              relative = TRUE)) +
+  tm_fill(col = "#f0f0f0") +
+  tm_shape(nyc_city) +
+  tm_fill(col = "grey80", title = "Base Map") +
+  tm_shape(bike_service_growth_comparison) +  
   tm_polygons("poverty",
               title = "",
               palette = c("#fee8c8","#fdbb84","#ef6548"),
@@ -111,10 +257,129 @@ tm4 <- tm_shape(city)+
               legend.reverse = T) +
   tm_legend(position = c("left","top"),
             text.size =2) +
-  tm_layout(main.title.size = 2.1,
+  tm_layout(main.title.size = 1.5,
+            fontfamily = "Futura-Medium",
+            title.fontfamily = "Futura-CondensedExtraBold",
             main.title = "Population in Poverty")
 
-tmap_arrange(tm1, tm2, tm3, tm4)
+tm3 <- 
+  tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
+                              xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
+                              relative = TRUE)) +
+  tm_fill(col = "#f0f0f0") +
+  tm_shape(nyc_city) +
+  tm_fill(col = "grey80", title = "Base Map") +
+  tm_shape(bike_service_growth_comparison) +  
+  tm_polygons("pop_white",
+              title = "",
+              palette = "Oranges",
+              border.alpha = 0,
+              breaks = c(0,0.3,0.52,0.6),
+              labels = c("26.2%","51.8%","55.3%")) +
+  tm_legend(position = c("left","top"),
+            text.size =2) +
+  tm_layout(main.title.size = 1.5,
+            fontfamily = "Futura-Medium",
+            title.fontfamily = "Futura-CondensedExtraBold",
+            main.title = "White Population")
+
+tm4 <- 
+  tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
+                              xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
+                              relative = TRUE)) +
+  tm_fill(col = "#f0f0f0") +
+  tm_shape(nyc_city) +
+  tm_fill(col = "grey80", title = "Base Map") +
+  tm_shape(bike_service_growth_comparison) +  
+  tm_polygons("education",
+              title = "",
+              palette = "Blues",
+              border.alpha = 0,
+              breaks = c(0,0.2,0.48,0.55),
+              labels = c("19.0%","47.5%","52.1%")) +
+  tm_legend(position = c("left","top"),
+            text.size =2) +
+  tm_layout(main.title.size = 1.5,
+            fontfamily = "Futura-Medium",
+            title.fontfamily = "Futura-CondensedExtraBold",
+            main.title = "Bachlor's Degree Attainment")
+
+figure_7 <- tmap_arrange(tm1, tm2, tm3, tm4)
+tmap_save(figure_7, "output/figure_7.png", width = 2400, height = 2400)
+
+
+## Figure 8. Vulnerability index
+
+figure_8 <- 
+  tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
+                              xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
+                              relative = TRUE)) +
+  tm_fill(col = "#f0f0f0") +
+  tm_shape(nyc_city) +
+  tm_fill(col = "grey80", title = "Base Map") +
+  tm_shape(CTs) +
+  tm_fill("vulnerability_index",
+          palette = "-RdYlGn",                 
+          border.alpha = 0,
+          title = "") +
+  tm_shape(bike_service_areas[3,]) +
+  tm_borders(col = "black", lwd = 2) +
+  tm_layout(frame = TRUE,
+            title = "Figure 8. Vulnerability index",
+            main.title.size = 1.5,
+            legend.title.size = 1.2,
+            legend.title.fontfamily = "Futura-CondensedExtraBold",
+            legend.position = c("left", "top"),
+            fontfamily = "Futura-Medium",
+            title.fontfamily = "Futura-CondensedExtraBold") +
+  tm_add_legend(type = "fill", labels = "No data", col = "#e0e0e0") +
+  tm_add_legend(type = "fill", labels = "Citi Bike service area", col = "white",
+                border.lwd = 2) +
+  tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50")
+
+tmap_save(figure_8, "output/figure_8.png", width = 2400, height = 2400)
+
+
+# Figure 9. Expansion areas
+
+figure_9 <- 
+  tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
+                              xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
+                              relative = TRUE)) +
+  tm_fill(col = "#f0f0f0") +
+  tm_shape(nyc_city) +
+  tm_fill(col = "grey80", title = "Base Map") +
+  tm_shape(target_neighbourhoods) +
+  tm_fill(col = "#db5727", 
+          title = "Bikeshare Expansion") +
+  tm_shape(bike_service_filled) +
+  tm_fill("#ffd92f") +
+  tm_shape(subway_lines) +
+  tm_lines(col = "grey90", alpha = 0.75) +
+  tm_layout(frame = TRUE,
+            title = "Figure 9. Proposed bike sharing expansion areas",
+            main.title.size = 1.5,
+            legend.title.size = 1.2,
+            legend.position = c("left", "top"),
+            fontfamily = "Futura-Medium",
+            title.fontfamily = "Futura-CondensedExtraBold") +
+  tm_add_legend(type = "fill", labels = "Existing Citi Bike service area",
+                col = "#ffd92f") +
+  tm_add_legend(type = "fill", labels = "Proposed expansion areas",
+                col = "#db5727") +
+  tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50")
+
+tmap_save(figure_9, "output/figure_9.png", width = 2400, height = 2400)
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -135,83 +400,12 @@ tm_shape(rockaway)+
 
 {
 
-tm_shape(city)+
-  tm_fill(col ="#e0e0e0") +
-  tm_shape(CTs) +
-  tm_polygons("med_income", 
-              text = "No Data", 
-              title = " Median Household Income", 
-              border.alpha = 0,
-              palette = "Greens",
-              breaks = c(0, 20000, 40000, 60000, 80000, 100000, 150000, 200000, 260000)) +
-  tm_shape(bike_service_filled) +
-  tm_borders(col = "black", lwd = 2) +
-  tm_layout(inner.margins = .05, 
-            fontfamily = "Georgia",
-            frame = F,
-            legend.outside = F,
-            main.title = "Income and Citi Bike Service Area", 
-            main.title.size = 2,
-            legend.text.size = 1.1,
-            legend.title.size = 1.5,
-            legend.format = list(fun = function(x) paste0("$", formatC(x, digits = 0, format = "f", big.mark = ","))),
-            legend.position = c(0.006, 0.48),
-            legend.width = 1) +
-  tm_compass(position = c(.9, .05)) +
-  tm_credits("Average inside service area: $90,000\nAverage outside service area: $55,000",
-             size = 1.2,
-             position = c(0.006,.92))   +
-  tm_add_legend(type = "fill", labels = "2018 Citi Bike Service Area", col = "white", border.lwd = 2) +
-  tm_add_legend(type = "fill", labels = "No Data", col = "#e0e0e0") 
+
 
   
   
-tm_shape(CTs) +
-  tm_polygons ("white_percent", 
-               textNA = "No Data", 
-               title = "White Population", 
-               border.alpha = 0,
-               palette = "Oranges") +
-  tm_shape(bike_service_filled) +
-  tm_borders(col = "black", lwd = 2) +
-  tm_layout(main.title = "Race and Citi Bike Service Area",
-            inner.margins = 0.05, 
-            frame = F,
-            legend.outside = F,
-            main.title.size = 2,
-            legend.title.size = 1.5,
-            legend.text.size = 1.1,
-            legend.format = list(fun = function(x) paste0(formatC(x, digits = 0, format = "f"), "%")),
-            legend.position = c(0.007, 0.65)) +
-  tm_compass(position = c(.9, .05))+
-  tm_credits("White population inside service area: 52%\nWhite population outside service area: 26%",
-             size = 1.2,
-             position = c(0.007,.93))  +
-  tm_add_legend(type = "fill", labels = "2018 Citi Bike Service Area", col = "white", border.lwd = 2) 
 
 
-tm_shape(CTs) +
-  tm_polygons ("education_percent", 
-               textNA = "No Data", 
-               title = "Population with Bachelor's Degree or higher", 
-               border.alpha = 0,
-               palette = "Blues") +
-  tm_shape(bike_service_filled) +
-  tm_borders(col = "black", lwd = 2) + 
-  tm_layout(main.title = "Education and Citi Bike Service Area", 
-            inner.margins = .05, 
-            frame = F,
-            legend.outside = F,
-            main.title.size = 2,
-            legend.title.size = 1.5,
-            legend.text.size = 1,
-            legend.format = list(fun = function(x) paste0(formatC(x, digits = 0, format = "f"), "%")),
-            legend.position = c(0.003, 0.69)) +
-  tm_compass(position = c(.9, .05)) + 
-  tm_credits("Average inside service area: 48%\nAverage outside service area: 19%",
-             size = 1.2,
-             position = c(0.003,.93))  +
-  tm_add_legend(type = "fill", labels = "2018 Citi Bike Service Area", col = "white", border.lwd = 2) 
 
 
 tm_shape(CTs) +
@@ -237,56 +431,9 @@ tm_shape(CTs) +
              position = c(0.003,.93)) +
   tm_add_legend(type = "fill", labels = "2018 Citi Bike Service Area", col = "white", border.lwd = 2) 
 
-tm_shape(CTs) +
-  tm_polygons("poverty_percent",
-               textNA = "No Data", 
-               title = " Population in Poverty", 
-               border.alpha = 0,
-               palette = c("#ef6548", "#fdbb84","#fdd49e","#fee8c8"),
-               breaks = c(0,15,30,45,60)) +
-  tm_shape(bike_service_filled) +
-  tm_borders(col = "black", lwd = 2) +
-  tm_layout(main.title = "Poverty and Citi Bike Service Area", 
-            inner.margins = .05, 
-            frame = F,
-            legend.outside = F,
-            main.title.size = 2,
-            legend.text.size = 1.1,
-            legend.title.size = 1.5,
-            legend.format = list(fun = function(x) paste0(formatC(x, digits = 0, format = "f"), "%")),
-            legend.position = c(0.007, 0.65)) +
-  tm_compass(position = c(.9, .075)) +
-  tm_credits("Population in poverty inside service area: 16.9%\nPopulation in poverty outside service area: 20.3%",
-             size = 1,
-             position = c(0.007,.93)) +
-  tm_add_legend(type = "fill", labels = "2018 Citi Bike Service Area", col = "white", border.lwd = 2) 
-
 
 
 }
-
-#bivariateservicemap
-
-{
-service_areas <- st_intersection(subway_service_areas,bike_service_areas)
-bivariate_2018 <- service_areas %>% filter(year == 2018)
-bivariate_2018$service <- c("Both", "Bike", "Subway", "Neither")
-
-
-tm_shape(bivariate_2018) +
-  tm_polygons("service",
-              palette = c("#ffb41e", "#9ce25f", "#E6E6E6", "#fffaa3"),
-              title = "",
-              border.alpha = 0) +
-  tm_layout(title = "Bike and Subway Service, 2018",
-            main.title.size = 3,
-            legend.text.size = 1.1,
-            legend.title.size = 1.5,
-            frame = F,
-            legend.position = c(0.007,.8)) +
-  tm_compass(position = c(.9, .05))
-
-  }
 
 
 ######carownership
@@ -321,7 +468,7 @@ CTs_vehicles <- get_acs(
   
 CTs_vehicles <- CTs_vehicles %>% filter(pop_total > 100) %>% na.omit()
 
-CTs_vehicles <- st_erase(CTs_vehicles, ny_water)
+CTs_vehicles <- st_erase(CTs_vehicles, nyc_water)
 
 names(CTs_vehicles) <- c("GEOID", "NAME", "Variable", "Estimate", "MOE", "pop_total",
                 "pop_total_MOE", "geometry")
@@ -490,23 +637,6 @@ tm_shape(CTs) +
   tm_compass(position = c(.9, .05))
 
 
-#bike expansion map
-  
 
-tm_shape(city)+
-  tm_fill(col ="#b2b2b2") +
-
-  tm_shape(target_neighbourhoods) +
-  tm_fill(col = "#db5727", 
-          title = "Bikeshare Expansion") +
-  tm_shape(bike_service_filled) +
-  tm_fill("#ffd92f") +
-  tm_layout(
-            main.title.size = 3,
-            legend.text.size = 1.1,
-            legend.title.size = 1.5,
-            frame = F,
-            legend.position = c(0.007,.8)) +
-  tm_compass(position = c(.9, .05))
   
 
