@@ -5,9 +5,13 @@
 source("R/01_helper_functions.R")
 
 
+## Initialize map list
+
+figure <- list()
+
 ## Figure 1. Citi Bike service area expansion 2013-2018
 
-figure_1 <- 
+figure[[1]] <- 
     tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
                                 xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
                                 relative = TRUE)) +
@@ -31,12 +35,12 @@ figure_1 <-
               title.fontfamily = "Futura-CondensedExtraBold") +
   tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50")
 
-tmap_save(figure_1, "output/figure_1.png", width = 2400, height = 2400)
+tmap_save(figure[[1]], "output/figure_1.png", width = 2400, height = 2400)
 
 
 ## Figure 2. Median household income
 
-figure_2 <- 
+figure[[2]] <- 
   tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
                               xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
                               relative = TRUE)) +
@@ -69,12 +73,12 @@ figure_2 <-
                 border.lwd = 2) +
   tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50")
 
-tmap_save(figure_2, "output/figure_2.png", width = 2400, height = 2400)
+tmap_save(figure[[2]], "output/figure_2.png", width = 2400, height = 2400)
 
 
 ## Figure 3. Poverty rate
 
-figure_3 <- 
+figure[[3]] <- 
   tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
                               xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
                               relative = TRUE)) +
@@ -106,12 +110,12 @@ figure_3 <-
                 border.lwd = 2) +
   tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50")
 
-tmap_save(figure_3, "output/figure_3.png", width = 2400, height = 2400)
+tmap_save(figure[[3]], "output/figure_3.png", width = 2400, height = 2400)
 
 
 ## Figure 4. Non-hispanic white population
 
-figure_4 <- 
+figure[[4]] <- 
   tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
                               xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
                               relative = TRUE)) +
@@ -143,12 +147,12 @@ figure_4 <-
                 border.lwd = 2) +
   tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50")
 
-tmap_save(figure_4, "output/figure_4.png", width = 2400, height = 2400)
+tmap_save(figure[[4]], "output/figure_4.png", width = 2400, height = 2400)
 
 
 ## Figure 5. Population with a bachelor's degree or more
 
-figure_5 <- 
+figure[[5]] <- 
   tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
                               xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
                               relative = TRUE)) +
@@ -179,7 +183,7 @@ figure_5 <-
                 border.lwd = 2) +
   tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50")
 
-tmap_save(figure_5, "output/figure_5.png", width = 2400, height = 2400)
+tmap_save(figure[[5]], "output/figure_5.png", width = 2400, height = 2400)
 
 
 ## Figure 6. Bike sharing and subway access
@@ -189,7 +193,7 @@ fig_6_data <- st_intersection(subway_service_areas,bike_service_areas) %>%
   mutate(service = c("Both", "Access to bike sharing", "Access to subway",
                       "Neither"))
 
-figure_6 <- 
+figure[[6]] <- 
   tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
                               xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
                               relative = TRUE)) +
@@ -214,7 +218,7 @@ figure_6 <-
             title.fontfamily = "Futura-CondensedExtraBold") +
   tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50")
 
-tmap_save(figure_6, "output/figure_6.png", width = 2400, height = 2400)
+tmap_save(figure[[6]], "output/figure_6.png", width = 2400, height = 2400)
 
 
 ## Figure 7. 
@@ -304,13 +308,13 @@ tm4 <-
             title.fontfamily = "Futura-CondensedExtraBold",
             main.title = "Bachlor's Degree Attainment")
 
-figure_7 <- tmap_arrange(tm1, tm2, tm3, tm4)
-tmap_save(figure_7, "output/figure_7.png", width = 2400, height = 2400)
+figure[[7]] <- tmap_arrange(tm1, tm2, tm3, tm4)
+tmap_save(figure[[7]], "output/figure_7.png", width = 2400, height = 2400)
 
 
 ## Figure 8. Vulnerability index
 
-figure_8 <- 
+figure[[8]] <- 
   tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
                               xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
                               relative = TRUE)) +
@@ -337,12 +341,12 @@ figure_8 <-
                 border.lwd = 2) +
   tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50")
 
-tmap_save(figure_8, "output/figure_8.png", width = 2400, height = 2400)
+tmap_save(figure[[8]], "output/figure_8.png", width = 2400, height = 2400)
 
 
 # Figure 9. Expansion areas
 
-figure_9 <- 
+figure[[9]] <- 
   tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
                               xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
                               relative = TRUE)) +
@@ -369,7 +373,7 @@ figure_9 <-
                 col = "#db5727") +
   tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50")
 
-tmap_save(figure_9, "output/figure_9.png", width = 2400, height = 2400)
+tmap_save(figure[[9]], "output/figure_9.png", width = 2400, height = 2400)
 
 
 
