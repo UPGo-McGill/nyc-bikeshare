@@ -5,7 +5,6 @@
 source("R/01_helper_functions.R")
 
 
-
 ### Import census geographies ####
 
 ## Import water
@@ -15,18 +14,7 @@ nyc_water <- rbind(
   area_water("NY", "Kings", class = "sf"),
   area_water("NY", "Queens", class = "sf"),
   area_water("NY", "Bronx", class = "sf"),
-  area_water("NY", "Richmond", class = "sf"),
-  area_water("NY", "Nassau", class = "sf"),
-  area_water("NY", "Westchester", class = "sf"),
-  area_water("NJ", "Bergen", class = "sf"),
-  area_water("NJ", "Hudson", class = "sf"),
-  area_water("NJ", "Union", class = "sf"),
-  area_water("NJ", "Middlesex", class = "sf"),
-  area_water("NJ", "Somerset", class = "sf"),
-  area_water("NJ", "Morris", class = "sf"),
-  area_water("NJ", "Monmouth", class = "sf"),
-  area_water("NJ", "Essex", class = "sf"),
-  area_water("NJ", "Passaic", class = "sf")) %>% 
+  area_water("NY", "Richmond", class = "sf")) %>% 
   st_transform(26918) %>% 
   st_union()
 
@@ -43,7 +31,27 @@ nyc_msa <- suppressWarnings(
                      "Middlesex", "Somerset", "Morris", "Essex", "Union",
                      "Passaic"),
          !(STATEFP == "36" & NAME == "Essex")) %>% 
-  st_erase(nyc_water))
+  st_erase(
+    rbind(
+      area_water("NY", "New York", class = "sf"),
+      area_water("NY", "Kings", class = "sf"),
+      area_water("NY", "Queens", class = "sf"),
+      area_water("NY", "Bronx", class = "sf"),
+      area_water("NY", "Richmond", class = "sf"),
+      area_water("NY", "Nassau", class = "sf"),
+      area_water("NY", "Westchester", class = "sf"),
+      area_water("NJ", "Bergen", class = "sf"),
+      area_water("NJ", "Hudson", class = "sf"),
+      area_water("NJ", "Union", class = "sf"),
+      area_water("NJ", "Middlesex", class = "sf"),
+      area_water("NJ", "Somerset", class = "sf"),
+      area_water("NJ", "Morris", class = "sf"),
+      area_water("NJ", "Monmouth", class = "sf"),
+      area_water("NJ", "Essex", class = "sf"),
+      area_water("NJ", "Passaic", class = "sf")) %>% 
+      st_transform(26918) %>% 
+      st_union()
+  ))
 
 nyc_city <- nyc_msa %>%
   filter(NAME %in% c("New York", "Kings", "Queens", "Bronx", "Richmond")) %>% 
