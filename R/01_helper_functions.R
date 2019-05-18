@@ -2,16 +2,17 @@
 
 ## Load libraries and fonts
 
+library(extrafont)
+library(osmdata)
+library(sf)
 library(smoothr)
 library(tidycensus)
 library(tidyverse)
-library(sf)
-library(units)
 library(tigris)
 library(tmap)
 library(tmaptools)
-library(extrafont)
-library(osmdata)
+library(units)
+
 options(tigris_use_cache = TRUE)
 suppressWarnings(font_import(paths = "data/fonts", prompt = FALSE))
 
