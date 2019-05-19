@@ -299,13 +299,17 @@ tmap_save(figure[[8]], "output/figure_8.png", width = 2400, height = 2400)
 figure[[9]] <- 
   base_map +
   tm_shape(target_neighbourhoods) +
-  tm_fill(col = "nbhd", title = "") +
+  tm_fill(col = "nbhd", title = "", palette = "Set3", n = 12) +
+  tm_borders(col = "white", lwd = 2) +
   tm_shape(bike_service_filled) +
   tm_fill(col = "grey40") +
   tm_shape(subway_lines) +
   tm_lines(col = "grey90", alpha = 0.75) +
+  #tm_shape(target_neighbourhoods) +
+  #tm_text("number", size = 0.7) +
   tm_layout(frame = TRUE,
             title = "Figure 9. Proposed bike sharing expansion areas",
+            legend.format = list(fun = function(x) paste0("1. ", x)),
             main.title.size = 1.5,
             legend.title.size = 1.2,
             legend.position = c("left", "top"),

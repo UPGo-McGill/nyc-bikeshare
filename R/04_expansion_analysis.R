@@ -62,25 +62,25 @@ target_neighbourhoods <-
 target_neighbourhoods <- 
   target_neighbourhoods %>%  
   mutate(nbhd = case_when(
-    PUMACE10 %in% c("03701", "03705", "03706", "03707") ~ "West Bronx",
+    PUMACE10 %in% c("03701", "03706")                   ~ "West Bronx",
+    PUMACE10 %in% c("03705", "03707")                   ~ "Central Bronx",
     PUMACE10 %in% c("03702", "03703", "03704", "03709") ~ "East Bronx",
     PUMACE10 %in% c("03708", "03710")                   ~ "South Bronx",
     PUMACE10 %in% c("03801", "03802", "03803", "03804") ~ "Upper Manhattan",
     PUMACE10 %in% c("04001", "04002", "04003", "04110") ~ "Bushwick/Ridgewood",
-    PUMACE10 %in% c("04005", "04006", "04010", "04011") ~ "Crown Heights/East Flatbush",
-    PUMACE10 %in% c("04007", "04008", "04009") ~ "East New York/Canarsie",
-    PUMACE10 %in% c("04012", "04013", "04014") ~ "Sunset Park/Bay Ridge",
-    PUMACE10 %in% c("04101", "04102", "04103", "04107", "04108", "04109") ~
-      "Jackson Heights/Flushing",
-    PUMACE10 %in% c("04106", "04111", "04112", "04113") ~ "Jamaica",
-    PUMACE10 %in% c("04114")                            ~ "Far Rockaway"
-  ))
+    PUMACE10 %in% c("04005", "04006", "04007", "04010",
+                    "04011")                            ~ "Crown Heights/Brownsville",
+    PUMACE10 %in% c("04008", "04009", "04111", "04113") ~ "East New York/Canarsie",
+    PUMACE10 %in% c("04012", "04013", "04014")          ~ "Sunset Park/Bay Ridge",
+    PUMACE10 %in% c("04101", "04102", "04103", "04107",
+                    "04108", "04109")                   ~ "Jackson Heights/Flushing",
+    PUMACE10 %in% c("04106", "04112")                   ~ "Jamaica",
+    PUMACE10 %in% c("04114")                            ~ "Far Rockaway"))
 
 target_neighbourhoods <- 
   target_neighbourhoods %>% 
   group_by(nbhd) %>% 
-  summarize(geometry = st_union(geometry))
-
+  summarize(geometry = st_union(geometry)) 
 
 ## Clean up geometries #### JAMAICA STILL SPLIT IN TWO
 
@@ -93,21 +93,27 @@ target_neighbourhoods <-
   target_neighbourhoods %>% 
   mutate(geometry = c(
     st_geometry(split_target[["Bushwick/Ridgewood"]][4,]),
-    st_geometry(split_target[["Crown Heights/East Flatbush"]][2,]),
+    st_geometry(split_target[["Central Bronx"]][1,]),
+    st_geometry(split_target[["Crown Heights/Brownsville"]][2,]),
     st_geometry(split_target[["East Bronx"]][2,]),
-    st_geometry(split_target[["East New York/Canarsie"]]),
+    st_geometry(split_target[["East New York/Canarsie"]][2,]),
     st_geometry(split_target[["Far Rockaway"]][3,]),
     rbind(split_target[["Jackson Heights/Flushing"]][3,2],
           split_target[["Bushwick/Ridgewood"]][1:2,2],
-          split_target[["Jamaica"]][2,2]) %>% st_union(),
-    st_union(split_target[["Jamaica"]][c(1,3:4),2]),
+          split_target[["Jamaica"]][1,2]) %>% st_union(),
+    rbind(split_target[["Jamaica"]][2,2],
+          split_target[["East New York/Canarsie"]][1,2]) %>% st_union(),
     st_geometry(split_target[["South Bronx"]][4,]),
     st_geometry(split_target[["Sunset Park/Bay Ridge"]][2,]),
     st_geometry(split_target[["Upper Manhattan"]][19,]),
     rbind(split_target[["West Bronx"]][1,2],
-          split_target[["Upper Manhattan"]][13,2]) %>% st_union()
-  ))
+          split_target[["Upper Manhattan"]][13,2]) %>% st_union()))
 
+target_neighbourhoods <- 
+  target_neighbourhoods %>% 
+  arrange(nbhd) %>% 
+  mutate(number = 1:12) %>% 
+  select(number, nbhd, geometry)
 
 
 ## Get demographics by target neighbourhoods
