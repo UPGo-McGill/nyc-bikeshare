@@ -92,7 +92,7 @@ bike_stations <-
 ## Import subway data
 
 subway_stations <-
-  st_read("data", "stops_nyc_subway_nov2018") %>%  
+  st_read("data", "stops_nyc_subway_nov2018", stringsAsFactors = FALSE) %>%  
   st_transform(26918) %>% 
   as_tibble() %>% 
   st_as_sf() %>%

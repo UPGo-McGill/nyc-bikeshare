@@ -26,4 +26,7 @@ table_1 <-
          number_of_stations_at_end_of_year, service_area_size) %>% 
   mutate(population_in_service_area = round(population_in_service_area, -3),
          service_area_size = round(service_area_size, 1))
-  
+
+
+## Table 2.
+
