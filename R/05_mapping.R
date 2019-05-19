@@ -5,19 +5,22 @@
 source("R/01_helper_functions.R")
 
 
-## Initialize map list
+## Initialize map list and base map
 
 figure <- list()
+base_map <-
+  tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city),
+                              xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
+                              relative = TRUE)) +
+  tm_fill(col = "#f0f0f0") +
+  tm_shape(nyc_city) +
+  tm_fill(col = "grey80", title = "Base Map")
+
 
 ## Figure 1. Citi Bike service area expansion 2013-2018
 
 figure[[1]] <- 
-    tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
-                                xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
-                                relative = TRUE)) +
-    tm_fill(col = "#f0f0f0") +
-    tm_shape(nyc_city) +
-    tm_fill(col = "grey80", title = "Base Map") +
+    base_map +
     tm_shape(growth) +
     tm_polygons(col = "year", 
                 palette = c("#ffd92f", "#a6d854", "#6bb2db", "#4fa35f",
@@ -41,12 +44,7 @@ tmap_save(figure[[1]], "output/figure_1.png", width = 2400, height = 2400)
 ## Figure 2. Median household income
 
 figure[[2]] <- 
-  tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
-                              xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
-                              relative = TRUE)) +
-  tm_fill(col = "#f0f0f0") +
-  tm_shape(nyc_city) +
-  tm_fill(col = "grey80", title = "Base Map") +
+  base_map +
   tm_shape(CTs) +
   tm_polygons(
     "med_income", 
@@ -79,12 +77,7 @@ tmap_save(figure[[2]], "output/figure_2.png", width = 2400, height = 2400)
 ## Figure 3. Poverty rate
 
 figure[[3]] <- 
-  tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
-                              xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
-                              relative = TRUE)) +
-  tm_fill(col = "#f0f0f0") +
-  tm_shape(nyc_city) +
-  tm_fill(col = "grey80", title = "Base Map") +
+  base_map +
   tm_shape(CTs) +
   tm_polygons("poverty_pct",
               title = "Inside service area: 16.9%\nOutside service area: 20.3%", 
@@ -115,12 +108,7 @@ tmap_save(figure[[3]], "output/figure_3.png", width = 2400, height = 2400)
 ## Figure 4. Non-hispanic white population
 
 figure[[4]] <- 
-  tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
-                              xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
-                              relative = TRUE)) +
-  tm_fill(col = "#f0f0f0") +
-  tm_shape(nyc_city) +
-  tm_fill(col = "grey80", title = "Base Map") +
+  base_map +
   tm_shape(CTs) +
   tm_polygons("pop_white_pct",
               title = "Inside service area: 52%\nOutside service area: 26%", 
@@ -151,12 +139,7 @@ tmap_save(figure[[4]], "output/figure_4.png", width = 2400, height = 2400)
 ## Figure 5. Population with a bachelor's degree or more
 
 figure[[5]] <- 
-  tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
-                              xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
-                              relative = TRUE)) +
-  tm_fill(col = "#f0f0f0") +
-  tm_shape(nyc_city) +
-  tm_fill(col = "grey80", title = "Base Map") +
+  base_map +
   tm_shape(CTs) +
   tm_polygons("education_pct",
               title = "Inside service area: 48%\nOutside service area: 19%", 
@@ -191,12 +174,7 @@ fig_6_data <- st_intersection(subway_service_areas,bike_service_areas) %>%
                       "Neither"))
 
 figure[[6]] <- 
-  tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
-                              xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
-                              relative = TRUE)) +
-  tm_fill(col = "#f0f0f0") +
-  tm_shape(nyc_city) +
-  tm_fill(col = "grey80", title = "Base Map") +
+  base_map +
   tm_shape(fig_6_data) +
   tm_polygons("service",
               palette = c("#b3cde3", "#decbe4", "#ccebc5", "#fbb4ae"),
@@ -221,12 +199,7 @@ tmap_save(figure[[6]], "output/figure_6.png", width = 2400, height = 2400)
 ## Figure 7. 
 
 tm1 <- 
-  tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
-                              xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
-                              relative = TRUE)) +
-  tm_fill(col = "#f0f0f0") +
-  tm_shape(nyc_city) +
-  tm_fill(col = "grey80", title = "Base Map") +
+  base_map +
   tm_shape(bike_service_growth_comparison) +  
   tm_polygons("med_income",
               title = "",
@@ -242,12 +215,7 @@ tm1 <-
             main.title = "Median Household Income")
 
 tm2 <-
-  tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
-                              xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
-                              relative = TRUE)) +
-  tm_fill(col = "#f0f0f0") +
-  tm_shape(nyc_city) +
-  tm_fill(col = "grey80", title = "Base Map") +
+  base_map +
   tm_shape(bike_service_growth_comparison) +  
   tm_polygons("poverty",
               title = "",
@@ -264,12 +232,7 @@ tm2 <-
             main.title = "Population in Poverty")
 
 tm3 <- 
-  tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
-                              xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
-                              relative = TRUE)) +
-  tm_fill(col = "#f0f0f0") +
-  tm_shape(nyc_city) +
-  tm_fill(col = "grey80", title = "Base Map") +
+  base_map +
   tm_shape(bike_service_growth_comparison) +  
   tm_polygons("pop_white",
               title = "",
@@ -285,12 +248,7 @@ tm3 <-
             main.title = "White Population")
 
 tm4 <- 
-  tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
-                              xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
-                              relative = TRUE)) +
-  tm_fill(col = "#f0f0f0") +
-  tm_shape(nyc_city) +
-  tm_fill(col = "grey80", title = "Base Map") +
+  base_map +
   tm_shape(bike_service_growth_comparison) +  
   tm_polygons("education",
               title = "",
@@ -312,12 +270,7 @@ tmap_save(figure[[7]], "output/figure_7.png", width = 2400, height = 2400)
 ## Figure 8. Vulnerability index
 
 figure[[8]] <- 
-  tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
-                              xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
-                              relative = TRUE)) +
-  tm_fill(col = "#f0f0f0") +
-  tm_shape(nyc_city) +
-  tm_fill(col = "grey80", title = "Base Map") +
+  base_map +
   tm_shape(CTs) +
   tm_fill("vulnerability_index",
           palette = "-RdYlGn",                 
@@ -344,17 +297,11 @@ tmap_save(figure[[8]], "output/figure_8.png", width = 2400, height = 2400)
 # Figure 9. Expansion areas
 
 figure[[9]] <- 
-  tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), 
-                              xlim=c(-0.02, 1.02), ylim=c(0.01, 1.05), 
-                              relative = TRUE)) +
-  tm_fill(col = "#f0f0f0") +
-  tm_shape(nyc_city) +
-  tm_fill(col = "grey80", title = "Base Map") +
+  base_map +
   tm_shape(target_neighbourhoods) +
-  tm_fill(col = "#db5727", 
-          title = "Bikeshare Expansion") +
+  tm_fill(col = "nbhd", title = "") +
   tm_shape(bike_service_filled) +
-  tm_fill("#ffd92f") +
+  tm_fill(col = "grey40") +
   tm_shape(subway_lines) +
   tm_lines(col = "grey90", alpha = 0.75) +
   tm_layout(frame = TRUE,
@@ -365,9 +312,7 @@ figure[[9]] <-
             fontfamily = "Futura-Medium",
             title.fontfamily = "Futura-CondensedExtraBold") +
   tm_add_legend(type = "fill", labels = "Existing Citi Bike service area",
-                col = "#ffd92f") +
-  tm_add_legend(type = "fill", labels = "Proposed expansion areas",
-                col = "#db5727") +
+                col = "grey40", border.lwd = 0) +
   tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50")
 
 tmap_save(figure[[9]], "output/figure_9.png", width = 2400, height = 2400)
