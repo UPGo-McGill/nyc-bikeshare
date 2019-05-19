@@ -126,6 +126,16 @@ target_neighbourhoods_demographics <- st_intersect_summarize(
   sum_vars = vars(pop_white, education, poverty),
   mean_vars = vars(med_income, vulnerability_index))
 
+target_neighbourhoods <- 
+  target_neighbourhoods %>% 
+  left_join(st_drop_geometry(
+    target_neighbourhoods_demographics[c("nbhd", "vulnerability_index")]),
+    by = "nbhd") %>% 
+  mutate(vulnerability_index = as.vector(vulnerability_index))
+
+
+
+
 subway_buffer_vulnerability <- st_intersect_summarize(
   CTs,
   subway_buffer_vulnerability,
