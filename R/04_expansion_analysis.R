@@ -84,6 +84,11 @@ target_neighbourhoods <-
 
 ## Clean up geometries #### JAMAICA STILL SPLIT IN TWO
 
+split_target <- 
+  suppressWarnings(target_neighbourhoods %>% 
+                     split(target_neighbourhoods$nbhd) %>% 
+                     map(st_cast, "POLYGON"))
+
 target_neighbourhoods <- 
   target_neighbourhoods %>% 
   mutate(geometry = c(
@@ -101,7 +106,7 @@ target_neighbourhoods <-
     st_geometry(split_target[["Upper Manhattan"]][19,]),
     rbind(split_target[["West Bronx"]][1,2],
           split_target[["Upper Manhattan"]][13,2]) %>% st_union()
-  )) %>% tm_shape() + tm_fill(col = "nbhd")
+  ))
 
 
 
@@ -110,7 +115,7 @@ target_neighbourhoods <-
 target_neighbourhoods_demographics <- st_intersect_summarize(
   CTs,
   target_neighbourhoods,
-  group_vars = vars(NA),
+  group_vars = vars(nbhd),
   population = pop_total,
   sum_vars = vars(pop_white, education, poverty),
   mean_vars = vars(med_income, vulnerability_index))
