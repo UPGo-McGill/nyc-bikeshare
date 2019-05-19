@@ -243,6 +243,6 @@ subway_service_areas <-
 
 rm(service_2013, service_2014, service_2015, service_2016, service_2017,
    service_2018, no_service_2013, no_service_2018, bike_expansion_2013to2018,
-   growth_2014, growth_2015, growth_2016, growth_2017, growth_2018, bronx,
+   growth_2014, growth_2015, growth_2016, growth_2017, growth_2018,
    subway_service, subway_no_service, geom)
 
