@@ -180,9 +180,6 @@ figure[[6]] <-
               palette = c("#b3cde3", "#decbe4", "#ccebc5", "#fbb4ae")) +
   tm_layout(frame = TRUE,
             title = "Figure 6. Bike sharing and subway access",
-            legend.format = list(
-              fun = function(x) paste0(formatC(x, digits = 0, 
-                                               format = "f"), "%")),
             main.title.size = 1.5,
             legend.title.size = 1.2,
             legend.title.fontfamily = "Futura-CondensedExtraBold",
@@ -345,3 +342,28 @@ figure[[10]] <-
 tmap_save(figure[[10]], "output/figure_10.png", width = 2400, height = 2400)
 
 
+# Figure 11. Subway accessibility of proposed bike sharing expansion areas
+
+figure[[11]] <- 
+  base_map +
+  tm_shape(target_neighbourhoods) +
+  tm_fill(col = "pop_no_subway", palette = "viridis", alpha = 0.8,
+          title = "Proportion of neighborhood population without subway access") +
+  tm_borders(col = "white", lwd = 2) +
+  tm_shape(subway_service_areas[1,]) +
+  tm_fill(col = "grey50", alpha = 0.3) +
+  tm_layout(frame = TRUE,
+            title = "Figure 11. Subway accessibility of proposed bike sharing expansion areas",
+            main.title.size = 1.5,
+            legend.format = list(fun = function(x) {
+              paste0(formatC(x * 100, digits = 0, format = "f"), "%")}),
+            legend.title.size = 1.2,
+            legend.title.fontfamily = "Futura-CondensedExtraBold",
+            legend.position = c("left", "top"),
+            fontfamily = "Futura-Medium",
+            title.fontfamily = "Futura-CondensedExtraBold") +
+  tm_add_legend(type = "fill", labels = "Access to subway", col = "grey50", 
+                alpha = 0.3) +
+  tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50")
+
+tmap_save(figure[[11]], "output/figure_11.png", width = 2400, height = 2400)
