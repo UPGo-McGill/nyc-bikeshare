@@ -149,23 +149,3 @@ target_neighbourhoods <-
     by = "nbhd") %>% 
   mutate(vulnerability_index = as.vector(vulnerability_index))
 
-
-
-
-
-
-
-subway_buffer_vulnerability <- st_intersect_summarize(
-  CTs,
-  subway_buffer_vulnerability,
-  group_vars = vars(PUMACE10, PUMA_name),
-  population = pop_total,
-  sum_vars = vars(pop_white, education, poverty),
-  mean_vars = vars(med_income, vulnerability_index))
-
-subway_buffer_vulnerability <-
-  subway_buffer_vulnerability %>%
-  mutate(vulnerability_index = as.double(vulnerability_index),
-         pop_total = as.double(pop_total)) %>%
-  filter(pop_total > 1000) 
-
