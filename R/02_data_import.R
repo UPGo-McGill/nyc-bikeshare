@@ -183,12 +183,12 @@ CTs <- suppressWarnings(st_erase(CTs, nyc_water))
 
 ## Create service and no-service areas
 
-service_2013 <- service_create(2013)
-service_2014 <- service_create(2014)
-service_2015 <- service_create(2015)
-service_2016 <- service_create(2016)
-service_2017 <- service_create(2017)
-service_2018 <- service_create(2018)
+service_2013 <- service_create(2013, 300)
+service_2014 <- service_create(2014, 300)
+service_2015 <- service_create(2015, 300)
+service_2016 <- service_create(2016, 300)
+service_2017 <- service_create(2017, 300)
+service_2018 <- service_create(2018, 300)
 
 no_service_2018 <- CTs %>% st_union %>% st_erase(service_2018)
 no_service_2013 <- CTs %>% st_union %>% st_erase(service_2013)

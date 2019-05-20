@@ -64,10 +64,10 @@ index_create <- function(var) {
 
 ## service_create helper function
 
-service_create <- function(year) {
+service_create <- function(year, distance) {
   suppressWarnings(bike_stations %>%
                      filter(Year == year) %>%
-                     st_buffer(300) %>%
+                     st_buffer(distance) %>%
                      st_union() %>%
                      st_erase(nyc_water))
 }

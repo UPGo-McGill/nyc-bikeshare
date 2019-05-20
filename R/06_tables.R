@@ -5,6 +5,16 @@
 source("R/01_helper_functions.R")
 
 
+### 1. INTRODUCTION ####
+
+## Vulnerability index quantile
+
+quantile(CTs$vulnerability_index, seq(0, 1, .333333))
+
+
+
+### 2. EQUITY AND BIKE SHARING IN NEW YORK ####
+
 ## Table 1. Citi Bike service area expansion, 2013-2018
 
 table_1 <- 
@@ -19,6 +29,8 @@ table_1 <-
     group_vars = vars(year), population = pop_total, sum_vars = vars(pop_white),
     mean_vars = vars(med_income)) %>% 
   mutate(service_area_size = set_units(st_area(.), km^2),
+         # Station numbers taken from December operating reports:
+         # https://www.citibikenyc.com/system-data/operating-reports
          number_of_stations_at_end_of_year = c(338, 325, 456, 585, 740, 746)
          ) %>% 
   st_drop_geometry() %>% 
@@ -26,6 +38,12 @@ table_1 <-
          number_of_stations_at_end_of_year, service_area_size) %>% 
   mutate(population_in_service_area = round(population_in_service_area, -3),
          service_area_size = round(service_area_size, 1))
+
+
+### 3. WHO HAS ACCESS TO CITI BIKE, AND WHO DOESN'T?
+
+
+
 
 
 ## Table 2.
