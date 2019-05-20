@@ -109,6 +109,8 @@ target_neighbourhoods <-
     rbind(split_target[["West Bronx"]][1,2],
           split_target[["Upper Manhattan"]][13,2]) %>% st_union()))
 
+rm(split_target)
+
 target_neighbourhoods <- 
   target_neighbourhoods %>% 
   arrange(nbhd) %>% 
