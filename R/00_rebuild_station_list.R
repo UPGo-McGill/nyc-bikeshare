@@ -2,7 +2,7 @@
 
 ## Load libraries and helper functions
 
-source("R/helper_functions.R")
+source("R/01_helper_functions.R")
 
 
 ## Import CSVs
@@ -118,3 +118,4 @@ station_list <- station_list[which(lengths(predicates)!=0),]
 ## Write output to disk
 
 st_write(station_list, "station_list.csv", layer_options = "GEOMETRY=AS_WKT")
+
