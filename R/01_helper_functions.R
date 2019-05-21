@@ -12,6 +12,7 @@ library(tigris)
 library(tmap)
 library(tmaptools)
 library(units)
+library(dodgr)
 
 options(tigris_use_cache = TRUE)
 suppressWarnings(font_import(paths = "data/fonts", prompt = FALSE))
@@ -71,3 +72,4 @@ service_create <- function(year, distance) {
                      st_union() %>%
                      st_erase(nyc_water))
 }
+
