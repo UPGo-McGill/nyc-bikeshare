@@ -113,7 +113,7 @@ figure[[5]] <-
               palette = "Blues") +
   tm_shape(bike_service_areas[3,]) +
   tm_borders(col = "black", lwd = 2) +
-  tm_layout(title = "Figure 5. Population with a bachelor's degree or more",
+  tm_layout(title = "Figure 5. Population with a bachelor's degree or higher",
             legend.format = list(fun = function(x) {
               paste0(formatC(x * 100, digits = 0, format = "f"), "%")})) +
   tm_add_legend(type = "fill", labels = "No data", col = "#e0e0e0") +
