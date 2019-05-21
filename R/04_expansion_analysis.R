@@ -45,13 +45,17 @@ subway_buffer_vulnerability <-
   subway_buffer_comparison %>%
   filter(vulnerability_index > 2.75)
 
-subway_buffer_vulnerability <-
+subway_stations_vulnerability <-
   subway_stations %>% 
+  filter(stop_id %in% subway_buffer_vulnerability$stop_id)
+
+subway_buffer_vulnerability <-
+  suppressWarnings(subway_stations %>% 
   filter(stop_id %in% subway_buffer_vulnerability$stop_id) %>%
   st_buffer(2000) %>% 
   st_intersection(nyc_city) %>% 
   st_erase(bike_service_filled) %>% 
-  st_intersection(nyc_pumas)
+  st_intersection(nyc_pumas))
 
 target_neighbourhoods <- 
   subway_buffer_vulnerability %>% 
