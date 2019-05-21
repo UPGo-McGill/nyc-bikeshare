@@ -309,21 +309,30 @@ figure[[13]] <-
   tm_fill(col = "#f0f0f0") +
   tm_shape(nyc_city) +
   tm_fill(col = "grey80", title = "Base Map") +
-  tm_shape(target_neighbourhoods[9,]) +
-  tm_fill(col = "red", alpha = 0.2) +
+  tm_shape(bronx_streets %>% filter(!is.na(name))) +
+  tm_lines(col = "grey50") +
+  tm_shape(st_erase(bronx_bike_catchment, bronx_subway_catchment)) +
+  tm_fill(col = "red", alpha = 0.3) +
+  tm_shape(bronx_subway_catchment) +
+  tm_fill(col = "blue", alpha = 0.3) +
   tm_shape(subway_lines) +
-  tm_lines(lwd = 1) +
-  tm_shape(subway_stations) +
-  tm_dots(size = 1) +
-  tm_shape(subway_service_areas[1,]) +
-  tm_fill(col = "blue", alpha = 0.2) +
-  tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50") +
-  tm_layout(title = "Figure 13. South Bronx case study",
+  tm_lines(lwd = 1, alpha = 0.5) +
+  tm_shape(bronx_stations) +
+  tm_dots(size = 0.5) +
+  #tm_text("stop_name", size = 0.7, 
+  #        xmod = c(  0, -1.3,   0,    1,   0,  0.6, -0.4),
+  #        ymod = c(0.8,  0.8, 0.8, -0.8, 0.8, -0.8,  0.8)) +
+  tm_scale_bar(position = c("right", "bottom"), color.dark = "black") +
+  tm_add_legend(type = "fill", labels = "Access to subway", col = "blue", 
+                alpha = 0.3, border.alpha = 0.1, border.col = "blue") +
+  tm_add_legend(type = "fill", labels = "Access to bike sharing", col = "red", 
+                alpha = 0.3, border.alpha = 0.1, border.col = ) +
+  tm_layout(main.title = "Figure 13. South Bronx case study",
             frame = TRUE, main.title.size = 1.5, legend.title.size = 1.2,
             legend.title.fontfamily = "Futura-CondensedExtraBold",
             legend.position = c("left", "top"),
             fontfamily = "Futura-Medium",
-            title.fontfamily = "Futura-CondensedExtraBold")
+            main.title.fontfamily = "Futura-CondensedExtraBold")
 
 tmap_save(figure[[13]], "output/figure_13.png", height = 2400)
 
