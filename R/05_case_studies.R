@@ -185,18 +185,18 @@ bronx_subway_catchment <-
 
 ## Versions of catchment areas to use for service population estimates
 
-jhf_bike_catchment_population <- 
+bronx_bike_catchment_population <- 
   calc_network_catchment(
-    jhf_network, network_city, as(jhf_stations, "Spatial"), c("data"),
+    bronx_network, network_city, as(bronx_stations, "Spatial"), c("data"),
     distance = 100, maximpedance = 2400, dissolve = TRUE) %>% 
   st_as_sf() %>% 
   as_tibble() %>% 
   st_as_sf() %>% 
   st_union()
 
-jhf_subway_catchment_population <- 
+bronx_subway_catchment_population <- 
   calc_network_catchment(
-    jhf_network, network_city, as(jhf_stations, "Spatial"), c("data"),
+    bronx_network, network_city, as(bronx_stations, "Spatial"), c("data"),
     distance = 100, maximpedance = 960, dissolve = TRUE) %>% 
   st_as_sf() %>% 
   as_tibble() %>% 

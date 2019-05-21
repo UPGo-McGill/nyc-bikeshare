@@ -12,6 +12,8 @@ library(tigris)
 library(tmap)
 library(tmaptools)
 library(units)
+library(dodgr)
+library(stplanr)
 
 options(tigris_use_cache = TRUE)
 suppressWarnings(font_import(paths = "data/fonts", prompt = FALSE))
@@ -69,5 +71,7 @@ service_create <- function(year, distance) {
                      filter(Year == year) %>%
                      st_buffer(distance) %>%
                      st_union() %>%
-                     st_erase(nyc_water))
+                     st_erase(nyc_water) %>% 
+                     fill_holes(20000))
 }
+
