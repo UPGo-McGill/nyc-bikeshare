@@ -102,7 +102,7 @@ figure[[4]] <-
 tmap_save(figure[[4]], "output/figure_4.png", width = 2400, height = 2400)
 
 
-## Figure 5. Population with a bachelor's degree or more
+## Figure 5. Population with a bachelor's degree or higher
 
 figure[[5]] <- 
   base_map +
@@ -149,35 +149,35 @@ panel_base_map$tm_scale_bar <- NULL
 tm1 <- 
   panel_base_map +
   tm_shape(bike_service_growth_comparison) +  
-  tm_polygons("med_income", title = "", palette = "Greens",
-              breaks = c(0, 55000, 91000, 100000),
-              labels = c("$54,700","$90,400","$99,800"),
-              border.alpha = 0) +
-  tm_layout(title = "Median household income")
-
-tm2 <-
-  panel_base_map +
-  tm_shape(bike_service_growth_comparison) +  
-  tm_polygons("poverty", title = "", palette = c("#fee8c8","#fdbb84","#ef6548"),
-              border.alpha = 0, breaks = c(0, 0.15, 0.2, 0.3),
-              labels = c("14.9%", "15.9%", "20.3%"), legend.reverse = TRUE) +
-  tm_layout(title = "Poverty rate")
-
-tm3 <- 
-  panel_base_map +
-  tm_shape(bike_service_growth_comparison) +  
   tm_polygons("pop_white", title = "", palette = "Oranges", border.alpha = 0,
               breaks = c(0, 0.3, 0.52, 0.6),
-              labels = c("26.2%", "51.8%", "55.3%")) +
+              labels = c("26.2%", "44.2%", "55.3%")) +
   tm_layout(title = "Non-hispanic white population")
 
-tm4 <- 
-  panel_base_map +
+tm2 <- panel_base_map +
   tm_shape(bike_service_growth_comparison) +  
   tm_polygons("education", title = "", palette = "Blues", border.alpha = 0,
               breaks = c(0, 0.2, 0.48, 0.55),
-              labels = c("19.0%", "47.5%", "52.1%")) +
+              labels = c("19.0%", "44.5%", "52.1%")) +
   tm_layout(title = "Population with a bachelor's degree")
+
+
+tm3 <- panel_base_map +
+  tm_shape(bike_service_growth_comparison) +  
+  tm_polygons("med_income", title = "", palette = "Greens",
+              breaks = c(0, 55000, 90000, 100000),
+              labels = c("$54,688","$83,676","$99,792"),
+              border.alpha = 0) +
+  tm_layout(title = "Median household income")
+
+
+tm4 <-  panel_base_map +
+  tm_shape(bike_service_growth_comparison) +  
+  tm_polygons("poverty", title = "", palette = c("#fee8c8","#fdbb84","#ef6548"),
+              border.alpha = 0, breaks = c(0, 0.15, 0.2, 0.3),
+              labels = c("14.9%", "16.9%", "20.3%"), legend.reverse = TRUE) +
+  tm_layout(title = "Poverty rate")
+ 
 
 figure[[7]] <- tmap_arrange(tm1, tm2, tm3, tm4)
 tmap_save(figure[[7]], "output/figure_7.png", width = 2400, height = 2400)
