@@ -71,6 +71,7 @@ service_create <- function(year, distance) {
                      filter(Year == year) %>%
                      st_buffer(distance) %>%
                      st_union() %>%
-                     st_erase(nyc_water))
+                     st_erase(nyc_water) %>% 
+                     fill_holes(20000))
 }
 
