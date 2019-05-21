@@ -66,6 +66,6 @@ subway_service_comparison <-
     ., 
     group_vars = vars(subway_service, bike_service),
     population = pop_total,
-    sum_vars = vars(pop_white, immigrant, education),
-    mean_vars = vars(med_income)))
+    sum_vars = vars(pop_white, immigrant, education, poverty),
+    mean_vars = vars(med_income, vulnerability_index)))
 
