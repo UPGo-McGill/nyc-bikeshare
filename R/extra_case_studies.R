@@ -94,6 +94,24 @@ jhf_subway_catchment_population <-
   st_union()
 
 
+## Service population estimates
+
+jhf_comparison <-
+  tibble(service = c("both", "bike", "subway"),
+         geometry = c(jhf_bike_catchment_population, st_erase(
+           jhf_bike_catchment_population, jhf_subway_catchment_population),
+           jhf_subway_catchment_population)) %>% 
+  st_as_sf() %>% 
+  st_set_crs(26918) %>% 
+  st_intersect_summarize(
+    CTs,
+    .,
+    group_vars = vars(service),
+    population = pop_total,
+    sum_vars = vars(pop_white, immigrant, education, poverty),
+    mean_vars = vars(med_income, vulnerability_index))
+
+
 
 ### REPEAT FOR SOUTH BRONX
 
@@ -184,6 +202,24 @@ jhf_subway_catchment_population <-
   as_tibble() %>% 
   st_as_sf() %>% 
   st_union()
+
+
+## Service population estimates
+
+bronx_comparison <-
+  tibble(service = c("both", "bike", "subway"),
+         geometry = c(bronx_bike_catchment_population, st_erase(
+           bronx_bike_catchment_population, bronx_subway_catchment_population),
+           bronx_subway_catchment_population)) %>% 
+  st_as_sf() %>% 
+  st_set_crs(26918) %>% 
+  st_intersect_summarize(
+    CTs,
+    .,
+    group_vars = vars(service),
+    population = pop_total,
+    sum_vars = vars(pop_white, immigrant, education, poverty),
+    mean_vars = vars(med_income, vulnerability_index))
 
 
 
