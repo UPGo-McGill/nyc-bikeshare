@@ -86,7 +86,8 @@ bike_stations <-
   st_as_sf() %>% 
   select(-WKT) %>% 
   st_set_crs(26918) %>% 
-  mutate(ID = as.numeric(ID), Year = as.numeric(Year))
+  mutate(ID = as.numeric(ID), Year = as.numeric(Year)) %>% 
+  st_erase(bronx)
 
 
 ## Import subway data
@@ -181,40 +182,39 @@ CTs <- suppressWarnings(st_erase(CTs, nyc_water))
 
 ### Create service areas ####
 
-## Create service and no-service areas
+## Create service and no-service areas, with holes filled in for maps
 
-service_2013 <- service_create(2013, 300)
-service_2014 <- service_create(2014, 300)
-service_2015 <- service_create(2015, 300)
-service_2016 <- service_create(2016, 300)
-service_2017 <- service_create(2017, 300)
-service_2018 <- service_create(2018, 300)
-
-no_service_2018 <- CTs %>% st_union %>% st_erase(service_2018)
-no_service_2013 <- CTs %>% st_union %>% st_erase(service_2013)
+service_years <- do.call(c,map(2013:2018, service_create, 300))
 
 bike_service_areas <-
   tibble(year = c(2013, 2013, 2018, 2018),
          bike_service = c(TRUE, FALSE, TRUE, FALSE), 
-         geometry = 
-           c(service_2013, no_service_2013, service_2018, no_service_2018)) %>%
+         geometry = c(
+           service_years[1],
+           CTs %>% st_union %>% st_erase(service_years[1]),
+           service_years[6],
+           CTs %>% st_union %>% st_erase(service_years[6]))) %>%
   st_as_sf()
 
-bike_expansion_2013to2018 <- st_erase(service_2018, service_2013)
+service_years <- fill_holes(service_years, 20000)
 
+bike_service_areas_no_holes <- 
+  tibble(year = c(2013, 2013, 2018, 2018),
+         bike_service = c(TRUE, FALSE, TRUE, FALSE), 
+         geometry = c(
+           service_years[1],
+           CTs %>% st_union %>% st_erase(service_years[1]),
+           service_years[6],
+           CTs %>% st_union %>% st_erase(service_years[6]))) %>%
+  st_as_sf()
 
 ## Create growth areas
 
-growth_2018 <- st_difference(service_2018, service_2017)
-growth_2017 <- st_difference(service_2017, service_2016) %>% st_erase(bronx)
-growth_2016 <- st_difference(service_2016, service_2015)
-growth_2015 <- st_difference(service_2015, service_2014)
-growth_2014 <- st_difference(service_2014, service_2013)
+growth_years <- map2(service_years[2:6], service_years[1:5], st_difference)
 
 growth <- tibble(
   year = c("2013", "2014", "2015", "2016", "2017", "2018"),
-  geometry = c(service_2013, growth_2014,growth_2015, growth_2016, growth_2017,
-               growth_2018)) %>% 
+  geometry = c(service_years[1], st_sfc(growth_years))) %>% 
   st_as_sf()
 
 
@@ -241,8 +241,5 @@ subway_service_areas <-
 
 ## Clean up
 
-rm(service_2013, service_2014, service_2015, service_2016, service_2017,
-   service_2018, no_service_2013, no_service_2018, bike_expansion_2013to2018,
-   growth_2014, growth_2015, growth_2016, growth_2017, growth_2018,
-   subway_service, subway_no_service, geom)
+rm(service_years, growth_years, subway_service, subway_no_service, geom)
 

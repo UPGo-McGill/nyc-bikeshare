@@ -22,9 +22,7 @@ table_1 <-
     CTs,
     tibble(
       year = 2013:2018,
-      geometry = c(
-        service_create(2013), service_create(2014), service_create(2015),
-        service_create(2016), service_create(2017), service_create(2018))) %>% 
+      geometry = do.call(c,map(2013:2018, service_create, 300))) %>% 
       st_as_sf(),
     group_vars = vars(year), population = pop_total, sum_vars = vars(pop_white),
     mean_vars = vars(med_income)) %>% 
@@ -36,7 +34,7 @@ table_1 <-
   st_drop_geometry() %>% 
   select(year, population_in_service_area = pop_total, 
          number_of_stations_at_end_of_year, service_area_size) %>% 
-  mutate(population_in_service_area = round(population_in_service_area, -3),
+  mutate(population_in_service_area = round(population_in_service_area, -2),
          service_area_size = round(service_area_size, 1))
 
 

@@ -13,8 +13,7 @@ bike_service_comparison <- st_intersect_summarize(
   group_vars = vars(year, bike_service),
   population = pop_total,
   sum_vars = vars(pop_white, immigrant, education, poverty),
-  mean_vars = vars(med_income, vulnerability_index)
-)
+  mean_vars = vars(med_income, vulnerability_index))
 
 
 ## Comparison between 2013 access, 2018 new access, and no access
@@ -68,4 +67,3 @@ subway_service_comparison <-
     population = pop_total,
     sum_vars = vars(pop_white, immigrant, education, poverty),
     mean_vars = vars(med_income, vulnerability_index)))
-

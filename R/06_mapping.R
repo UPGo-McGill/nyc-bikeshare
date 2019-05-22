@@ -44,9 +44,9 @@ figure[[2]] <-
   base_map +
   tm_shape(CTs) +
   tm_polygons("med_income", border.alpha = 0, palette = "Greens",
-    title = "Inside service area: $90,000\nOutside service area: $55,000", 
+    title = "Inside service area: $90,400\nOutside service area: $54,700", 
     breaks = c(0, 25000, 50000, 75000, 100000, 150000, 200000, 260000)) +
-  tm_shape(bike_service_areas[3,]) +
+  tm_shape(bike_service_filled) +
   tm_borders(col = "black", lwd = 2) +
   tm_layout(title = "Figure 2. Median household income",
             legend.format = list(fun = function(x) {
@@ -68,7 +68,7 @@ figure[[3]] <-
               title = "Inside service area: 16.9%\nOutside service area: 20.3%", 
               palette = c("#ef6548", "#fdbb84","#fdd49e","#fee8c8"),
               breaks = c(0, .12, .24, .36, .48, .60)) +
-  tm_shape(bike_service_areas[3,]) +
+  tm_shape(bike_service_filled) +
   tm_borders(col = "black", lwd = 2) +
   tm_layout(title = "Figure 3. Poverty rate",
             legend.format = list(fun = function(x) {
@@ -86,11 +86,11 @@ figure[[4]] <-
   base_map +
   tm_shape(CTs) +
   tm_polygons("pop_white_pct",
-              title = "Inside service area: 52%\nOutside service area: 26%", 
+              title = "Inside service area: 51.8%\nOutside service area: 26.2%", 
               border.alpha = 0,
               palette = "Oranges",
               breaks = c(0, .12, .24, .36, .48, .60)) +
-  tm_shape(bike_service_areas[3,]) +
+  tm_shape(bike_service_filled) +
   tm_borders(col = "black", lwd = 2) +
   tm_layout(title = "Figure 4. Non-hispanic white population",
             legend.format = list(fun = function(x) {
@@ -108,10 +108,10 @@ figure[[5]] <-
   base_map +
   tm_shape(CTs) +
   tm_polygons("education_pct",
-              title = "Inside service area: 48%\nOutside service area: 19%", 
+              title = "Inside service area: 47.5%\nOutside service area: 19.0%", 
               border.alpha = 0,
               palette = "Blues") +
-  tm_shape(bike_service_areas[3,]) +
+  tm_shape(bike_service_filled) +
   tm_borders(col = "black", lwd = 2) +
   tm_layout(title = "Figure 5. Population with a bachelor's degree or higher",
             legend.format = list(fun = function(x) {
@@ -125,7 +125,8 @@ tmap_save(figure[[5]], "output/figure_5.png", width = 2400, height = 2400)
 
 ## Figure 6. Bike sharing and subway access
 
-fig_6_data <- st_intersection(subway_service_areas,bike_service_areas) %>% 
+fig_6_data <-
+  st_intersection(subway_service_areas, bike_service_areas_no_holes) %>% 
   filter(year == 2018) %>% 
   mutate(service = c("Both", "Access to bike sharing", "Access to subway",
                       "Neither"))
@@ -146,23 +147,7 @@ panel_base_map <- base_map +
   tm_layout(legend.text.size = 1.1, title.size = 1.1)
 panel_base_map$tm_scale_bar <- NULL
 
-tm1 <- 
-  panel_base_map +
-  tm_shape(bike_service_growth_comparison) +  
-  tm_polygons("pop_white", title = "", palette = "Oranges", border.alpha = 0,
-              breaks = c(0, 0.3, 0.52, 0.6),
-              labels = c("26.2%", "44.2%", "55.3%")) +
-  tm_layout(title = "Non-hispanic white population")
-
-tm2 <- panel_base_map +
-  tm_shape(bike_service_growth_comparison) +  
-  tm_polygons("education", title = "", palette = "Blues", border.alpha = 0,
-              breaks = c(0, 0.2, 0.48, 0.55),
-              labels = c("19.0%", "44.5%", "52.1%")) +
-  tm_layout(title = "Population with a bachelor's degree")
-
-
-tm3 <- panel_base_map +
+tm1 <- panel_base_map +
   tm_shape(bike_service_growth_comparison) +  
   tm_polygons("med_income", title = "", palette = "Greens",
               breaks = c(0, 55000, 90000, 100000),
@@ -170,14 +155,27 @@ tm3 <- panel_base_map +
               border.alpha = 0) +
   tm_layout(title = "Median household income")
 
-
-tm4 <-  panel_base_map +
+tm2 <-  panel_base_map +
   tm_shape(bike_service_growth_comparison) +  
   tm_polygons("poverty", title = "", palette = c("#fee8c8","#fdbb84","#ef6548"),
               border.alpha = 0, breaks = c(0, 0.15, 0.2, 0.3),
               labels = c("14.9%", "16.9%", "20.3%"), legend.reverse = TRUE) +
   tm_layout(title = "Poverty rate")
  
+tm3 <- 
+  panel_base_map +
+  tm_shape(bike_service_growth_comparison) +  
+  tm_polygons("pop_white", title = "", palette = "Oranges", border.alpha = 0,
+              breaks = c(0, 0.3, 0.52, 0.6),
+              labels = c("26.2%", "44.2%", "55.3%")) +
+  tm_layout(title = "Non-hispanic white population")
+
+tm4 <- panel_base_map +
+  tm_shape(bike_service_growth_comparison) +  
+  tm_polygons("education", title = "", palette = "Blues", border.alpha = 0,
+              breaks = c(0, 0.2, 0.48, 0.55),
+              labels = c("19.0%", "44.5%", "52.1%")) +
+  tm_layout(title = "Population with a bachelor's degree")
 
 figure[[7]] <- tmap_arrange(tm1, tm2, tm3, tm4)
 tmap_save(figure[[7]], "output/figure_7.png", width = 2400, height = 2400)
@@ -190,7 +188,7 @@ figure[[8]] <-
   tm_shape(CTs) +
   tm_fill("vulnerability_index", palette = "-RdYlGn", border.alpha = 0, n = 8,
           title = "") +
-  tm_shape(bike_service_areas[3,]) +
+  tm_shape(bike_service_filled) +
   tm_borders(col = "black", lwd = 2) +
   tm_layout(frame = TRUE,
             title = "Figure 8. Vulnerability index",

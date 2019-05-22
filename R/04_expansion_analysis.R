@@ -15,7 +15,7 @@ expansion_subway_service_areas <-
   st_intersection(nyc_city) %>% 
   st_collection_extract("POLYGON")
 
-bike_service_filled <- fill_holes(bike_service_areas$geometry[3], 1e+07)
+bike_service_filled <- fill_holes(bike_service_areas$geometry[3], 20000)
 
 expansion_bike_service_areas <- bike_stations %>%
   filter(Year == 2018) %>%
@@ -83,10 +83,11 @@ target_neighbourhoods <-
 
 target_neighbourhoods <- 
   target_neighbourhoods %>% 
+  filter(!is.na(nbhd)) %>% 
   group_by(nbhd) %>% 
   summarize(geometry = st_union(geometry)) 
 
-## Clean up geometries #### JAMAICA STILL SPLIT IN TWO
+## Clean up geometries
 
 split_target <- 
   suppressWarnings(target_neighbourhoods %>% 
@@ -154,4 +155,3 @@ target_neighbourhoods <-
                                          "pop_no_subway")]),
     by = "nbhd") %>% 
   mutate(vulnerability_index = as.vector(vulnerability_index))
-
