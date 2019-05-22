@@ -65,7 +65,7 @@ figure[[3]] <-
   base_map +
   tm_shape(CTs) +
   tm_polygons("poverty_pct", border.alpha = 0, 
-              title = "Inside service area: 16.9%\nOutside service area: 20.3%", 
+              title = "Inside service area: 15.9%\nOutside service area: 20.3%", 
               palette = c("#ef6548", "#fdbb84","#fdd49e","#fee8c8"),
               breaks = c(0, .12, .24, .36, .48, .60)) +
   tm_shape(bike_service_areas_no_holes[3,]) +
