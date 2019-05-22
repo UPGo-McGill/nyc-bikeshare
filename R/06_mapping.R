@@ -46,7 +46,7 @@ figure[[2]] <-
   tm_polygons("med_income", border.alpha = 0, palette = "Greens",
     title = "Inside service area: $90,400\nOutside service area: $54,700", 
     breaks = c(0, 25000, 50000, 75000, 100000, 150000, 200000, 260000)) +
-  tm_shape(bike_service_filled) +
+  tm_shape(bike_service_areas_no_holes[3,]) +
   tm_borders(col = "black", lwd = 2) +
   tm_layout(title = "Figure 2. Median household income",
             legend.format = list(fun = function(x) {
@@ -68,7 +68,7 @@ figure[[3]] <-
               title = "Inside service area: 16.9%\nOutside service area: 20.3%", 
               palette = c("#ef6548", "#fdbb84","#fdd49e","#fee8c8"),
               breaks = c(0, .12, .24, .36, .48, .60)) +
-  tm_shape(bike_service_filled) +
+  tm_shape(bike_service_areas_no_holes[3,]) +
   tm_borders(col = "black", lwd = 2) +
   tm_layout(title = "Figure 3. Poverty rate",
             legend.format = list(fun = function(x) {
@@ -90,7 +90,7 @@ figure[[4]] <-
               border.alpha = 0,
               palette = "Oranges",
               breaks = c(0, .12, .24, .36, .48, .60)) +
-  tm_shape(bike_service_filled) +
+  tm_shape(bike_service_areas_no_holes[3,]) +
   tm_borders(col = "black", lwd = 2) +
   tm_layout(title = "Figure 4. Non-hispanic white population",
             legend.format = list(fun = function(x) {
@@ -111,7 +111,7 @@ figure[[5]] <-
               title = "Inside service area: 47.5%\nOutside service area: 19.0%", 
               border.alpha = 0,
               palette = "Blues") +
-  tm_shape(bike_service_filled) +
+  tm_shape(bike_service_areas_no_holes[3,]) +
   tm_borders(col = "black", lwd = 2) +
   tm_layout(title = "Figure 5. Population with a bachelor's degree or higher",
             legend.format = list(fun = function(x) {

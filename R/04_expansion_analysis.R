@@ -15,8 +15,6 @@ expansion_subway_service_areas <-
   st_intersection(nyc_city) %>% 
   st_collection_extract("POLYGON")
 
-bike_service_filled <- fill_holes(bike_service_areas$geometry[3], 20000)
-
 expansion_bike_service_areas <- bike_stations %>%
   filter(Year == 2018) %>%
   st_buffer(2000) %>%
