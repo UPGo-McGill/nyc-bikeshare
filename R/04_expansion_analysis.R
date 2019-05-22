@@ -96,6 +96,9 @@ split_target <-
                      split(target_neighbourhoods$nbhd) %>% 
                      map(st_cast, "POLYGON"))
 
+# AD HOC CLEAN UP, TO BE REPLACED WITH SYSTEMATIC CLEAN UP
+split_target[[5]] <- 
+  split_target[[5]] %>% arrange(st_area(.))
 split_target[[11]] <- 
   split_target[[11]] %>%
   filter(drop_units(st_area(.)) > 20000)
@@ -161,3 +164,13 @@ target_neighbourhoods <-
                                          "pop_no_subway")]),
     by = "nbhd") %>% 
   mutate(vulnerability_index = as.vector(vulnerability_index))
+
+target_subway_areas <- 
+  st_intersection(target_neighbourhoods, subway_service_areas[1,]) %>% 
+  select(-vulnerability_index, -pop_no_subway) %>% 
+  
+
+target_no_subway_areas <- 
+  st_erase(target_neighbourhoods, st_union(target_subway_areas))
+
+
