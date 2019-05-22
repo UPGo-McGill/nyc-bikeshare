@@ -40,6 +40,37 @@ table_1 <-
 
 ### 3. WHO HAS ACCESS TO CITI BIKE, AND WHO DOESN'T?
 
+## NYC racial demographics
+ {nyc_demographics <- get_acs(
+  geography = "county", 
+  variables = c( 
+                 pop_non_hisp_white = "B03002_003",
+                pop_non_hisp_black = "B03002_004",
+                pop_hisp = "B03002_012"),
+  year = 2017, 
+  state = "36",
+  county = c("New York County",
+             "Kings County",
+             "Queens County",
+             "Bronx County",
+             "Richmond County"),
+  summary_var = "B01003_001")
+
+names(nyc_demographics) <- c("GEOID", "NAME", "Variable", "Estimate", "MOE", "pop_total",
+                "pop_total_MOE")
+
+nyc_demographics <-
+  nyc_demographics %>%
+  select(-MOE, -pop_total_MOE) %>% 
+  spread(key = Variable, value = Estimate)
+
+nyc_demographics <- nyc_demographics %>% filter(pop_total > 100) %>% na.omit() }
+
+nyc_summary_demographics <- c(pop_total = sum(nyc_demographics$pop_total) ,
+                              pop_white = round(sum(nyc_demographics$pop_non_hisp_white)/sum(nyc_demographics$pop_total), 3),
+                              pop_black = round(sum(nyc_demographics$pop_non_hisp_black)/sum(nyc_demographics$pop_total), 3),
+                              pop_hisp = round(sum(nyc_demographics$pop_hisp)/sum(nyc_demographics$pop_total), 3))
+
 ## Table 2. Demographic differences in bike sharing access
 
 table_2 <-
