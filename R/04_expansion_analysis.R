@@ -7,6 +7,8 @@ source("R/01_helper_functions.R")
 
 ## Generate potential expansion service areas
 
+bike_service_filled <- fill_holes(bike_service_areas$geometry[3], 20000)
+
 expansion_subway_service_areas <- 
   suppressWarnings(subway_stations %>%
                      st_buffer(2000) %>%
@@ -54,6 +56,8 @@ subway_buffer_vulnerability <-
   st_intersection(nyc_city) %>% 
   st_erase(bike_service_filled) %>% 
   st_intersection(nyc_pumas))
+
+rm(bike_service_filled)
 
 target_neighbourhoods <- 
   subway_buffer_vulnerability %>% 
