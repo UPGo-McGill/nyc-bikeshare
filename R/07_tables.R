@@ -40,12 +40,15 @@ table_1 <-
 
 ### 3. WHO HAS ACCESS TO CITI BIKE, AND WHO DOESN'T?
 
+## Table 2. Demographic differences in bike sharing access
 
-
-
-
-## Table 2.
-
+table_2 <-
+  bike_service_comparison %>% 
+  st_drop_geometry() %>% 
+  filter(year == 2018) %>% 
+  select(-immigrant, -vulnerability_index) %>% 
+  drop_units()
+### NEED TO ADD SUBWAY ACCESS TO THIS
 
 
 
