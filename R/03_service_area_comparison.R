@@ -37,7 +37,6 @@ bike_service_growth_comparison <- st_intersect_summarize(
   mean_vars = vars(med_income, vulnerability_index))
 
 
-
 ## Comparison between bike sharing areas with/without transit
 
 bike_service_added_comparison <-
