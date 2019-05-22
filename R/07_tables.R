@@ -43,19 +43,19 @@ table_1 <-
 ## Table 2. Demographic differences in bike sharing access
 
 table_2 <-
-  bike_service_comparison %>%   
-  mutate(subway_access = c(subway_service_comparison$pop_total[3]/bike_service_comparison$pop_total[3], 
-                           subway_service_comparison$pop_total[4]/bike_service_comparison$pop_total[4]))%>% 
+  bike_service_comparison %>%
   st_drop_geometry() %>% 
   filter(year == 2018) %>% 
-  select(-immigrant, -vulnerability_index) %>% 
+  mutate(subway_access = c(
+    subway_service_comparison$pop_total[3] / pop_total[1], 
+    subway_service_comparison$pop_total[4] / pop_total[2])) %>% 
+    select(-immigrant, -vulnerability_index) %>% 
   mutate(pop_total = round(pop_total, -3),
          med_income = round(med_income, -2),
          pop_white = round(pop_white, 3),
          education = round(education, 3),
          poverty = round(poverty, 3),
-         subway_access = round(subway_access, 3) )%>%
-  drop_units()
+         subway_access = round(subway_access, 3))
 
 
 
