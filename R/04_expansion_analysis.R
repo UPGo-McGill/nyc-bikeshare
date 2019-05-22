@@ -96,6 +96,10 @@ split_target <-
                      split(target_neighbourhoods$nbhd) %>% 
                      map(st_cast, "POLYGON"))
 
+split_target[[11]] <- 
+  split_target[[11]] %>%
+  filter(drop_units(st_area(.)) > 20000)
+
 target_neighbourhoods <- 
   target_neighbourhoods %>% 
   mutate(geometry = c(
@@ -112,9 +116,9 @@ target_neighbourhoods <-
           split_target[["East New York/Canarsie"]][1,2]) %>% st_union(),
     st_geometry(split_target[["South Bronx"]][4,]),
     st_geometry(split_target[["Sunset Park/Bay Ridge"]][2,]),
-    st_geometry(split_target[["Upper Manhattan"]][19,]),
+    st_geometry(split_target[["Upper Manhattan"]][3,]),
     rbind(split_target[["West Bronx"]][1,2],
-          split_target[["Upper Manhattan"]][13,2]) %>% st_union()))
+          split_target[["Upper Manhattan"]][2,2]) %>% st_union()))
 
 rm(split_target)
 
