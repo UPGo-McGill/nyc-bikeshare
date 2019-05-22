@@ -134,6 +134,16 @@ target_neighbourhoods <-
 
 ## Get demographics by target neighbourhoods
 
+target_subway_areas <- 
+  suppressWarnings(
+    st_intersection(target_neighbourhoods, subway_service_areas[1,]))
+
+target_subway_areas <- suppressWarnings(rbind(
+  target_subway_areas,
+  st_erase(target_neighbourhoods, st_union(target_subway_areas)) %>% 
+    mutate(subway_service = FALSE) %>% 
+    select(number, nbhd, subway_service, geometry)))
+
 target_neighbourhoods_demographics <- st_intersect_summarize(
   CTs,
   target_neighbourhoods,
@@ -143,12 +153,12 @@ target_neighbourhoods_demographics <- st_intersect_summarize(
   mean_vars = vars(med_income, vulnerability_index))
 
 target_subway_access <- st_intersect_summarize(
-  target_neighbourhoods_demographics,
-  subway_service_areas,
+  CTs,
+  target_subway_areas,
   group_vars = vars(nbhd, subway_service),
   population = pop_total,
   sum_vars = vars(pop_white),
-  mean_vars = vars(vulnerability_index))
+  mean_vars = vars(med_income))
 
 target_neighbourhoods_demographics <- 
   target_neighbourhoods_demographics %>% 
@@ -164,13 +174,3 @@ target_neighbourhoods <-
                                          "pop_no_subway")]),
     by = "nbhd") %>% 
   mutate(vulnerability_index = as.vector(vulnerability_index))
-
-target_subway_areas <- 
-  st_intersection(target_neighbourhoods, subway_service_areas[1,]) %>% 
-  select(-vulnerability_index, -pop_no_subway) %>% 
-  
-
-target_no_subway_areas <- 
-  st_erase(target_neighbourhoods, st_union(target_subway_areas))
-
-
