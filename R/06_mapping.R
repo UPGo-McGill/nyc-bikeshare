@@ -1,15 +1,11 @@
 ### MAP MAKING #################################################################
 
-## Load libraries and helper functions
-
-source("R/01_helper_functions.R")
-
-
 ## Initialize map list and base map
 
 figure <- list()
 base_map <- tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), xlim=c(-0.02, 1.02),
-                                        ylim=c(0.01, 1.05), relative = TRUE)) +
+                                        ylim=c(0.01, 1.05), relative = TRUE),
+                     unit = "mi") +
   tm_fill(col = "#f0f0f0") +
   tm_shape(nyc_city) +
   tm_fill(col = "grey80", title = "Base Map") +
@@ -141,7 +137,7 @@ figure[[6]] <-
 tmap_save(figure[[6]], "output/figure_6.png", width = 2400, height = 2400)
 
 
-## Figure 7. 
+## Figure 7. Bike sharing service expansion demographics, 2013-2018
 
 panel_base_map <- base_map +
   tm_layout(legend.text.size = 1.1, title.size = 1.1)
