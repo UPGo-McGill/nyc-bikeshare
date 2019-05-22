@@ -93,7 +93,7 @@ table_2 <-
 
 ### 4. HOW HAS CITI BIKE ACCESS CHANGED SINCE 2013?
 
-## Table 3. 
+## Table 3. Demographic differences in bike sharing access, 2013-2018
 
 table_3 <- 
   bike_service_growth_comparison %>% 
