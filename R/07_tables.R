@@ -7,6 +7,16 @@ source("R/01_helper_functions.R")
 
 ### 1. INTRODUCTION ####
 
+# 12 priority areas table
+
+target_subway_access <- st_intersect_summarize(
+  CTs,
+  target_subway_areas,
+  group_vars = vars(nbhd, subway_service),
+  population = pop_total,
+  sum_vars = vars(pop_white, education, poverty),
+  mean_vars = vars(med_income))
+
 ## Vulnerability index quantile
 
 quantile(CTs$vulnerability_index, seq(0, 1, .333333))
