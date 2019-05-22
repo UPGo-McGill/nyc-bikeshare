@@ -100,6 +100,22 @@ table_2 <-
 
 
 
+
+### 4. HOW HAS CITI BIKE ACCESS CHANGED SINCE 2013?
+
+## Table 3. Demographic differences in bike sharing access, 2013-2018
+
+table_3 <- 
+  bike_service_growth_comparison %>% 
+  st_drop_geometry() %>% 
+  mutate_at(c("pop_white", "education", "poverty"), round, 3) %>% 
+  mutate(pop_total = round(pop_total, -3),
+         med_income = round(med_income, -2)) %>% 
+  select(service, pop_total, med_income, poverty, pop_white, education)
+
+
+### 5.
+
 ## Table X. Expansion neighborhood demographics
 
 table_4 <-

@@ -1,10 +1,5 @@
 ### SERVICE AREA COMPARISON ####################################################
 
-## Load libraries and helper functions
-
-source("R/01_helper_functions.R")
-
-
 ## Bike service comparisons for 2013 and 2018
 
 bike_service_comparison <- st_intersect_summarize(
