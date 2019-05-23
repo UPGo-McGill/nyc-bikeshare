@@ -21,7 +21,7 @@ expansion_bike_service_areas <- bike_stations %>%
   st_collection_extract("POLYGON")
 
 subway_buffers <- subway_stations %>%
-  st_buffer(2000) %>%
+  st_buffer(expansion_distance) %>%
   mutate(bike_proximity = st_distance(subway_stations, bike_service_filled))
 
 subway_buffer_comparison <- st_intersect_summarize(
