@@ -1,21 +1,13 @@
 ### TABLES AND CHARTS ##########################################################
 
-## Load libraries and helper functions
-
-source("R/01_helper_functions.R")
-
-
-### 1. INTRODUCTION ####
+### EXECUTIVE SUMMARY ####
 
 # 12 priority areas table
 
-target_subway_access <- st_intersect_summarize(
-  CTs,
-  target_subway_areas,
-  group_vars = vars(nbhd, subway_service),
-  population = pop_total,
-  sum_vars = vars(pop_white, education, poverty),
-  mean_vars = vars(med_income))
+target_subway_access
+
+
+### 1. INTRODUCTION ####
 
 ## Vulnerability index quantile
 
@@ -76,10 +68,12 @@ nyc_demographics <-
 
 nyc_demographics <- nyc_demographics %>% filter(pop_total > 100) %>% na.omit() }
 
-nyc_summary_demographics <- c(pop_total = sum(nyc_demographics$pop_total) ,
-                              pop_white = round(sum(nyc_demographics$pop_non_hisp_white)/sum(nyc_demographics$pop_total), 3),
-                              pop_black = round(sum(nyc_demographics$pop_non_hisp_black)/sum(nyc_demographics$pop_total), 3),
-                              pop_hisp = round(sum(nyc_demographics$pop_hisp)/sum(nyc_demographics$pop_total), 3))
+nyc_summary_demographics <- c(
+  pop_total = sum(nyc_demographics$pop_total),
+  pop_white = round(sum(nyc_demographics$pop_non_hisp_white)/sum(nyc_demographics$pop_total), 3),
+  pop_black = round(sum(nyc_demographics$pop_non_hisp_black)/sum(nyc_demographics$pop_total), 3),
+  pop_hisp = round(sum(nyc_demographics$pop_hisp)/sum(nyc_demographics$pop_total), 3))
+
 
 ## Table 2. Demographic differences in bike sharing access
 
