@@ -122,18 +122,10 @@ table_3 <-
   select(service, pop_total, med_income, poverty, pop_white, education)
 
 
-### 5.
+### 5.How should New York’s bike sharing expand in the future?
 
-## Table X. Expansion neighborhood demographics
+# Table 4. Leading potential expansion areas based on vulnerability index
 
-table_4 <-
-  target_neighbourhoods_demographics %>% 
-  st_drop_geometry() %>% 
-    mutate_at(c("pop_white", "education", "poverty", "pop_no_subway"), round, 3) %>%
-    mutate(pop_total = round(pop_total, -3),
-           med_income = round(med_income, -2)) %>% 
-    select(neighborhood = nbhd, population = pop_total, med_income,
-           pct_in_poverty = poverty, pct_non_hispanic_white = pop_white,
-           pct_with_bachelors_degree = education,
-           pct_without_subway_access = pop_no_subway)
-    
+target_subway_access
+
+# Table 5. Leading potential expansion areas based on subway access
