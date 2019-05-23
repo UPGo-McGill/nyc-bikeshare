@@ -142,10 +142,3 @@ table_5 <-
          access_per_mi = pop_total / area) %>%
   st_drop_geometry()
 
-
-
-target_subway_access$area <- st_area(target_subway_access) * 0.000000386102159
-target_subway_access$accesspermi <- target_subway_access$pop_total / target_subway_access$area
-
-table5 <- target_subway_access %>% select(nbhd, subway_service, pop_total, geometry, area, accesspermi) %>%  filter(subway_service == FALSE) 
-
