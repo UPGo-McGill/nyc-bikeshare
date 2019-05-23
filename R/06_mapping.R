@@ -147,7 +147,7 @@ tm1 <- panel_base_map +
   tm_shape(bike_service_growth_comparison) +  
   tm_polygons("med_income", title = "", palette = "Greens",
               breaks = c(0, 55000, 90000, 100000),
-              labels = c("$54,688","$83,676","$99,792"),
+              labels = c("$54,700","$83,700","$99,800"),
               border.alpha = 0) +
   tm_layout(title = "Median household income")
 
