@@ -117,7 +117,7 @@ subway_lines <-
 
 CTs <- get_acs(
   geography = "tract", 
-  variables = c(pop_non_hisp_white = "B03002_003",
+  variables = c(pop__white = "B03002_003",
                 med_income = "B19013_001",
                 immigrant = "B05001_006",
                 education = "B16010_041",
