@@ -126,10 +126,23 @@ table_3 <-
 
 # Table 4. Leading potential expansion areas based on vulnerability index
 
-table4 <- 
+# table4 <- 
 
 
 # Table 5. Leading potential expansion areas based on subway access
+
+table_5 <- 
+  target_subway_access %>% 
+  filter(subway_service == FALSE) %>%
+  st_collection_extract("POLYGON") %>%
+  group_by(nbhd) %>% 
+  summarize(pop_total = first(pop_total),
+            geometry = st_union(geometry)) %>%
+  mutate(area = st_area(.) %>% set_units(mi^2),
+         access_per_mi = pop_total / area) %>%
+  st_drop_geometry()
+
+
 
 target_subway_access$area <- st_area(target_subway_access) * 0.000000386102159
 target_subway_access$accesspermi <- target_subway_access$pop_total / target_subway_access$area
