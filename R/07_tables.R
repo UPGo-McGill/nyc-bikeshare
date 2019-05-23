@@ -126,6 +126,13 @@ table_3 <-
 
 # Table 4. Leading potential expansion areas based on vulnerability index
 
-target_subway_access
+table4 <- 
+
 
 # Table 5. Leading potential expansion areas based on subway access
+
+target_subway_access$area <- st_area(target_subway_access) * 0.000000386102159
+target_subway_access$accesspermi <- target_subway_access$pop_total / target_subway_access$area
+
+table5 <- target_subway_access %>% select(nbhd, subway_service, pop_total, geometry, area, accesspermi) %>%  filter(subway_service == FALSE) 
+
