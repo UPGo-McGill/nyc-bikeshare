@@ -130,10 +130,10 @@ table_4 <-
   target_neighbourhoods_demographics %>% 
   st_collection_extract("POLYGON") %>%
   group_by(nbhd) %>% 
-  mutate(pop_no_subway = pop_no_subway * pop_total) %>% 
-  select(nbhd,vulnerability_index,pop_total,pop_no_subway)
-
-## I am unsure why this creates 23 rows, after extracting the polygons and grouping by nbhd
+  st_drop_geometry() %>%
+  summarize(vulnerability_index = first(vulnerability_index),
+            pop_total = first(pop_total),
+            pop_no_subway = first(pop_no_subway) * first(pop_total))
 
 
 # Table 5. Leading potential expansion areas based on subway access
