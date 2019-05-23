@@ -117,8 +117,7 @@ subway_lines <-
 
 CTs <- get_acs(
   geography = "tract", 
-  variables = c(pop_white = "B02001_002", 
-                pop_hisp_white = "B03002_013",
+  variables = c(pop_non_hisp_white = "B03002_003",
                 med_income = "B19013_001",
                 immigrant = "B05001_006",
                 education = "B16010_041",
@@ -143,8 +142,6 @@ CTs <-
   CTs %>%
   select(-MOE, -pop_total_MOE) %>% 
   spread(key = Variable, value = Estimate) %>% 
-  mutate(pop_white = pop_white - pop_hisp_white) %>% 
-  select(-pop_hisp_white) %>%
   mutate(pop_density = pop_total/st_area(geometry)) 
 
 CTs <- CTs %>% filter(pop_total > 100) %>% na.omit()
@@ -184,7 +181,7 @@ CTs <- suppressWarnings(st_erase(CTs, nyc_water))
 
 ## Create service and no-service areas, with holes filled in for maps
 
-service_years <- do.call(c,map(2013:2018, service_create, 300))
+service_years <- do.call(c,map(2013:2018, service_create, bike_distance))
 
 bike_service_areas <-
   tibble(year = c(2013, 2013, 2018, 2018),
@@ -222,7 +219,7 @@ growth <- tibble(
 
 subway_service <- 
   suppressWarnings(subway_stations %>%
-                     st_buffer(800) %>%
+                     st_buffer(subway_distance) %>%
                      st_union() %>%
                      st_erase(nyc_water)) 
 
