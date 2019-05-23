@@ -53,13 +53,15 @@ table_1 <-
 
 ### 3. WHO HAS ACCESS TO CITI BIKE, AND WHO DOESN'T?
 
-## NYC racial demographics
- {nyc_demographics <- get_acs(
+## NYC summary demographics
+{nyc_demographics <- get_acs(
   geography = "county", 
-  variables = c( 
-                 pop_non_hisp_white = "B03002_003",
+  variables = c(pop_non_hisp_white = "B03002_003",
                 pop_non_hisp_black = "B03002_004",
-                pop_hisp = "B03002_012"),
+                pop_hisp = "B03002_012",
+                education = "B16010_041",
+                poverty = "B17001_002"),
+  
   year = 2017, 
   state = "36",
   county = c("New York County",
@@ -68,23 +70,24 @@ table_1 <-
              "Bronx County",
              "Richmond County"),
   summary_var = "B01003_001")
+  
+  names(nyc_demographics) <- c("GEOID", "NAME", "Variable", "Estimate", "MOE", "pop_total",
+                               "pop_total_MOE")
+  
+  nyc_demographics <-
+    nyc_demographics %>%
+    select(-MOE, -pop_total_MOE) %>% 
+    spread(key = Variable, value = Estimate)
+  
+  nyc_demographics <- nyc_demographics %>% filter(pop_total > 100) %>% na.omit() }
 
-names(nyc_demographics) <- c("GEOID", "NAME", "Variable", "Estimate", "MOE", "pop_total",
-                "pop_total_MOE")
-
-nyc_demographics <-
-  nyc_demographics %>%
-  select(-MOE, -pop_total_MOE) %>% 
-  spread(key = Variable, value = Estimate)
-
-nyc_demographics <- nyc_demographics %>% filter(pop_total > 100) %>% na.omit() }
-
-nyc_summary_demographics <- c(
-  pop_total = sum(nyc_demographics$pop_total),
-  pop_white = round(sum(nyc_demographics$pop_non_hisp_white)/sum(nyc_demographics$pop_total), 3),
-  pop_black = round(sum(nyc_demographics$pop_non_hisp_black)/sum(nyc_demographics$pop_total), 3),
-  pop_hisp = round(sum(nyc_demographics$pop_hisp)/sum(nyc_demographics$pop_total), 3))
-
+nyc_summary_demographics <- c(pop_total = sum(nyc_demographics$pop_total) ,
+                              pop_white = round(sum(nyc_demographics$pop_non_hisp_white)/sum(nyc_demographics$pop_total), 3),
+                              pop_black = round(sum(nyc_demographics$pop_non_hisp_black)/sum(nyc_demographics$pop_total), 3),
+                              pop_hisp = round(sum(nyc_demographics$pop_hisp)/sum(nyc_demographics$pop_total), 3),
+                              education = round(sum(nyc_demographics$education)/sum(nyc_demographics$pop_total), 3),
+                              poverty = round(sum(nyc_demographics$poverty)/sum(nyc_demographics$pop_total), 3)
+)
 
 ## Table 2. Demographic differences in bike sharing access
 
@@ -95,7 +98,7 @@ table_2 <-
   mutate(subway_access = c(
     subway_service_comparison$pop_total[3] / pop_total[1], 
     subway_service_comparison$pop_total[4] / pop_total[2])) %>% 
-    select(-immigrant, -vulnerability_index) %>% 
+  select(-immigrant, -vulnerability_index) %>% 
   mutate(pop_total = round(pop_total, -3),
          med_income = round(med_income, -2),
          pop_white = round(pop_white, 3),

@@ -64,6 +64,11 @@ index_create <- function(var) {
   (var - min(var)) / (max(var) - min(var))
 }
 
+##set buffer values
+bike_distance <- 300
+subway_distance <- 800
+expansion_distance <- 2000
+
 
 ## service_create helper function
 
