@@ -18,6 +18,14 @@ library(stplanr)
 options(tigris_use_cache = TRUE)
 suppressWarnings(font_import(paths = "data/fonts", prompt = FALSE))
 
+
+## Set buffer values
+
+bike_distance <- 300
+subway_distance <- 800
+expansion_distance <- 2000
+
+
 ## st_erase helper function
 
 st_erase <- function(x, y) st_difference(x, st_union(st_combine(y)))
@@ -63,11 +71,6 @@ st_intersect_summarize <- function(data, poly, group_vars, population, sum_vars,
 index_create <- function(var) {
   (var - min(var)) / (max(var) - min(var))
 }
-
-##set buffer values
-bike_distance <- 300
-subway_distance <- 800
-expansion_distance <- 2000
 
 
 ## service_create helper function

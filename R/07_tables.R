@@ -35,7 +35,7 @@ table_1 <-
     CTs,
     tibble(
       year = 2013:2018,
-      geometry = do.call(c,map(2013:2018, service_create, 300))) %>% 
+      geometry = do.call(c,map(2013:2018, service_create, bike_distance))) %>% 
       st_as_sf(),
     group_vars = vars(year), population = pop_total, sum_vars = vars(pop_white),
     mean_vars = vars(med_income)) %>% 

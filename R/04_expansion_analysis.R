@@ -6,7 +6,7 @@ bike_service_filled <- fill_holes(bike_service_areas$geometry[3], 20000)
 
 expansion_subway_service_areas <- 
   suppressWarnings(subway_stations %>%
-                     st_buffer(2000) %>%
+                     st_buffer(expansion_distance) %>%
                      st_union() %>% 
                      st_erase(subway_service_areas[1,])) %>% 
   st_intersection(nyc_city) %>% 
@@ -14,14 +14,14 @@ expansion_subway_service_areas <-
 
 expansion_bike_service_areas <- bike_stations %>%
   filter(Year == 2018) %>%
-  st_buffer(2000) %>%
+  st_buffer(expansion_distance) %>%
   st_union() %>%
   st_erase(bike_service_filled) %>%
   st_intersection(nyc_city) %>% 
   st_collection_extract("POLYGON")
 
 subway_buffers <- subway_stations %>%
-  st_buffer(2000) %>%
+  st_buffer(expansion_distance) %>%
   mutate(bike_proximity = st_distance(subway_stations, bike_service_filled))
 
 subway_buffer_comparison <- st_intersect_summarize(
@@ -47,7 +47,7 @@ subway_stations_vulnerability <-
 subway_buffer_vulnerability <-
   suppressWarnings(subway_stations %>% 
   filter(stop_id %in% subway_buffer_vulnerability$stop_id) %>%
-  st_buffer(2000) %>% 
+  st_buffer(expansion_distance) %>% 
   st_intersection(nyc_city) %>% 
   st_erase(bike_service_filled) %>% 
   st_intersection(nyc_pumas))

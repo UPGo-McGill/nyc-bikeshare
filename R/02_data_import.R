@@ -117,11 +117,12 @@ subway_lines <-
 
 CTs <- get_acs(
   geography = "tract", 
-  variables = c(pop_non_hisp_white = "B03002_003",
-                med_income = "B19013_001",
+  variables = c(med_income = "B19013_001",
+                poverty = "B17001_002",
+                pop_white = "B03002_003",
                 immigrant = "B05001_006",
-                education = "B16010_041",
-                poverty = "B17001_002"),
+                education = "B16010_041"
+                ),
   year = 2017, 
   state = "36",
   county = c("New York County",
