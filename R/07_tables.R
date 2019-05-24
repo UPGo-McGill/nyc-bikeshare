@@ -2,20 +2,31 @@
 
 ### EXECUTIVE SUMMARY ####
 
+## p. 2
+
+# All facts taken from chapter 3
+
+## p. 3
+
 # White and non-white bike share percentages
 
-white_bike_share <- (st_drop_geometry(bike_service_comparison)[4,3] *
-                       st_drop_geometry(bike_service_comparison)[4,4]) / 
-  sum(nyc_demographics$pop_non_hisp_white)
+white_bike_share <-
+  (st_drop_geometry(bike_service_comparison)[4,3] *
+     st_drop_geometry(bike_service_comparison)[4,4]) /
+     sum(nyc_demographics$pop_non_hisp_white)
 
-non_white_bike_share <- (st_drop_geometry(bike_service_comparison)[4,3] *
-                           (1 - st_drop_geometry(bike_service_comparison)[4,4])) / 
-  (sum(nyc_demographics$pop_total) - sum(nyc_demographics$pop_non_hisp_white))
+non_white_bike_share <-
+  (st_drop_geometry(bike_service_comparison)[4,3] *
+     (1 - st_drop_geometry(bike_service_comparison)[4,4])) / 
+     (sum(nyc_demographics$pop_total) - sum(nyc_demographics$pop_non_hisp_white))
 
+# Population with and without subway access
 
-# 12 priority areas table
+subway_service_comparison %>% 
+  st_drop_geometry() %>% 
+  filter(subway_service == FALSE) %>% 
+  summarize(pop_without_bike_share = pop_total[1] / sum(pop_total))
 
-target_subway_access
 
 
 ### 1. INTRODUCTION ####
