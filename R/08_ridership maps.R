@@ -1,50 +1,64 @@
-Ridership Maps
+#### Ridership Maps
 
 
 ### STEP 1. Table rides per station, by season
 
-rider_201806 <- rider_201806 %>% select(c(4)) 
-names(rider_201806) <- "ID"
-rider_201806$ID <-as.numeric(rider_201806$ID)
-rider_201806 <- rider_201806 %>% 
-                group_by(ID) %>% 
-                summarize(rides_jun = n())
+rider_201806 <-
+  read_csv("data/201806-citibike-tripdata.csv") %>% 
+  select(4) %>% 
+  set_names("ID") %>%
+  group_by(ID) %>% 
+  summarize(rides_jun = n())
 
+rider_201812 <-
+  read_csv("data/201812-citibike-tripdata.csv") %>%
+  select(4) %>% 
+  set_names("ID") %>%
+  group_by(ID) %>% 
+  summarize(rides_dec = n()) %>% 
+  mutate(ID = as.numeric(ID))
 
-rider_201812 <- rider_201812 %>% select(c(4))
-names(rider_201812) <- "ID"
-rider_201812$ID <-as.numeric(rider_201812$ID)
-rider_201812 <- rider_201812 %>% 
-                group_by(ID) %>% 
-                summarize(rides_dec = n())
-
-rider_2018 <- full_join(rider_201806, rider_201812, by = "ID")
+rider_2018 <- full_join(rider_201806, rider_201812)
 rider_2018[is.na(rider_2018)] <- 0
-rider_2018$total <-  rider_2018$rides_jun + rider_2018$rides_dec
-names(rider_2018) <- c("ID", "Rides (June)", "Rides (December)", "Rides (Combined)")
+rider_2018 <- 
+  rider_2018 %>% 
+  mutate(rides = rides_jun + rides_dec) %>% 
+  select(-rides_jun, -rides_dec)
 
-# join this table to station list, to long/lat
+stations_2018 <- 
+  filter(bike_stations, Year == 2018) %>% 
+  select(-Year) %>% 
+  left_join(rider_2018, .) %>% 
+  filter(!st_is_empty(geometry)) %>% 
+  st_as_sf()
 
-stations_2018 <- filter(bike_stations, Year == 2018) 
-stations_2018 <- left_join(rider_2018, stations_2018, by = "ID") %>% 
-  st_as_sf() 
-
-#identify and remove NA rows
-which(st_is_empty(stations_2018))
-stations_2018 <- stations_2018[-c(596,739,797), ]
 
 ### STEP 2. Mapping to find redudancies ## need help here
 
+
 ### STEP 3. Create voronoi polygons
 
+voronoi <-
+  tibble(
+    ID = stations_2018$ID,
+    rides = stations_2018$rides,
+    geometry = stations_2018 %>% 
+      st_union() %>% 
+      st_voronoi() %>%
+      st_collection_extract() %>% 
+      st_erase(nyc_water) %>% 
+      st_intersection(bike_service_filled)) %>% 
+  st_as_sf()
 
-#first try
-stations_v <- st_voronoi(st_union(stations_2018), bike_service_filled)
 
-tm_shape(stations_v) +
-  tm_borders()
+# Example map
 
-plot(stations_v)
+tm_shape(voronoi) +
+  tm_fill("rides") +
+  tm_borders(col = "white") +
+  tm_shape(stations_2018$geometry) +
+  tm_dots()
+
 
 
                   
