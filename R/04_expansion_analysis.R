@@ -12,7 +12,8 @@ expansion_subway_service_areas <-
   st_intersection(nyc_city) %>% 
   st_collection_extract("POLYGON")
 
-expansion_bike_service_areas <- bike_stations %>%
+expansion_bike_service_areas <-
+  bike_stations %>%
   filter(Year == 2018) %>%
   st_buffer(expansion_distance) %>%
   st_union() %>%
@@ -20,7 +21,8 @@ expansion_bike_service_areas <- bike_stations %>%
   st_intersection(nyc_city) %>% 
   st_collection_extract("POLYGON")
 
-subway_buffers <- subway_stations %>%
+subway_buffers <-
+  subway_stations %>%
   st_buffer(expansion_distance) %>%
   mutate(bike_proximity = st_distance(subway_stations, bike_service_filled))
 
@@ -40,41 +42,56 @@ subway_buffer_vulnerability <-
   subway_buffer_comparison %>%
   filter(vulnerability_index > 2.75)
 
-subway_buffer_vulnerability <-
-  suppressWarnings(subway_stations %>% 
-                     filter(stop_id %in% subway_buffer_vulnerability$stop_id) %>%
+subway_stations_vulnerability <-
+  subway_stations %>% 
+  filter(stop_id %in% subway_buffer_vulnerability$stop_id)
+
+target_neighbourhoods <-
+  suppressWarnings(subway_stations_vulnerability %>%
                      st_buffer(expansion_distance) %>% 
                      st_intersection(nyc_city) %>% 
                      st_erase(bike_service_filled) %>%
                      st_union() %>%
                      st_cast("POLYGON") %>%
-                     tibble() %>% 
-                     st_as_sf %>% 
+                     as_tibble() %>% 
+                     st_as_sf() %>% 
                      mutate(area = st_area(.)) %>%
                      arrange(-area) %>%
-                     st_erase(.[8:28,]) %>%
-                     mutate(nbhd = c("bronx_cluster", "brooklyn_cluster", "Jackson Heights/Flushing", "Jamaica", "Sunset Park/Bay Ridge", "Upper Manhattan", "Far Rockaway")) )  %>% 
-  group_by(nbhd)  %>% 
-  summarize(geometry = st_union(.)) 
+                     filter(area > set_units(2000000, m^2)) %>%
+                     mutate(nbhd = c("bronx_cluster", "brooklyn_cluster", 
+                                     "Jackson Heights/Flushing", 
+                                     "Jamaica", "Sunset Park/Bay Ridge", 
+                                     "Upper Manhattan", "Far Rockaway")))
 
-target_neighbourhoods <- suppressWarnings(subway_buffer_vulnerability[1:2,] %>%
-                                            st_intersection(nyc_pumas)%>%  
-                                            mutate(nbhd = case_when(PUMACE10 %in% c("03701", "03706")                   ~ "West Bronx",
-                                                                    PUMACE10 %in% c("03705", "03707")                   ~ "Central Bronx",
-                                                                    PUMACE10 %in% c("03702", "03703", "03704", "03709") ~ "East Bronx",
-                                                                    PUMACE10 %in% c("03708", "03710")                   ~ "South Bronx",
-                                                                    PUMACE10 %in% c("04001", "04002", "04003", "04110") ~ "Bushwick/Ridgewood",
-                                                                    PUMACE10 %in% c("04005", "04006", "04007", "04010",
-                                                                                    "04011")                            ~ "Crown Heights/Brownsville",
-                                                                    PUMACE10 %in% c("04008", "04009", "04111", "04113") ~ "East New York/Canarsie"))%>% 
-                                            filter(!is.na(nbhd))  %>% 
-                                            group_by(nbhd) %>% 
-                                            summarize(geometry = st_union(geometry)) %>% 
-                                            rbind(subway_buffer_vulnerability[3:7,]) %>% 
-                                            arrange(nbhd) %>% 
-                                            mutate(number = 1:12) %>% 
-                                            select(number, nbhd, geometry))
 
+clusters <- suppressWarnings(target_neighbourhoods[1:2,] %>%
+                      st_intersection(nyc_pumas) %>%   
+  mutate(nbhd = case_when(
+    PUMACE10 %in% c("03701", "03706", "03801")          ~ "West Bronx",
+    PUMACE10 %in% c("03705", "03707")                   ~ "Central Bronx",
+    PUMACE10 %in% c("03702", "03703", "03704", "03709") ~ "East Bronx",
+    PUMACE10 %in% c("03708", "03710")                   ~ "South Bronx",
+    PUMACE10 %in% c("04001", "04002", "04003", "04110") ~ "Bushwick/Ridgewood",
+    PUMACE10 %in% c("04005", "04006", "04007", "04010",
+                    "04011")                            ~ "Crown Heights/Brownsville",
+    PUMACE10 %in% c("04008", "04009", "04111", "04113") ~ "East New York/Canarsie")) %>%
+    
+  st_collection_extract("POLYGON") %>% 
+  filter(!is.na(nbhd))  %>%
+  group_by(nbhd) %>% 
+  summarize())
+
+clusters[7,] <- 
+  clusters[7,] %>%
+  st_cast("POLYGON") %>%
+  filter(st_area(.) > set_units(10000, m^2))
+    
+target_neighbourhoods <- 
+  target_neighbourhoods[3:7,] %>% 
+  select(nbhd, geometry) %>% 
+  rbind(clusters) %>% 
+  arrange(nbhd)
+  
 
 ## Get demographics by target neighbourhoods
 
@@ -117,4 +134,5 @@ target_neighbourhoods <-
     target_neighbourhoods_demographics[c("nbhd", "vulnerability_index",
                                          "pop_no_subway")]),
     by = "nbhd") %>% 
-  mutate(vulnerability_index = as.vector(vulnerability_index))
+  mutate(vulnerability_index = as.vector(vulnerability_index)) 
+
