@@ -33,14 +33,29 @@ stations_2018 <-
   st_as_sf()
 
 
-### STEP 2. Mapping to find redudancies 
+### STEP 2. Find duplicates 
 
-station_buffer <- st_buffer(stations_2018, dist = 30)
-station_overlap <- st_intersection(station_buffer)  #this created 10 extra points; there are also 10 rows that 2 intersections
+overlaps <-
+  stations_2018 %>% 
+  st_buffer(30) %>% 
+  st_intersection() %>% 
+  filter(n.overlaps > 1) %>% 
+  pull(origins)
 
-plot(station_overlap)
-tm_shape(station_overlap)+
-  tm_fill(col = "red")
+stations_2018 <- 
+  stations_2018 %>% 
+  filter(!(ID %in% stations_2018[unlist(overlaps),]$ID)) %>% 
+  rbind(map(overlaps, ~{
+    stations <- stations_2018[.x,]
+    tibble(ID = min(stations$ID),
+           rides = sum(stations$rides),
+           geometry = st_centroid(st_union(stations))) %>% 
+      st_as_sf()}) %>% 
+      do.call(rbind, .) %>% 
+      st_as_sf()) %>% 
+  arrange(ID)
+
+rm(overlaps)
 
 
 ### STEP 3. Create voronoi polygons
@@ -65,14 +80,3 @@ tm_shape(voronoi) +
   tm_borders(col = "white") +
   tm_shape(stations_2018$geometry) +
   tm_dots()
-
-
-
-voronoi <- deldir(stations_2018$geometry)
-
-voronoi.polygons(stations_2018, bike_service_filled)
-
-SpatialPointsDataFrame(stations_2018)
-
-
-
