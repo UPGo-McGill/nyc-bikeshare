@@ -80,3 +80,22 @@ tm_shape(voronoi) +
   tm_borders(col = "white") +
   tm_shape(stations_2018$geometry) +
   tm_dots()
+
+
+### STEP 4. Analyze demographics
+
+voronoi_comparison <- st_intersect_summarize(
+  CTs,
+  voronoi,
+  group_vars = vars(ID),
+  population = pop_total,
+  sum_vars = vars(pop_white, education, poverty),
+  mean_vars = vars(med_income, vulnerability_index)) %>% 
+  left_join(st_drop_geometry(voronoi))
+
+# Rough regression model
+
+lm(rides ~ pop_total + pop_white + education + poverty + med_income,
+   data = voronoi_comparison) %>% 
+  summary()
+
