@@ -81,10 +81,10 @@ clusters <- suppressWarnings(target_neighbourhoods[1:2,] %>%
   group_by(nbhd) %>% 
   summarize())
 
-clusters[7,] <- 
+clusters[7,] <- suppressWarnings(
   clusters[7,] %>%
   st_cast("POLYGON") %>%
-  filter(st_area(.) > set_units(10000, m^2))
+  filter(st_area(.) > set_units(10000, m^2)))
     
 target_neighbourhoods <- 
   target_neighbourhoods[3:7,] %>% 
@@ -97,13 +97,13 @@ target_neighbourhoods <-
 
 target_subway_areas <- 
   suppressWarnings(
-    st_intersection(target_neighbourhoods, subway_service_areas[1,]))
+    st_intersection(target_neighbourhoods, subway_service_areas %>% filter(subway_service == TRUE)))
 
 target_subway_areas <- suppressWarnings(rbind(
   target_subway_areas,
   st_erase(target_neighbourhoods, st_union(target_subway_areas)) %>% 
     mutate(subway_service = FALSE) %>% 
-    select(number, nbhd, subway_service, geometry)))
+    select(nbhd, subway_service, geometry)))
 
 target_neighbourhoods_demographics <- st_intersect_summarize(
   CTs,
