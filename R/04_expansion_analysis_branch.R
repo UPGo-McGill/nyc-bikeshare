@@ -12,7 +12,8 @@ expansion_subway_service_areas <-
   st_intersection(nyc_city) %>% 
   st_collection_extract("POLYGON")
 
-expansion_bike_service_areas <- bike_stations %>%
+expansion_bike_service_areas <-
+  bike_stations %>%
   filter(Year == 2018) %>%
   st_buffer(expansion_distance) %>%
   st_union() %>%
@@ -20,7 +21,8 @@ expansion_bike_service_areas <- bike_stations %>%
   st_intersection(nyc_city) %>% 
   st_collection_extract("POLYGON")
 
-subway_buffers <- subway_stations %>%
+subway_buffers <-
+  subway_stations %>%
   st_buffer(expansion_distance) %>%
   mutate(bike_proximity = st_distance(subway_stations, bike_service_filled))
 
