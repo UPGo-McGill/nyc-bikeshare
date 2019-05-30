@@ -1,7 +1,6 @@
-#### Ridership Maps
+### RIDERSHIP ANALYSIS #########################################################
 
-
-### STEP 1. Table rides per station, by season
+## Table rides per station, by season
 
 rider_201806 <-
   read_csv("data/201806-citibike-tripdata.csv") %>% 
@@ -62,9 +61,11 @@ stations_2013 <-
   st_as_sf()
 
 
-rm(rider_201806, rider_201812, rider_2018, rider_201306, rider_201312, rider_2013)
+rm(rider_201806, rider_201812, rider_2018, rider_201306, rider_201312,
+   rider_2013)
 
-### STEP 2. Find duplicates 
+
+## Find duplicates 
 
 overlaps_2018 <-
   stations_2018 %>% 
@@ -109,7 +110,7 @@ stations_2013 <-
 rm(overlaps_2018, overlaps_2013)
 
 
-### STEP 3. Create voronoi polygons
+## Create voronoi polygons
 
 voronoi_2018 <-
   tibble(
@@ -136,58 +137,7 @@ voronoi_2013 <-
   st_as_sf()
 
 
-# Example map
-
-ride_base_map <-
-  tm_shape(nyc_msa,
-           bbox = bb(st_bbox(voronoi_2018), ext = 1, relative = TRUE),
-           unit = "mi") +
-  tm_fill(col = "#f0f0f0") +
-  tm_shape(nyc_city) +
-  tm_fill(col = "grey80", title = "Base Map") +
-  tm_shape(subway_lines) +
-  tm_lines(col = "grey90", alpha = 0.75) +
-  tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50") +
-  tm_layout(frame = TRUE, main.title.size = 1.5, legend.title.size = 1.2,
-            legend.title.fontfamily = "Futura-CondensedExtraBold",
-            legend.position = c("left", "top"),
-            fontfamily = "Futura-Medium",
-            title.fontfamily = "Futura-CondensedExtraBold",
-            legend.format = list(fun = function(x) {
-              paste0(formatC(x/10000, digits = 0, format = "f", big.mark = ","))
-              }))
-
-ride_map_2018 <- 
-  ride_base_map +
-  tm_shape(voronoi_2018) +
-  tm_polygons("rides", convert2density = TRUE, style = "fixed", n = 7,
-              breaks = c(0, 50000, 100000, 150000, 200000, 300000, 500000,
-                         1000000),
-              palette = "viridis", border.col = "white", border.alpha = 0.2,
-              title = "") +
-  tm_shape(stations_2018) +
-  tm_dots(col = "white", alpha = 0.2) +
-  tm_layout(title = "2018")
-
-ride_map_2013 <-
-  ride_base_map +
-  tm_shape(voronoi_2013) +
-  tm_polygons("rides", convert2density = TRUE, style = "fixed", n = 7,
-              breaks = c(0, 50000, 100000, 150000, 200000, 300000, 500000,
-                         1000000),
-              palette = "viridis", border.col = "white", border.alpha = 0.2,
-              title = "") +
-  tm_shape(stations_2013) +
-  tm_dots(col = "white", alpha = 0.2) +
-  tm_layout(title = "2013")
-
-ride_map <- tmap_arrange(ride_map_2013, ride_map_2018)
-
-tmap_save(ride_map, "output/ride_map.png", width = 2400)
-
-
-
-### STEP 4. Analyze demographics
+## Analyze demographics
 
 voronoi_comparison_2018 <-
   st_intersect_summarize(
@@ -209,11 +159,12 @@ voronoi_comparison_2013 <-
     mean_vars = vars(med_income, vulnerability_index)) %>% 
   left_join(st_drop_geometry(voronoi_2013))
 
-# Correlations and rough regression model
+
+## Correlations and rough regression model
 
 voronoi_comparison_2018 %>% 
   st_drop_geometry() %>% 
-  map(~cor(.x, voronoi_comparison_2018$rides))
+  map(~cor(.x, (voronoi_comparison_2018$rides / st_area(voronoi_comparison_2018))))
 
 voronoi_comparison_2018 %>% 
   st_drop_geometry() %>% 
@@ -231,7 +182,7 @@ lm(rides ~ pop_total + pop_white + education + poverty + med_income,
 
 voronoi_comparison_2013 %>% 
   st_drop_geometry() %>% 
-  map(~cor(.x, voronoi_comparison_2013$rides))
+  map(~cor(.x, (voronoi_comparison_2013$rides / st_area(voronoi_comparison_2013))))
 
 voronoi_comparison_2013 %>% 
   st_drop_geometry() %>% 
