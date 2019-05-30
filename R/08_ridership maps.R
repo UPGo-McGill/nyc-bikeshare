@@ -75,7 +75,7 @@ voronoi <-
 
 # Example map
 
-tm_shape(nyc_msa, bbox = bb(st_bbox(voronoi), ext = 1.1, relative = TRUE),
+ride_map <- tm_shape(nyc_msa, bbox = bb(st_bbox(voronoi), ext = 1.1, relative = TRUE),
          unit = "mi") +
   tm_fill(col = "#f0f0f0") +
   tm_shape(nyc_city) +
@@ -87,13 +87,16 @@ tm_shape(nyc_msa, bbox = bb(st_bbox(voronoi), ext = 1.1, relative = TRUE),
             fontfamily = "Futura-Medium",
             title.fontfamily = "Futura-CondensedExtraBold") +
   tm_shape(voronoi) +
-  tm_polygons("rides", convert2density = TRUE, style = "fisher", n = 7,
-              palette = "cividis", border.col = "white", border.alpha = 0.2,
+  tm_polygons("rides", convert2density = TRUE, style = "fixed", n = 7,
+              breaks = c(0, 50000, 100000, 150000, 200000, 300000, 500000,
+                         1000000),
+              palette = "viridis", border.col = "white", border.alpha = 0.2,
               title = "") +
   tm_shape(stations_2018) +
   tm_dots(col = "white", alpha = 0.2) +
-  tm_layout(title = "Figure X. Citi Bike ride density per station")
+  tm_layout(title = "Figure X. Sample ride density per square mile")
 
+tmap_save(ride_map, "output/ride_map2.png", height = 2400)
 
 
 ### STEP 4. Analyze demographics
