@@ -32,10 +32,41 @@ stations_2018 <-
   filter(!st_is_empty(geometry)) %>% 
   st_as_sf()
 
+rider_201306 <-
+  read_csv("data/201306-citibike-tripdata.csv") %>% 
+  select(4) %>% 
+  set_names("ID") %>%
+  group_by(ID) %>% 
+  summarize(rides_jun = n())
+
+rider_201312 <-
+  read_csv("data/201312-citibike-tripdata.csv") %>%
+  select(4) %>% 
+  set_names("ID") %>%
+  group_by(ID) %>% 
+  summarize(rides_dec = n()) %>% 
+  mutate(ID = as.numeric(ID))
+
+rider_2013 <- full_join(rider_201306, rider_201312)
+rider_2013[is.na(rider_2013)] <- 0
+rider_2013 <- 
+  rider_2013 %>% 
+  mutate(rides = rides_jun + rides_dec) %>% 
+  select(-rides_jun, -rides_dec)
+
+stations_2013 <- 
+  filter(bike_stations, Year == 2013) %>% 
+  select(-Year) %>% 
+  left_join(rider_2013, .) %>% 
+  filter(!st_is_empty(geometry)) %>% 
+  st_as_sf()
+
+
+rm(rider_201806, rider_201812, rider_2018, rider_201306, rider_201312, rider_2013)
 
 ### STEP 2. Find duplicates 
 
-overlaps <-
+overlaps_2018 <-
   stations_2018 %>% 
   st_buffer(30) %>% 
   st_intersection() %>% 
@@ -44,8 +75,8 @@ overlaps <-
 
 stations_2018 <- 
   stations_2018 %>% 
-  filter(!(ID %in% stations_2018[unlist(overlaps),]$ID)) %>% 
-  rbind(map(overlaps, ~{
+  filter(!(ID %in% stations_2018[unlist(overlaps_2018),]$ID)) %>% 
+  rbind(map(overlaps_2018, ~{
     stations <- stations_2018[.x,]
     tibble(ID = min(stations$ID),
            rides = sum(stations$rides),
@@ -55,12 +86,32 @@ stations_2018 <-
       st_as_sf()) %>% 
   arrange(ID)
 
-rm(overlaps)
+overlaps_2013 <-
+  stations_2013 %>% 
+  st_buffer(30) %>% 
+  st_intersection() %>% 
+  filter(n.overlaps > 1) %>% 
+  pull(origins)
+
+stations_2013 <- 
+  stations_2013 %>% 
+  filter(!(ID %in% stations_2013[unlist(overlaps_2013),]$ID)) %>% 
+  rbind(map(overlaps_2013, ~{
+    stations <- stations_2013[.x,]
+    tibble(ID = min(stations$ID),
+           rides = sum(stations$rides),
+           geometry = st_centroid(st_union(stations))) %>% 
+      st_as_sf()}) %>% 
+      do.call(rbind, .) %>% 
+      st_as_sf()) %>% 
+  arrange(ID)
+
+rm(overlaps_2018, overlaps_2013)
 
 
 ### STEP 3. Create voronoi polygons
 
-voronoi <-
+voronoi_2018 <-
   tibble(
     ID = stations_2018$ID,
     rides = stations_2018$rides,
@@ -72,10 +123,23 @@ voronoi <-
       st_intersection(bike_service_filled)) %>% 
   st_as_sf()
 
+voronoi_2013 <-
+  tibble(
+    ID = stations_2013$ID,
+    rides = stations_2013$rides,
+    geometry = stations_2013 %>% 
+      st_union() %>% 
+      st_voronoi() %>%
+      st_collection_extract() %>% 
+      st_erase(nyc_water) %>% 
+      st_intersection(bike_service_filled)) %>% 
+  st_as_sf()
+
 
 # Example map
 
-ride_map <- tm_shape(nyc_msa, bbox = bb(st_bbox(voronoi), ext = 1.1, relative = TRUE),
+ride_map_2018 <- 
+  tm_shape(nyc_msa, bbox = bb(st_bbox(voronoi_2018), ext = 1.1, relative = TRUE),
          unit = "mi") +
   tm_fill(col = "#f0f0f0") +
   tm_shape(nyc_city) +
@@ -86,7 +150,7 @@ ride_map <- tm_shape(nyc_msa, bbox = bb(st_bbox(voronoi), ext = 1.1, relative = 
             legend.position = c("left", "top"),
             fontfamily = "Futura-Medium",
             title.fontfamily = "Futura-CondensedExtraBold") +
-  tm_shape(voronoi) +
+  tm_shape(voronoi_2018) +
   tm_polygons("rides", convert2density = TRUE, style = "fixed", n = 7,
               breaks = c(0, 50000, 100000, 150000, 200000, 300000, 500000,
                          1000000),
@@ -96,7 +160,32 @@ ride_map <- tm_shape(nyc_msa, bbox = bb(st_bbox(voronoi), ext = 1.1, relative = 
   tm_dots(col = "white", alpha = 0.2) +
   tm_layout(title = "Figure X. Sample ride density per square mile")
 
-tmap_save(ride_map, "output/ride_map2.png", height = 2400)
+tmap_save(ride_map_2018, "output/ride_map_2018.png", height = 2400)
+
+ride_map_2013 <- 
+  tm_shape(nyc_msa, bbox = bb(st_bbox(voronoi_2018), ext = 1.1, relative = TRUE),
+           unit = "mi") +
+  tm_fill(col = "#f0f0f0") +
+  tm_shape(nyc_city) +
+  tm_fill(col = "grey80", title = "Base Map") +
+  tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50") +
+  tm_layout(frame = TRUE, main.title.size = 1.5, legend.title.size = 1.2,
+            legend.title.fontfamily = "Futura-CondensedExtraBold",
+            legend.position = c("left", "top"),
+            fontfamily = "Futura-Medium",
+            title.fontfamily = "Futura-CondensedExtraBold") +
+  tm_shape(voronoi_2013) +
+  tm_polygons("rides", convert2density = TRUE, style = "fixed", n = 7,
+              breaks = c(0, 50000, 100000, 150000, 200000, 300000, 500000,
+                         1000000),
+              palette = "viridis", border.col = "white", border.alpha = 0.2,
+              title = "") +
+  tm_shape(stations_2013) +
+  tm_dots(col = "white", alpha = 0.2) +
+  tm_layout(title = "Figure X. Sample ride density per square mile")
+
+tmap_save(ride_map, "output/ride_map_2013.png", height = 2400)
+
 
 
 ### STEP 4. Analyze demographics
