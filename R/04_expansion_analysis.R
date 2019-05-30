@@ -3,6 +3,7 @@
 ## Generate potential expansion service areas
 
 bike_service_filled <- fill_holes(bike_service_areas$geometry[3], 20000)
+bike_service_filled_2013 <- fill_holes(bike_service_areas$geometry[1], 20000)
 
 expansion_subway_service_areas <- 
   suppressWarnings(subway_stations %>%

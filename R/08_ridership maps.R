@@ -132,24 +132,33 @@ voronoi_2013 <-
       st_voronoi() %>%
       st_collection_extract() %>% 
       st_erase(nyc_water) %>% 
-      st_intersection(bike_service_filled)) %>% 
+      st_intersection(bike_service_filled_2013)) %>% 
   st_as_sf()
 
 
 # Example map
 
-ride_map_2018 <- 
-  tm_shape(nyc_msa, bbox = bb(st_bbox(voronoi_2018), ext = 1.1, relative = TRUE),
-         unit = "mi") +
+ride_base_map <-
+  tm_shape(nyc_msa,
+           bbox = bb(st_bbox(voronoi_2018), ext = 1, relative = TRUE),
+           unit = "mi") +
   tm_fill(col = "#f0f0f0") +
   tm_shape(nyc_city) +
   tm_fill(col = "grey80", title = "Base Map") +
+  tm_shape(subway_lines) +
+  tm_lines(col = "grey90", alpha = 0.75) +
   tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50") +
   tm_layout(frame = TRUE, main.title.size = 1.5, legend.title.size = 1.2,
             legend.title.fontfamily = "Futura-CondensedExtraBold",
             legend.position = c("left", "top"),
             fontfamily = "Futura-Medium",
-            title.fontfamily = "Futura-CondensedExtraBold") +
+            title.fontfamily = "Futura-CondensedExtraBold",
+            legend.format = list(fun = function(x) {
+              paste0(formatC(x/10000, digits = 0, format = "f", big.mark = ","))
+              }))
+
+ride_map_2018 <- 
+  ride_base_map +
   tm_shape(voronoi_2018) +
   tm_polygons("rides", convert2density = TRUE, style = "fixed", n = 7,
               breaks = c(0, 50000, 100000, 150000, 200000, 300000, 500000,
@@ -158,22 +167,10 @@ ride_map_2018 <-
               title = "") +
   tm_shape(stations_2018) +
   tm_dots(col = "white", alpha = 0.2) +
-  tm_layout(title = "Figure X. Sample ride density per square mile")
+  tm_layout(title = "2018")
 
-tmap_save(ride_map_2018, "output/ride_map_2018.png", height = 2400)
-
-ride_map_2013 <- 
-  tm_shape(nyc_msa, bbox = bb(st_bbox(voronoi_2018), ext = 1.1, relative = TRUE),
-           unit = "mi") +
-  tm_fill(col = "#f0f0f0") +
-  tm_shape(nyc_city) +
-  tm_fill(col = "grey80", title = "Base Map") +
-  tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50") +
-  tm_layout(frame = TRUE, main.title.size = 1.5, legend.title.size = 1.2,
-            legend.title.fontfamily = "Futura-CondensedExtraBold",
-            legend.position = c("left", "top"),
-            fontfamily = "Futura-Medium",
-            title.fontfamily = "Futura-CondensedExtraBold") +
+ride_map_2013 <-
+  ride_base_map +
   tm_shape(voronoi_2013) +
   tm_polygons("rides", convert2density = TRUE, style = "fixed", n = 7,
               breaks = c(0, 50000, 100000, 150000, 200000, 300000, 500000,
@@ -182,34 +179,60 @@ ride_map_2013 <-
               title = "") +
   tm_shape(stations_2013) +
   tm_dots(col = "white", alpha = 0.2) +
-  tm_layout(title = "Figure X. Sample ride density per square mile")
+  tm_layout(title = "2013")
 
-tmap_save(ride_map_2013, "output/ride_map_2013.png", height = 2400)
+ride_map <- tmap_arrange(ride_map_2013, ride_map_2018)
+
+tmap_save(ride_map, "output/ride_map.png", width = 2400)
 
 
 
 ### STEP 4. Analyze demographics
 
-voronoi_comparison <- st_intersect_summarize(
-  CTs,
-  voronoi,
-  group_vars = vars(ID),
-  population = pop_total,
-  sum_vars = vars(pop_white, education, poverty),
-  mean_vars = vars(med_income, vulnerability_index)) %>% 
-  left_join(st_drop_geometry(voronoi))
+voronoi_comparison_2018 <-
+  st_intersect_summarize(
+    CTs,
+    voronoi_2018,
+    group_vars = vars(ID),
+    population = pop_total,
+    sum_vars = vars(pop_white, education, poverty),
+    mean_vars = vars(med_income, vulnerability_index)) %>% 
+  left_join(st_drop_geometry(voronoi_2018))
+
+voronoi_comparison_2013 <-
+  st_intersect_summarize(
+    CTs,
+    voronoi_2013,
+    group_vars = vars(ID),
+    population = pop_total,
+    sum_vars = vars(pop_white, education, poverty),
+    mean_vars = vars(med_income, vulnerability_index)) %>% 
+  left_join(st_drop_geometry(voronoi_2013))
 
 # Correlations and rough regression model
 
-voronoi_comparison %>% 
+voronoi_comparison_2018 %>% 
   st_drop_geometry() %>% 
-  map(~cor(.x, voronoi_comparison$rides))
+  map(~cor(.x, voronoi_comparison_2018$rides))
 
-voronoi_comparison %>% 
+voronoi_comparison_2018 %>% 
   st_drop_geometry() %>% 
-  map(~plot(voronoi_comparison$rides ~ .x))
+  map(~plot(voronoi_comparison_2018$rides ~ .x))
 
 lm(rides ~ pop_total + pop_white + education + poverty + med_income,
-   data = voronoi_comparison) %>% 
+   data = voronoi_comparison_2018) %>% 
   summary()
+
+voronoi_comparison_2013 %>% 
+  st_drop_geometry() %>% 
+  map(~cor(.x, voronoi_comparison_2013$rides))
+
+voronoi_comparison_2013 %>% 
+  st_drop_geometry() %>% 
+  map(~plot(voronoi_comparison_2013$rides ~ .x))
+
+lm(rides ~ pop_total + pop_white + education + poverty + med_income,
+   data = voronoi_comparison_2013) %>% 
+  summary()
+
 
