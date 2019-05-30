@@ -217,6 +217,7 @@ voronoi_comparison_2018 %>%
 
 voronoi_comparison_2018 %>% 
   st_drop_geometry() %>% 
+  select(-ID, -rides) %>% 
   map(~{
     ggplot(voronoi_comparison_2018, aes(.x, rides)) +
       geom_point() +
@@ -233,6 +234,7 @@ voronoi_comparison_2013 %>%
 
 voronoi_comparison_2013 %>% 
   st_drop_geometry() %>% 
+  select(-ID, -rides) %>% 
   map(~{
     ggplot(voronoi_comparison_2013, aes(.x, rides)) +
       geom_point() +
