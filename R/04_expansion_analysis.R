@@ -74,8 +74,8 @@ clusters <- suppressWarnings(target_neighbourhoods[1:2,] %>%
     PUMACE10 %in% c("04001", "04002", "04003", "04110") ~ "Bushwick/Ridgewood",
     PUMACE10 %in% c("04005", "04006", "04007", "04010",
                     "04011")                            ~ "Crown Heights/Brownsville",
-    PUMACE10 %in% c("04008", "04009", "04111", "04113") ~ "East New York/Canarsie")) %>%
-    
+    PUMACE10 %in% c("04008", "04009", "04111", "04113") ~ "East New York/Canarsie")
+    ) %>%
   st_collection_extract("POLYGON") %>% 
   filter(!is.na(nbhd))  %>%
   group_by(nbhd) %>% 
@@ -97,7 +97,8 @@ target_neighbourhoods <-
 
 target_subway_areas <- 
   suppressWarnings(
-    st_intersection(target_neighbourhoods, subway_service_areas %>% filter(subway_service == TRUE)))
+    st_intersection(target_neighbourhoods,
+                    subway_service_areas %>% filter(subway_service == TRUE)))
 
 target_subway_areas <- suppressWarnings(rbind(
   target_subway_areas,

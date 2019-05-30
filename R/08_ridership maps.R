@@ -75,11 +75,25 @@ voronoi <-
 
 # Example map
 
-tm_shape(voronoi) +
-  tm_fill("rides") +
-  tm_borders(col = "white") +
-  tm_shape(stations_2018$geometry) +
-  tm_dots()
+tm_shape(nyc_msa, bbox = bb(st_bbox(voronoi), ext = 1.1, relative = TRUE),
+         unit = "mi") +
+  tm_fill(col = "#f0f0f0") +
+  tm_shape(nyc_city) +
+  tm_fill(col = "grey80", title = "Base Map") +
+  tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50") +
+  tm_layout(frame = TRUE, main.title.size = 1.5, legend.title.size = 1.2,
+            legend.title.fontfamily = "Futura-CondensedExtraBold",
+            legend.position = c("left", "top"),
+            fontfamily = "Futura-Medium",
+            title.fontfamily = "Futura-CondensedExtraBold") +
+  tm_shape(voronoi) +
+  tm_polygons("rides", convert2density = TRUE, style = "fisher", n = 7,
+              palette = "cividis", border.col = "white", border.alpha = 0.2,
+              title = "") +
+  tm_shape(stations_2018) +
+  tm_dots(col = "white", alpha = 0.2) +
+  tm_layout(title = "Figure X. Citi Bike ride density per station")
+
 
 
 ### STEP 4. Analyze demographics
@@ -93,7 +107,15 @@ voronoi_comparison <- st_intersect_summarize(
   mean_vars = vars(med_income, vulnerability_index)) %>% 
   left_join(st_drop_geometry(voronoi))
 
-# Rough regression model
+# Correlations and rough regression model
+
+voronoi_comparison %>% 
+  st_drop_geometry() %>% 
+  map(~cor(.x, voronoi_comparison$rides))
+
+voronoi_comparison %>% 
+  st_drop_geometry() %>% 
+  map(~plot(voronoi_comparison$rides ~ .x))
 
 lm(rides ~ pop_total + pop_white + education + poverty + med_income,
    data = voronoi_comparison) %>% 
