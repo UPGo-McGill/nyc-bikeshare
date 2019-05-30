@@ -14,8 +14,6 @@ figure[[2.1]] <-
   tm_fill(col = "grey40") +
   tm_shape(subway_lines) +
   tm_lines(col = "grey90", alpha = 0.75) +
-  #tm_shape(target_neighbourhoods) +
-  #tm_text("number", size = 0.7) +
   tm_layout(title = "Figure 1. Proposed bike sharing expansion areas") +
   tm_add_legend(type = "fill", labels = "Existing Citi Bike service area",
                 col = "grey40", border.lwd = 0)
@@ -68,15 +66,26 @@ figure[[2.4]] <-
   tm_shape(nyc_city) +
   tm_fill(col = "grey80", title = "Base Map") +
   tm_shape(jhf_streets %>% filter(!is.na(name))) +
-  tm_lines(col = "grey50") +
-  tm_shape(jhf_bike_network) +
-  tm_lines(col = "red", alpha = 0.3) +
-  tm_shape(subway_service_network %>% filter(nbhd == "Jackson Heights/Flushing")) +
-  tm_lines(col= "blue", lwd = 1) +
+  tm_lines(col = "grey50", alpha = 0.5) +
+  tm_shape(st_buffer(jhf_bike_network, dist = 30)) +
+  tm_fill(col = "#fec44f", alpha = 0.3) +
+  tm_shape(st_buffer(subway_network, dist = 30)) +
+  tm_fill(col= "#2c7bb6", alpha = 0.3) +
+  tm_shape(st_buffer(st_intersection(jhf_bike_network, subway_network), dist = 30)) +
+  tm_fill(col= "#5AA039", alpha = 0.3) +
+  tm_shape(subway_lines) +
+  tm_lines(lwd = 3, alpha = 0.2) +
+  tm_shape(jhf_stations) +
+  tm_dots(size = 0.5, alpha = 0.5) +
+  tm_text("stop_name", size = 0.7, 
+          xmod = c(  0, -1.3,   0,    1,   0,  0.6, -0.4),
+          ymod = c(0.8,  0.8, 0.8, -0.8, 0.8, -0.8,  0.8)) +
   tm_scale_bar(position = c("right", "bottom"), color.dark = "black") +
   tm_add_legend(type = "fill", labels = "Access to subway", col = "blue", 
                 alpha = 0.3, border.alpha = 0.1, border.col = "blue") +
   tm_add_legend(type = "fill", labels = "Access to bike sharing", col = "red", 
+                alpha = 0.3, border.alpha = 0.1, border.col = ) +
+  tm_add_legend(type = "fill", labels = "Access to both", col = "purple", 
                 alpha = 0.3, border.alpha = 0.1, border.col = ) +
   tm_layout(main.title = "Figure 4. Jackson Heights/Flushing case study",
             frame = TRUE, main.title.size = 1.5, legend.title.size = 1.2,
@@ -88,11 +97,6 @@ figure[[2.4]] <-
 tmap_save(figure[[2.4]], "output/figure_2.4.png", width = 2400)
 
 
-tm_shape(jhf_stations) +
-  tm_dots(size = 0.5) +
-  tm_text("stop_name", size = 0.7, 
-          xmod = c(  0, -1.3,   0,    1,   0,  0.6, -0.4),
-          ymod = c(0.8,  0.8, 0.8, -0.8, 0.8, -0.8,  0.8)) +
 
 # Figure 5. South Bronx case study map
 
@@ -101,23 +105,27 @@ figure[[2.5]] <-
   tm_fill(col = "#f0f0f0") +
   tm_shape(nyc_city) +
   tm_fill(col = "grey80", title = "Base Map") +
-  tm_shape(bronx_streets %>% filter(!is.na(name))) +
+  tm_shape(sbronx_streets %>% filter(!is.na(name))) +
   tm_lines(col = "grey50") +
-  tm_shape(st_erase(bronx_bike_catchment, bronx_subway_catchment)) +
-  tm_fill(col = "red", alpha = 0.3) +
-  tm_shape(bronx_subway_catchment) +
-  tm_fill(col = "blue", alpha = 0.3) +
+  tm_shape(sbronx_bike_network) +
+  tm_lines(col = "#d53e4f", lwd = 3, alpha = 0.3) +
+  tm_shape(subway_catchment) +
+  tm_lines(col= "#fee08b", lwd = 3, alpha = 0.5) +
+  tm_shape(st_intersection(sbronx_bike_network, subway_network)) +
+  tm_lines(col= "#fc8d59", lwd = 3, alpha = 0.3) +
   tm_shape(subway_lines) +
-  tm_lines(lwd = 1, alpha = 0.5) +
-  tm_shape(bronx_stations) +
+  tm_lines(lwd = 2, alpha = 0.1) +
+  tm_shape(sbronx_stations) +
   tm_dots(size = 0.5) +
-  #tm_text("stop_name", size = 0.7, 
-  #        xmod = c(  0, -1.3,   0,    1,   0,  0.6, -0.4),
-  #        ymod = c(0.8,  0.8, 0.8, -0.8, 0.8, -0.8,  0.8)) +
+  tm_text("stop_name", size = 0.7, 
+          xmod = c(  0, -1.3,   0,    1,   0,  0.6, -0.4),
+          ymod = c(0.8,  0.8, 0.8, -0.8, 0.8, -0.8,  0.8)) +
   tm_scale_bar(position = c("right", "bottom"), color.dark = "black") +
   tm_add_legend(type = "fill", labels = "Access to subway", col = "blue", 
                 alpha = 0.3, border.alpha = 0.1, border.col = "blue") +
   tm_add_legend(type = "fill", labels = "Access to bike sharing", col = "red", 
+                alpha = 0.3, border.alpha = 0.1, border.col = ) +
+  tm_add_legend(type = "fill", labels = "Access to both", col = "purple", 
                 alpha = 0.3, border.alpha = 0.1, border.col = ) +
   tm_layout(main.title = "Figure 5. South Bronx case study",
             frame = TRUE, main.title.size = 1.5, legend.title.size = 1.2,
