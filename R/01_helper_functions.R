@@ -14,6 +14,8 @@ library(tmaptools)
 library(units)
 library(dodgr)
 library(stplanr)
+library(grid)
+library(gridExtra)
 
 options(tigris_use_cache = TRUE)
 suppressWarnings(font_import(paths = "data/fonts", prompt = FALSE))
