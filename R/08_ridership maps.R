@@ -184,7 +184,7 @@ ride_map_2013 <-
   tm_dots(col = "white", alpha = 0.2) +
   tm_layout(title = "Figure X. Sample ride density per square mile")
 
-tmap_save(ride_map, "output/ride_map_2013.png", height = 2400)
+tmap_save(ride_map_2013, "output/ride_map_2013.png", height = 2400)
 
 
 
