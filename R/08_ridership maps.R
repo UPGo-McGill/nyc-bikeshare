@@ -218,8 +218,9 @@ voronoi_comparison_2018 %>%
 voronoi_comparison_2018 %>% 
   st_drop_geometry() %>% 
   map(~{
-    ggplot(voronoi_comparison_2018) +
-      geom_point(aes(.x, rides))
+    ggplot(voronoi_comparison_2018, aes(.x, rides)) +
+      geom_point() +
+      geom_smooth()
   }) %>% do.call(grid.arrange, .)
 
 lm(rides ~ pop_total + pop_white + education + poverty + med_income,
@@ -233,8 +234,9 @@ voronoi_comparison_2013 %>%
 voronoi_comparison_2013 %>% 
   st_drop_geometry() %>% 
   map(~{
-    ggplot(voronoi_comparison_2013) +
-      geom_point(aes(.x, rides))
+    ggplot(voronoi_comparison_2013, aes(.x, rides)) +
+      geom_point() +
+      geom_smooth()
   }) %>% do.call(grid.arrange, .)
 
 lm(rides ~ pop_total + pop_white + education + poverty + med_income,
