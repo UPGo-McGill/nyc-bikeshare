@@ -202,7 +202,7 @@ ride_map_2013 <-
   ride_base_map +
   tm_shape(voronoi_2013) +
   tm_polygons("rides", convert2density = TRUE, style = "fixed", n = 7,
-              breaks = c(0, 50000, 100000, 150000, 200000, 300000, 500000,
+              breaks = c(0, 40000, 80000, 120000, 200000, 300000, 400000,
                          1000000),
               palette = "viridis", border.col = "white", border.alpha = 0.2,
               title = "") +
@@ -214,7 +214,7 @@ ride_map_2018 <-
   ride_base_map +
   tm_shape(voronoi_2018) +
   tm_polygons("rides", convert2density = TRUE, style = "fixed", n = 7,
-              breaks = c(0, 50000, 100000, 150000, 200000, 300000, 500000,
+              breaks = c(0, 40000, 80000, 120000, 200000, 300000, 400000,
                          1000000),
               palette = "viridis", border.col = "white", border.alpha = 0.2,
               title = "") +
