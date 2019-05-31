@@ -57,6 +57,9 @@ nyc_city <- nyc_msa %>%
   filter(NAME %in% c("New York", "Kings", "Queens", "Bronx", "Richmond")) %>% 
   st_union()
 
+manhattan <- nyc_msa %>% 
+  filter(NAME == "New York")
+
 bronx <- nyc_msa %>% 
   filter(NAME == "Bronx")
 

@@ -1,5 +1,24 @@
 ### RIDERSHIP ANALYSIS #########################################################
 
+## Get Broadway line
+
+broadway <- 
+  getbb("manhattan new york city") %>% 
+  opq() %>% 
+  add_osm_feature(key = "highway") %>% 
+  osmdata_sf()
+
+broadway <- 
+  rbind(broadway$osm_polygons %>% st_cast("LINESTRING"),
+        broadway$osm_lines) %>% 
+  as_tibble() %>% 
+  st_as_sf() %>% 
+  st_transform(26918) %>%
+  filter(name == "Broadway") %>%
+  st_intersection(manhattan) %>% 
+  st_union()
+
+
 ## Table rides per station, by season
 
 rider_201806 <-
@@ -115,7 +134,7 @@ rm(overlaps_2018, overlaps_2013)
 voronoi_2018 <-
   tibble(
     ID = stations_2018$ID,
-    rides = stations_2018$rides,
+    rides = stations_2018$rides / 61,
     geometry = stations_2018 %>% 
       st_union() %>% 
       st_voronoi() %>%
@@ -127,7 +146,7 @@ voronoi_2018 <-
 voronoi_2013 <-
   tibble(
     ID = stations_2013$ID,
-    rides = stations_2013$rides,
+    rides = stations_2013$rides / 61,
     geometry = stations_2013 %>% 
       st_union() %>% 
       st_voronoi() %>%
@@ -139,6 +158,12 @@ voronoi_2013 <-
 
 ## Analyze demographics
 
+sum(stations_2018$rides) + sum(stations_2013$rides)
+sum(stations_2018$rides) / 61
+sum(stations_2013$rides) / 61
+
+mean(stations_2018$rides) / mean(stations_2013$rides)
+
 voronoi_comparison_2018 <-
   st_intersect_summarize(
     CTs,
@@ -147,7 +172,11 @@ voronoi_comparison_2018 <-
     population = pop_total,
     sum_vars = vars(pop_white, education, poverty),
     mean_vars = vars(med_income, vulnerability_index)) %>% 
-  left_join(st_drop_geometry(voronoi_2018))
+  left_join(st_drop_geometry(voronoi_2018)) %>% 
+  mutate(ride_density = drop_units(rides / st_area(geometry)),
+         pop_density = drop_units(pop_total / st_area(geometry)),
+         dist_to_broadway = as.numeric(drop_units(st_distance(geometry,
+                                                              broadway))))
 
 voronoi_comparison_2013 <-
   st_intersect_summarize(
@@ -157,45 +186,33 @@ voronoi_comparison_2013 <-
     population = pop_total,
     sum_vars = vars(pop_white, education, poverty),
     mean_vars = vars(med_income, vulnerability_index)) %>% 
-  left_join(st_drop_geometry(voronoi_2013))
+  left_join(st_drop_geometry(voronoi_2013)) %>% 
+  mutate(ride_density = drop_units(rides / st_area(geometry)),
+         pop_density = drop_units(pop_total / st_area(geometry)),
+         dist_to_broadway = as.numeric(drop_units(st_distance(geometry,
+                                                              broadway))))
 
 
 ## Correlations and rough regression model
 
 voronoi_comparison_2018 %>% 
   st_drop_geometry() %>% 
-  map(~cor(.x, (voronoi_comparison_2018$rides / st_area(voronoi_comparison_2018))))
+  map(~cor(.x, (voronoi_comparison_2018$ride_density)))
 
-voronoi_comparison_2018 %>% 
-  st_drop_geometry() %>% 
-  select(-ID, -rides) %>% 
-  names() %>% 
-  map(~{
-    ggplot(voronoi_comparison_2018, aes_string(.x, "rides")) +
-      geom_point() +
-      geom_smooth()
-  }) %>% do.call(grid.arrange, .)
+regression_2018 <-
+  lm(ride_density ~ dist_to_broadway + pop_total + pop_white + education +
+     poverty + med_income, data = voronoi_comparison_2018)
 
-lm(rides ~ pop_total + pop_white + education + poverty + med_income,
-   data = voronoi_comparison_2018) %>% 
-  summary()
+summary(regression_2018)
+
+stargazer(regression_2018, type = "text")
 
 voronoi_comparison_2013 %>% 
   st_drop_geometry() %>% 
-  map(~cor(.x, (voronoi_comparison_2013$rides / st_area(voronoi_comparison_2013))))
+  map(~cor(.x, (voronoi_comparison_2013$ride_density)))
 
-voronoi_comparison_2013 %>% 
-  st_drop_geometry() %>% 
-  select(-ID, -rides) %>% 
-  names() %>% 
-  map(~{
-    ggplot(voronoi_comparison_2013, aes_string(.x, "rides")) +
-      geom_point() +
-      geom_smooth()
-  }) %>% do.call(grid.arrange, .)
-
-lm(rides ~ pop_total + pop_white + education + poverty + med_income,
-   data = voronoi_comparison_2013) %>% 
+lm(ride_density ~ dist_to_broadway + pop_total + pop_white + education +
+     poverty + med_income, data = voronoi_comparison_2013) %>% 
   summary()
 
-
+pandoc(regression_html, )
