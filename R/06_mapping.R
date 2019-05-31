@@ -88,7 +88,7 @@ figure[[4]] <-
               breaks = c(0, .12, .24, .36, .48, .60)) +
   tm_shape(bike_service_areas_no_holes[3,]) +
   tm_borders(col = "black", lwd = 2) +
-  tm_layout(title = "Figure 4. Non-hispanic white population",
+  tm_layout(title = "Figure 4. Non-Hispanic white population",
             legend.format = list(fun = function(x) {
               paste0(formatC(x * 100, digits = 0, format = "f"), "%")})) +
   tm_add_legend(type = "fill", labels = "No data", col = "#e0e0e0") +
@@ -164,7 +164,7 @@ tm3 <-
   tm_polygons("pop_white", title = "", palette = "Oranges", border.alpha = 0,
               breaks = c(0, 0.3, 0.52, 0.6),
               labels = c("26.2%", "44.2%", "55.3%")) +
-  tm_layout(title = "Non-hispanic white population")
+  tm_layout(title = "Non-Hispanic white population")
 
 tm4 <- panel_base_map +
   tm_shape(bike_service_growth_comparison) +  
@@ -230,40 +230,44 @@ tmap_save(figure[[8]], "output/figure_8.png", width = 2400)
 
 scatter_base <- 
   voronoi_comparison_2018 %>% 
-  mutate(ride_density = drop_units(rides / st_area(geometry)),
-         pop_density = drop_units(pop_total / st_area(geometry))) %>% 
   st_drop_geometry() %>% 
-  select(rides, ride_density, pop_density, med_income, poverty, pop_white,
-         education) %>% 
   ggplot(aes(y = ride_density)) +
   scale_y_log10() +
   labs(y = "Ride density (log)") +
   theme_minimal() +
   theme(text=element_text(family = "Futura-Medium"), legend.position = "none")
 
+sp0 <- 
+  scatter_base +
+  geom_point(aes(pop_total, size = rides), colour = "black", alpha = 0.3) +
+  geom_smooth(aes(pop_total), colour = "black", method = "lm", se = FALSE) +
+  scale_x_continuous(name = "Total population", labels = comma) +
+  annotate("text", x = 0, y = 6e-04, label = "Correlation = -0.24", size = 3,
+           colour = "black", family = "Futura-Medium", hjust = 0)
+
 sp1 <- 
   scatter_base +
   geom_point(aes(med_income, size = rides), colour = "#2E974E", alpha = 0.3) +
   geom_smooth(aes(med_income), colour = "#2E974E", method = "lm", se = FALSE) +
   scale_x_continuous(name = "Median household income", labels = dollar) +
-  annotate("text", x = 50000, y = 5e-05, label = "Correlation = 0.21", size = 3,
-           colour = "#2E974E", family = "Futura-Medium")
+  annotate("text", x = 0, y = 6e-04, label = "Correlation = 0.21", size = 3,
+           colour = "#2E974E", family = "Futura-Medium", hjust = 0)
   
 sp2 <- 
   scatter_base +
   geom_point(aes(poverty, size = rides), colour = "#7262AC", alpha = 0.3) +
   geom_smooth(aes(poverty), colour = "#7262AC", method = "lm", se = FALSE) +
   scale_x_continuous(name = "Poverty rate", labels = percent) +
-  annotate("text", x = .1, y = 5e-05, label = "Correlation = -0.11",
-           size = 3, colour = "#7262AC", family = "Futura-Medium")
+  annotate("text", x = 0, y = 6e-04, label = "Correlation = -0.11",
+           size = 3, colour = "#7262AC", family = "Futura-Medium", hjust = 0)
 
 sp3 <- 
   scatter_base +
   geom_point(aes(pop_white, size = rides), colour = "#E25508", alpha = 0.3) +
   geom_smooth(aes(pop_white), colour = "#E25508", method = "lm", se = FALSE) +
   scale_x_continuous(name = "Non-Hispanic white population", labels = percent) +
-  annotate("text", x = .16, y = 5e-05, label = "Correlation = 0.15", size = 3,
-           colour = "#E25508", family = "Futura-Medium")
+  annotate("text", x = 0, y = 6e-04, label = "Correlation = 0.15", size = 3,
+           colour = "#E25508", family = "Futura-Medium", hjust = 0)
 
 sp4 <- 
   scatter_base +
@@ -271,8 +275,19 @@ sp4 <-
   geom_smooth(aes(education), colour = "#2E7EBB", method = "lm", se = FALSE) +
   scale_x_continuous(name = "Population with a bachelor's degree",
                      labels = percent) +
-  annotate("text", x = .16, y = 5e-05, label = "Correlation = 0.23", size = 3,
-           colour = "#2E7EBB", family = "Futura-Medium")
+  annotate("text", x = 0, y = 6e-04, label = "Correlation = 0.23", size = 3,
+           colour = "#2E7EBB", family = "Futura-Medium", hjust = 0)
+
+sp5 <- 
+  scatter_base +
+  geom_point(aes(dist_to_broadway *.00062, size = rides), colour = "black",
+             alpha = 0.3) +
+  geom_smooth(aes(dist_to_broadway *.00062), colour = "black", method = "lm",
+              se = FALSE) +
+  scale_x_continuous(name = "Distance to Broadway",
+                     labels = unit_format(unit = "mi", big.mark = ",")) +
+  annotate("text", x = 0, y = 6e-04, label = "Correlation = -0.33", size = 3,
+           colour = "black", family = "Futura-Medium", hjust = 0)
 
 
 legend <- get_legend(scatter_base + 
@@ -281,14 +296,15 @@ legend <- get_legend(scatter_base +
                        labs(size = "Ride count") +
                        theme(legend.position = "bottom"))
 
-figure[[9]] <- grid.arrange(sp1, sp2, sp3, sp4, legend, heights = c(1, 1, 0.2),
-                            layout_matrix = rbind(c(1, 2), c(3, 4), c(5, 5)))
+figure[[9]] <-
+  grid.arrange(sp0, sp1, sp2, sp3, sp4, sp5, legend, heights = c(1, 1, 0.2), 
+               layout_matrix = rbind(c(1, 2, 3), c(4, 5, 6), c(7, 7, 7)))
 
-ggsave("output/figure_9.png", plot = figure[[9]], width = 9.6, height = 7.2,
-       units = "in", dpi = 250)
+ggsave("output/figure_9.png", plot = figure[[9]], width = 12.8, height = 8,
+       units = "in", dpi = 300)
 
 
-## Figure 10. Vulnerability index
+ ## Figure 10. Vulnerability index
 
 figure[[10]] <- 
   base_map +
