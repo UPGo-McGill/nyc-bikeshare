@@ -158,6 +158,11 @@ voronoi_2013 <-
 
 ## Analyze demographics
 
+sum(stations_2018$rides)
+sum(stations_2013$rides)
+
+mean(stations_2018$rides) / mean(stations_2013$rides)
+
 voronoi_comparison_2018 <-
   st_intersect_summarize(
     CTs,
@@ -193,9 +198,11 @@ voronoi_comparison_2018 %>%
   st_drop_geometry() %>% 
   map(~cor(.x, (voronoi_comparison_2018$ride_density)))
 
-lm(ride_density ~ dist_to_broadway + pop_total + pop_white + education +
-     poverty + med_income, data = voronoi_comparison_2018) %>% 
-  summary()
+regression_2018 <-
+  lm(ride_density ~ dist_to_broadway + pop_total + pop_white + education +
+     poverty + med_income, data = voronoi_comparison_2018)
+
+regression_html <- stargazer(regression_2018, type = "text")
 
 voronoi_comparison_2013 %>% 
   st_drop_geometry() %>% 
@@ -205,4 +212,4 @@ lm(ride_density ~ dist_to_broadway + pop_total + pop_white + education +
      poverty + med_income, data = voronoi_comparison_2013) %>% 
   summary()
 
-
+pandoc(regression_html, )
