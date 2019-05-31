@@ -134,7 +134,7 @@ rm(overlaps_2018, overlaps_2013)
 voronoi_2018 <-
   tibble(
     ID = stations_2018$ID,
-    rides = stations_2018$rides,
+    rides = stations_2018$rides / 61,
     geometry = stations_2018 %>% 
       st_union() %>% 
       st_voronoi() %>%
@@ -146,7 +146,7 @@ voronoi_2018 <-
 voronoi_2013 <-
   tibble(
     ID = stations_2013$ID,
-    rides = stations_2013$rides,
+    rides = stations_2013$rides / 61,
     geometry = stations_2013 %>% 
       st_union() %>% 
       st_voronoi() %>%
@@ -158,8 +158,9 @@ voronoi_2013 <-
 
 ## Analyze demographics
 
-sum(stations_2018$rides)
-sum(stations_2013$rides)
+sum(stations_2018$rides) + sum(stations_2013$rides)
+sum(stations_2018$rides) / 61
+sum(stations_2013$rides) / 61
 
 mean(stations_2018$rides) / mean(stations_2013$rides)
 
@@ -202,7 +203,9 @@ regression_2018 <-
   lm(ride_density ~ dist_to_broadway + pop_total + pop_white + education +
      poverty + med_income, data = voronoi_comparison_2018)
 
-regression_html <- stargazer(regression_2018, type = "text")
+summary(regression_2018)
+
+stargazer(regression_2018, type = "text")
 
 voronoi_comparison_2013 %>% 
   st_drop_geometry() %>% 

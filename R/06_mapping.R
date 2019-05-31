@@ -195,15 +195,15 @@ ride_base_map <-
             fontfamily = "Futura-Medium",
             title.fontfamily = "Futura-CondensedExtraBold",
             legend.format = list(fun = function(x) {
-              paste0(formatC(x/10000, digits = 0, format = "f", big.mark = ","))
+              paste0(formatC(x, digits = 0, format = "f", big.mark = ","))
             }))
 
 ride_map_2013 <-
   ride_base_map +
   tm_shape(voronoi_2013) +
   tm_polygons("rides", convert2density = TRUE, style = "fixed", n = 7,
-              breaks = c(0, 40000, 80000, 120000, 200000, 300000, 400000,
-                         1000000),
+              breaks = c(0, 600, 1200, 1800, 3000, 4500, 6000,
+                         Inf),
               palette = "viridis", border.col = "white", border.alpha = 0.2,
               title = "") +
   tm_shape(stations_2013) +
@@ -214,8 +214,8 @@ ride_map_2018 <-
   ride_base_map +
   tm_shape(voronoi_2018) +
   tm_polygons("rides", convert2density = TRUE, style = "fixed", n = 7,
-              breaks = c(0, 40000, 80000, 120000, 200000, 300000, 400000,
-                         1000000),
+              breaks = c(0, 600, 1200, 1800, 3000, 4500, 6000,
+                         Inf),
               palette = "viridis", border.col = "white", border.alpha = 0.2,
               title = "") +
   tm_shape(stations_2018) +
@@ -242,7 +242,7 @@ sp0 <-
   geom_point(aes(pop_total, size = rides), colour = "black", alpha = 0.3) +
   geom_smooth(aes(pop_total), colour = "black", method = "lm", se = FALSE) +
   scale_x_continuous(name = "Total population", labels = comma) +
-  annotate("text", x = 0, y = 6e-04, label = "Correlation = -0.24", size = 3,
+  annotate("text", x = 0, y = 1e-05, label = "Correlation = -0.24", size = 3,
            colour = "black", family = "Futura-Medium", hjust = 0)
 
 sp1 <- 
@@ -250,7 +250,7 @@ sp1 <-
   geom_point(aes(med_income, size = rides), colour = "#2E974E", alpha = 0.3) +
   geom_smooth(aes(med_income), colour = "#2E974E", method = "lm", se = FALSE) +
   scale_x_continuous(name = "Median household income", labels = dollar) +
-  annotate("text", x = 0, y = 6e-04, label = "Correlation = 0.21", size = 3,
+  annotate("text", x = 0, y = 1e-05, label = "Correlation = 0.21", size = 3,
            colour = "#2E974E", family = "Futura-Medium", hjust = 0)
   
 sp2 <- 
@@ -258,7 +258,7 @@ sp2 <-
   geom_point(aes(poverty, size = rides), colour = "#7262AC", alpha = 0.3) +
   geom_smooth(aes(poverty), colour = "#7262AC", method = "lm", se = FALSE) +
   scale_x_continuous(name = "Poverty rate", labels = percent) +
-  annotate("text", x = 0, y = 6e-04, label = "Correlation = -0.11",
+  annotate("text", x = 0, y = 1e-05, label = "Correlation = -0.11",
            size = 3, colour = "#7262AC", family = "Futura-Medium", hjust = 0)
 
 sp3 <- 
@@ -266,7 +266,7 @@ sp3 <-
   geom_point(aes(pop_white, size = rides), colour = "#E25508", alpha = 0.3) +
   geom_smooth(aes(pop_white), colour = "#E25508", method = "lm", se = FALSE) +
   scale_x_continuous(name = "Non-Hispanic white population", labels = percent) +
-  annotate("text", x = 0, y = 6e-04, label = "Correlation = 0.15", size = 3,
+  annotate("text", x = 0, y = 1e-05, label = "Correlation = 0.15", size = 3,
            colour = "#E25508", family = "Futura-Medium", hjust = 0)
 
 sp4 <- 
@@ -275,7 +275,7 @@ sp4 <-
   geom_smooth(aes(education), colour = "#2E7EBB", method = "lm", se = FALSE) +
   scale_x_continuous(name = "Population with a bachelor's degree",
                      labels = percent) +
-  annotate("text", x = 0, y = 6e-04, label = "Correlation = 0.23", size = 3,
+  annotate("text", x = 0, y = 1e-05, label = "Correlation = 0.23", size = 3,
            colour = "#2E7EBB", family = "Futura-Medium", hjust = 0)
 
 sp5 <- 
@@ -286,7 +286,7 @@ sp5 <-
               se = FALSE) +
   scale_x_continuous(name = "Distance to Broadway",
                      labels = unit_format(unit = "mi", big.mark = ",")) +
-  annotate("text", x = 0, y = 6e-04, label = "Correlation = -0.33", size = 3,
+  annotate("text", x = 0, y = 1e-05, label = "Correlation = -0.33", size = 3,
            colour = "black", family = "Futura-Medium", hjust = 0)
 
 
@@ -304,7 +304,7 @@ ggsave("output/figure_9.png", plot = figure[[9]], width = 12.8, height = 8,
        units = "in", dpi = 300)
 
 
- ## Figure 10. Vulnerability index
+## Figure 10. Vulnerability index
 
 figure[[10]] <- 
   base_map +
