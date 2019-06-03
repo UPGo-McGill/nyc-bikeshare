@@ -1,11 +1,5 @@
 ### CASE STUDY EXTRAS ###########
 
-## Create simple city DF to use for catchment calculations
-
-network_city <-
-  as(tibble(data = 1, geometry = nyc_city) %>% st_as_sf(), "Spatial")
-
-
 
 ##create vulnerable station file with target neighbourhoods and coordinates to create bike service network by neighbourhood in Python
 target_subway_stations  <-subway_stations %>%  
@@ -40,7 +34,7 @@ network_calculator <- function(bike_path, subway_path, man_erase = FALSE, bronx_
   }
   
   if (bronx_erase) {
-    bike_network <- st_erase(bike_network, bronx)
+    bike_network <- bike_network %>% st_erase(filter(clusters, nbhd == "West Bronx")) %>% st_erase(filter(clusters, nbhd == "West Bronx"))
   }
   
   
@@ -103,6 +97,9 @@ umanhattan <- network_calculator("data/bike_service_network/Upper_Manhattan/edge
 wbronx <- network_calculator("data/bike_service_network/West_Bronx/edges", "data/subway_service_network/West_Bronx/edges", man_erase = TRUE)
 
 
+View(umanhattan[[1]])
+
+plot(umanhattan[[1]][2,])
 
 bronx_catchment <- wbronx[[2]] %>% st_union(sbronx[[2]]) %>%
   st_polygonize() %>%
