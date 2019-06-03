@@ -6,32 +6,118 @@ network_city <-
   as(tibble(data = 1, geometry = nyc_city) %>% st_as_sf(), "Spatial")
 
 
-##Create subway station data with coordinates to create subway access network
-subway_stations_coordinates <-
-  st_read("data", "stops_nyc_subway_nov2018", stringsAsFactors = FALSE) %>%  
-  st_transform(26918) %>% 
-  as_tibble() %>% 
-  st_as_sf(coords = c("stop_lon", "stop_lat"), crs = 26918) 
 
-##create vulnerable station file with target neighbourhoods and coordinates to create bike service network by neighbourhood
-nbhd_subway_stations  <-subway_stations %>%  
+##create vulnerable station file with target neighbourhoods and coordinates to create bike service network by neighbourhood in Python
+target_subway_stations  <-subway_stations %>%  
   filter(stop_id %in% subway_buffer_vulnerability$stop_id) %>%
   st_intersection(target_neighbourhoods) %>% 
   st_transform(4326)
 
-write.csv(nbhd_subway_stations, "data/nbhd_subway_stations.csv")
+write.csv(target_subway_stations, "data/nbhd_subway_stations.csv")
 
 
-##get subway access network
+##Create subway station data with coordinates to create subway access network in Python
+nbhd_buffer_subway_stations <- subway_stations %>% 
+  st_intersection(st_buffer(target_neighbourhoods, dist = 2400)) %>% 
+  st_transform(4326)
 
-subway_network <- 
-  st_read("data/subway_network/edges.shp", stringsAsFactors = FALSE) %>%  
-  as_tibble() %>%
-  st_as_sf() %>%
-  st_transform(26918) %>%
-  st_union()
+write.csv(nbhd_buffer_subway_stations, "data/nbhd_buffer_subway_stations.csv")
 
-write.csv(subway_network, "data/subway_network.csv")
+
+
+##create function to map and get demographics for bike and subway access by neighbourhood
+network_calculator <- function(bike_path, subway_path, man_erase = FALSE, bronx_erase = FALSE) {
+  
+  bike_network <-
+    st_read(bike_path, stringsAsFactors = FALSE) %>%
+    as_tibble() %>%
+    st_as_sf() %>%
+    st_transform(26918) %>%
+    st_union()
+  
+  if (man_erase) {
+    bike_network <- bike_network %>% st_erase(manhattan %>% st_erase(filter(clusters, nbhd == "West Bronx")))
+  }
+  
+  if (bronx_erase) {
+    bike_network <- st_erase(bike_network, bronx)
+  }
+  
+  
+  subway_network <-
+    st_read(subway_path, stringsAsFactors = FALSE) %>%
+    as_tibble() %>%
+    st_as_sf() %>%
+    st_transform(26918) %>%
+    st_union()
+  
+  bike_catchment <-
+    bike_network %>%
+    st_polygonize() %>%
+    st_buffer(dist = 50)
+  
+  subway_catchment <-
+    subway_network %>%
+    st_polygonize() %>%
+    st_buffer(dist = 50)
+  
+  comparison <-
+    tibble(service = c("bike_total", "bike_only"),
+           geometry = c(bike_catchment,
+                        st_erase(bike_catchment, subway_catchment))) %>%
+    st_as_sf() %>%
+    st_set_crs(26918) %>%
+    st_intersect_summarize(
+      CTs,
+      .,
+      group_vars = vars(service),
+      population = pop_total,
+      sum_vars = vars(pop_white, education, poverty),
+      mean_vars = vars(med_income, vulnerability_index))
+  
+  list(comparison, bike_network, subway_network)
+}
+
+bushwick <- network_calculator("data/bike_service_network/Bushwick_Ridgewood/edges", "data/subway_service_network/Bushwick_Ridgewood/edges")
+
+cbronx <- network_calculator("data/bike_service_network/Central_Bronx/edges", "data/subway_service_network/Central_Bronx/edges", man_erase = TRUE)
+
+chb <- network_calculator("data/bike_service_network/Crown_Heights_Brownsville/edges", "data/subway_service_network/Crown_Heights_Brownsville/edges")
+
+ebronx <- network_calculator("data/bike_service_network/East_Bronx/edges", "data/subway_service_network/East_Bronx/edges")
+
+enyc <- network_calculator("data/bike_service_network/East_New_York_Canarsie/edges", "data/subway_service_network/East_New_York_Canarsie/edges")
+
+rockaway <- network_calculator("data/bike_service_network/Far_Rockaway/edges", "data/subway_service_network/Far_Rockaway/edges")
+
+jhf <- network_calculator("data/bike_service_network/Jackson_Heights_Flushing/edges", "data/subway_service_network/Jackson_Heights_Flushing/edges")
+
+jamaica <- network_calculator("data/bike_service_network/Jamaica/edges", "data/subway_service_network/Jamaica/edges")
+
+sbronx <- network_calculator("data/bike_service_network/South_Bronx/edges", "data/subway_service_network/South_Bronx/edges", man_erase = TRUE)
+
+spbr <- network_calculator("data/bike_service_network/Sunset_Park_Bay_Ridge/edges", "data/subway_service_network/Sunset_Park_Bay_Ridge/edges")
+
+umanhattan <- network_calculator("data/bike_service_network/Upper_Manhattan/edges", "data/subway_service_network/Upper_Manhattan/edges", bronx_erase = TRUE)
+
+wbronx <- network_calculator("data/bike_service_network/West_Bronx/edges", "data/subway_service_network/West_Bronx/edges", man_erase = TRUE)
+
+
+
+bronx_catchment <- wbronx[[2]] %>% st_union(sbronx[[2]]) %>%
+  st_polygonize() %>%
+  st_buffer(dist = 50)
+
+
+
+swbronx_catchment <- wbronx[[1]][2,] %>% st_union(sbronx[[1]][2,]) %>% st_intersect_summarize(
+  CTs,
+  .,
+  group_vars = vars(NA),
+  population = pop_total,
+  sum_vars = vars(pop_white, education, poverty),
+  mean_vars = vars(med_income, vulnerability_index))
+
 
 
 ## Get Jackson Heights streets and subway stations
@@ -59,87 +145,3 @@ jhf_stations <- subway_stations_vulnerability[
   lengths(st_intersects(subway_stations_vulnerability,
                         target_neighbourhoods %>% 
                           filter(nbhd == "Jackson Heights/Flushing"))) > 0,]
-
-
-## Develop JHF network catchment areas
-jhf_bike_network <- 
-  st_read("data/neighbourhoods/Jackson_Heights_Flushing/edges", stringsAsFactors = FALSE) %>%  
-  as_tibble() %>%
-  st_as_sf() %>%
-  st_transform(26918) %>%
-  st_union()
-
-
-## Versions of catchment areas to use for service population estimates
-
-jhf_bike_catchment_population <- 
-  calc_network_catchment(
-    jhf_network, network_city, as(jhf_stations, "Spatial"), c("data"),
-    distance = 100, maximpedance = 2400, dissolve = TRUE) %>% 
-  st_as_sf() %>% 
-  as_tibble() %>% 
-  st_as_sf() %>% 
-  st_union()
-
-jhf_subway_catchment_population <- 
-  calc_network_catchment(
-    jhf_network, network_city, as(jhf_stations, "Spatial"), c("data"),
-    distance = 100, maximpedance = 960, dissolve = TRUE) %>% 
-  st_as_sf() %>% 
-  as_tibble() %>% 
-  st_as_sf() %>% 
-  st_union()
-
-
-## Service population estimates
-
-jhf_comparison <-
-  tibble(service = c("both", "bike", "subway"),
-         geometry = c(jhf_bike_catchment_population, st_erase(
-           jhf_bike_catchment_population, jhf_subway_catchment_population),
-           jhf_subway_catchment_population)) %>% 
-  st_as_sf() %>% 
-  st_set_crs(26918) %>% 
-  st_intersect_summarize(
-    CTs,
-    .,
-    group_vars = vars(service),
-    population = pop_total,
-    sum_vars = vars(pop_white, immigrant, education, poverty),
-    mean_vars = vars(med_income, vulnerability_index))
-
-
-
-## Get South Bronx streets and subway stations
-
-sbronx_osm <- 
-  target_neighbourhoods %>% 
-  filter(nbhd == "South Bronx") %>% 
-  st_transform(4326) %>% 
-  st_bbox() %>% 
-  bb(ext = 1.2) %>% 
-  as.vector() %>%
-  opq() %>% 
-  add_osm_feature(key = "highway") %>% 
-  osmdata_sf()
-
-sbronx_streets <- 
-  rbind(sbronx_osm$osm_polygons %>% st_cast("LINESTRING"), sbronx_osm$osm_lines) %>% 
-  as_tibble() %>% 
-  st_as_sf() %>% 
-  st_transform(26918) %>%
-  select(osm_id, name, geometry)
-
-
-sbronx_stations <- subway_stations_vulnerability[
-  lengths(st_intersects(subway_stations_vulnerability,
-                        target_neighbourhoods %>% 
-                          filter(nbhd == "South Bronx"))) > 0,]
-
-
-## Develop Bronx network catchment areas
-sbronx_bike_network <- 
-  st_read("data/neighbourhoods/South_Bronx/edges", stringsAsFactors = FALSE) %>%  
-  as_tibble() %>%
-  st_as_sf() %>%
-  st_transform(26918)
