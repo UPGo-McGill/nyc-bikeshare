@@ -1,7 +1,7 @@
 ### CASE STUDY EXTRAS ###########
 
 
-##create vulnerable station file with target neighbourhoods and coordinates to create bike service network by neighbourhood in Python
+##create file with subway stations identified as vulnerable by neighbourhood to create bike service network by neighbourhood in Python
 target_subway_stations  <-subway_stations %>%  
   filter(stop_id %in% subway_buffer_vulnerability$stop_id) %>%
   st_intersection(target_neighbourhoods) %>% 
@@ -10,17 +10,32 @@ target_subway_stations  <-subway_stations %>%
 write.csv(target_subway_stations, "data/nbhd_subway_stations.csv")
 
 
-##Create subway station data with coordinates to create subway access network in Python
+##Create file with subway station data by neighbourhood to create subway access network in Python
 nbhd_buffer_subway_stations <- subway_stations %>% 
   st_intersection(st_buffer(target_neighbourhoods, dist = 2400)) %>% 
   st_transform(4326)
 
 write.csv(nbhd_buffer_subway_stations, "data/nbhd_buffer_subway_stations.csv")
 
+py_discover_config()
+use_python("C:/Users/hanna/AppData/Local/Programs/Python/Python37", required = T)
+py_config()
+source_python("data/subway_network.py")
+city <- cityNetwork("nbhd_buffer_subway_stations.csv")
+nbhd <- neighborhoods("nbhd_buffer_subway_stations.csv")
+
+
+##create total subway service network for all of NYC
+subway_total_catchment <-
+  st_read("data/subway_total_network/edges.shp", stringsAsFactors = FALSE) %>%
+  st_transform(26918) %>%
+  st_union() %>%
+  st_polygonize() %>%
+  st_buffer(dist = 50)
 
 
 ##create function to map and get demographics for bike and subway access by neighbourhood
-network_calculator <- function(bike_path, subway_path, man_erase = FALSE, bronx_erase = FALSE) {
+network_calculator <- function(bike_path, subway_path, man_erase = FALSE, man_clip = FALSE) {
   
   bike_network <-
     st_read(bike_path, stringsAsFactors = FALSE) %>%
@@ -30,11 +45,14 @@ network_calculator <- function(bike_path, subway_path, man_erase = FALSE, bronx_
     st_union()
   
   if (man_erase) {
-    bike_network <- bike_network %>% st_erase(manhattan %>% st_erase(filter(clusters, nbhd == "West Bronx")))
+    bike_network <- bike_network %>% 
+      st_erase(manhattan %>% st_erase(filter(clusters, nbhd == "West Bronx")))
   }
   
-  if (bronx_erase) {
-    bike_network <- bike_network %>% st_erase(filter(clusters, nbhd == "West Bronx")) %>% st_erase(filter(clusters, nbhd == "West Bronx"))
+  if (man_clip) {
+    bike_network <- bike_network %>% 
+      st_erase(filter(clusters, nbhd == "West Bronx")) %>% 
+      st_erase(bronx) 
   }
   
   
@@ -49,6 +67,15 @@ network_calculator <- function(bike_path, subway_path, man_erase = FALSE, bronx_
     bike_network %>%
     st_polygonize() %>%
     st_buffer(dist = 50)
+  
+  if (man_clip) {
+    bike_catchment <- bike_catchment %>% 
+      st_cast("POLYGON") %>% 
+      as_tibble() %>% 
+      st_as_sf() %>% 
+      filter(st_area(.) > set_units(100000, m^2)) %>% 
+      st_union()
+  }
   
   subway_catchment <-
     subway_network %>%
@@ -92,53 +119,119 @@ sbronx <- network_calculator("data/bike_service_network/South_Bronx/edges", "dat
 
 spbr <- network_calculator("data/bike_service_network/Sunset_Park_Bay_Ridge/edges", "data/subway_service_network/Sunset_Park_Bay_Ridge/edges")
 
-umanhattan <- network_calculator("data/bike_service_network/Upper_Manhattan/edges", "data/subway_service_network/Upper_Manhattan/edges", bronx_erase = TRUE)
+umanhattan <- network_calculator("data/bike_service_network/Upper_Manhattan/edges", "data/subway_service_network/Upper_Manhattan/edges", man_clip = TRUE)
 
 wbronx <- network_calculator("data/bike_service_network/West_Bronx/edges", "data/subway_service_network/West_Bronx/edges", man_erase = TRUE)
 
 
-View(umanhattan[[1]])
-
-plot(umanhattan[[1]][2,])
-
-bronx_catchment <- wbronx[[2]] %>% st_union(sbronx[[2]]) %>%
-  st_polygonize() %>%
-  st_buffer(dist = 50)
 
 
-
-swbronx_catchment <- wbronx[[1]][2,] %>% st_union(sbronx[[1]][2,]) %>% st_intersect_summarize(
-  CTs,
-  .,
-  group_vars = vars(NA),
-  population = pop_total,
-  sum_vars = vars(pop_white, education, poverty),
-  mean_vars = vars(med_income, vulnerability_index))
-
-
-
-## Get Jackson Heights streets and subway stations
-
-jhf_osm <- 
-  target_neighbourhoods %>% 
-  filter(nbhd == "Jackson Heights/Flushing") %>% 
-  st_transform(4326) %>% 
-  st_bbox() %>% 
-  bb(ext = 1.2) %>% 
-  as.vector() %>%
-  opq() %>% 
-  add_osm_feature(key = "highway") %>% 
-  osmdata_sf()
-
-jhf_streets <- 
-  rbind(jhf_osm$osm_polygons %>% st_cast("LINESTRING"), jhf_osm$osm_lines) %>% 
-  as_tibble() %>% 
-  st_as_sf() %>% 
-  st_transform(26918) %>%
-  select(osm_id, name, geometry)
+swbronx_catchment <- wbronx[[1]][2,] %>% st_union(sbronx[[1]][2,]) %>% 
+  st_intersect_summarize(
+    CTs,
+    .,
+    group_vars = vars(NA),
+    population = pop_total,
+    sum_vars = vars(pop_white, education, poverty),
+    mean_vars = vars(med_income, vulnerability_index))
 
 
-jhf_stations <- subway_stations_vulnerability[
-  lengths(st_intersects(subway_stations_vulnerability,
-                        target_neighbourhoods %>% 
-                          filter(nbhd == "Jackson Heights/Flushing"))) > 0,]
+##Find summary demographics for leading potential expansion areas based on vulnerability index
+vulnerability_catchment <- cbronx[[1]][2,"geometry"] %>% 
+  st_union(chb[[1]][2,"geometry"]) %>%
+  st_union(ebronx[[1]][2,"geometry"]) %>% 
+  st_union(sbronx[[1]][2,"geometry"]) %>% 
+  st_union(wbronx[[1]][2,"geometry"]) %>%
+  st_union()
+
+vulnerability_catchment <- 
+  st_intersect_summarize(
+    CTs,
+    tibble(service = c("bike_total", "bike_only"),
+           geometry = c(vulnerability_catchment,
+                        st_erase(vulnerability_catchment, subway_total_catchment))) %>%
+      st_as_sf() %>%
+      st_set_crs(26918) ,
+    group_vars = vars(service),
+    population = pop_total,
+    sum_vars = vars(pop_white, education, poverty),
+    mean_vars = vars(med_income, vulnerability_index))
+
+
+##Find summary demographics for leading potential expansion areas based on subway access
+accessibility_catchment <- bushwick[[1]][2, "geometry"] %>%
+  st_union(cbronx[[1]][2,"geometry"]) %>% 
+  st_union(chb[[1]][2,"geometry"]) %>%
+  st_union(jhf[[1]][2,"geometry"]) %>% 
+  st_union(jamaica[[1]][2,"geometry"]) %>% 
+  st_union()
+
+accessibility_catchment <- 
+  st_intersect_summarize(
+    CTs,
+    tibble(service = c("bike_total", "bike_only"),
+           geometry = c(accessibility_catchment,
+                        st_erase(accessibility_catchment, subway_total_catchment))) %>%
+      st_as_sf() %>%
+      st_set_crs(26918) ,
+    group_vars = vars(service),
+    population = pop_total,
+    sum_vars = vars(pop_white, education, poverty),
+    mean_vars = vars(med_income, vulnerability_index))
+
+
+##Find summary demographics for all target neighbourhoods
+bike_total_catchment <- bushwick[[1]][2, "geometry"] %>% 
+  st_union(cbronx[[1]][2,"geometry"]) %>% 
+  st_union(chb[[1]][2,"geometry"]) %>%
+  st_union(ebronx[[1]][2,"geometry"]) %>% 
+  st_union(enyc[[1]][2,"geometry"]) %>% 
+  st_union(rockaway[[1]][2,"geometry"]) %>% 
+  st_union(jhf[[1]][2,"geometry"]) %>% 
+  st_union(jamaica[[1]][2,"geometry"]) %>% 
+  st_union(sbronx[[1]][2,"geometry"]) %>% 
+  st_union(spbr[[1]][2,"geometry"]) %>% 
+  st_union(umanhattan[[1]][2,"geometry"]) %>% 
+  st_union(wbronx[[1]][2,"geometry"]) %>%
+  st_union()
+
+bike_total_catchment <- 
+  st_intersect_summarize(
+    CTs,
+    tibble(service = c("bike_total", "bike_only"),
+           geometry = c(bike_total_catchment,
+                        st_erase(bike_total_catchment, subway_total_catchment))) %>%
+      st_as_sf() %>%
+      st_set_crs(26918) ,
+    group_vars = vars(service),
+    population = pop_total,
+    sum_vars = vars(pop_white, education, poverty),
+    mean_vars = vars(med_income, vulnerability_index))
+
+
+
+# Table 1. Leading potential expansion areas based on vulnerability index
+
+table_2.1 <- 
+  target_neighbourhoods_demographics %>% 
+  st_collection_extract("POLYGON") %>%
+  group_by(nbhd) %>% 
+  st_drop_geometry() %>%
+  summarize(vulnerability_index = first(vulnerability_index),
+            pop_total = first(pop_total),
+            pop_no_subway = first(pop_no_subway) * first(pop_total))
+
+
+# Table 2. Leading potential expansion areas based on subway access
+
+table_2.2 <- 
+  target_subway_access %>% 
+  filter(subway_service == FALSE) %>%
+  st_collection_extract("POLYGON") %>%
+  group_by(nbhd) %>% 
+  summarize(pop_total = first(pop_total),
+            geometry = st_union(geometry)) %>%
+  mutate(area = st_area(.) %>% set_units(mi^2),
+         access_per_mi = pop_total / area) %>%
+  st_drop_geometry()
+
