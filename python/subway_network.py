@@ -18,7 +18,7 @@ def parseLat(input):
     return lat
 
 def cityNetwork(file):
-    with open(os.path.join(sys.path[0],"../" + file), newline='\n') as file:
+    with open(os.path.join(sys.path[0],"../data/" + file), newline='\n') as file:
         entries = csv.reader(file)
         lines = list(entries)
         i = 1
@@ -32,7 +32,7 @@ def cityNetwork(file):
         ox.save_graph_shapefile(G, filename='entire_city', folder = 'whole_city')
 
 def neighborhoodsSmall(file):
-    with open(os.path.join(sys.path[0],"../" + file), newline='\n') as file:
+    with open(os.path.join(sys.path[0],"../data/" + file), newline='\n') as file:
         entries = csv.reader(file)
         lines = list(entries)
 
@@ -109,7 +109,7 @@ def neighborhoodsSmall(file):
         print("Composed all graphs.")
 
 def neighborhoodsLarge(file):
-    with open(os.path.join(sys.path[0],"../" + file), newline='\n') as file:
+    with open(os.path.join(sys.path[0],"../data/" + file), newline='\n') as file:
         entries = csv.reader(file)
         lines = list(entries)
 
