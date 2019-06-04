@@ -2,36 +2,48 @@
 
 
 ##create file with subway stations identified as vulnerable by neighbourhood to create bike service network by neighbourhood in Python
-target_subway_stations  <-subway_stations %>%  
+bike_service_stationlist  <-subway_stations %>%  
   filter(stop_id %in% subway_buffer_vulnerability$stop_id) %>%
   st_intersection(target_neighbourhoods) %>% 
   st_transform(4326)
 
-write.csv(target_subway_stations, "data/nbhd_subway_stations.csv")
+write.csv(bike_service_stationlist, "data/bike_service_stationlist.csv")
 
 
 ##Create file with subway station data by neighbourhood to create subway access network in Python
-nbhd_buffer_subway_stations <- subway_stations %>% 
+subway_service_stationlist <- subway_stations %>% 
   st_intersection(st_buffer(target_neighbourhoods, dist = 2400)) %>% 
   st_transform(4326)
 
-write.csv(nbhd_buffer_subway_stations, "data/nbhd_buffer_subway_stations.csv")
+write.csv(subway_service_stationlist, "data/subway_service_stationlist.csv")
+
+
+##Create file with coordinates of all subway stations to create total subway access network in Python
+total_stationlist <- subway_stations %>% 
+  st_transform(4326)
+
+write.csv(total_stationlist, "data/total_stationlist.csv")
+
 
 py_discover_config()
 use_python("C:/Users/hanna/AppData/Local/Programs/Python/Python37", required = T)
 py_config()
 source_python("data/subway_network.py")
-city <- cityNetwork("nbhd_buffer_subway_stations.csv")
-nbhd <- neighborhoods("nbhd_buffer_subway_stations.csv")
+subway_service_network <- neighbourhoodsSmall("subway_service_stationlist.csv")
+bike_service_network <- neighborhoodsLarge("bike_service_stationlist.csv")
+wholecity <- cityNetwork("total_stationlist.csv")
+
 
 
 ##create total subway service network for all of NYC
 subway_total_catchment <-
-  st_read("data/subway_total_network/edges.shp", stringsAsFactors = FALSE) %>%
+  st_read("data/whole_city/edges.shp", stringsAsFactors = FALSE) %>%
   st_transform(26918) %>%
   st_union() %>%
   st_polygonize() %>%
   st_buffer(dist = 50)
+
+
 
 
 ##create function to map and get demographics for bike and subway access by neighbourhood
@@ -96,7 +108,7 @@ network_calculator <- function(bike_path, subway_path, man_erase = FALSE, man_cl
       sum_vars = vars(pop_white, education, poverty),
       mean_vars = vars(med_income, vulnerability_index))
   
-  list(comparison, bike_network, subway_network)
+  list(comparison, bike_network, subway_network, bike_catchment)
 }
 
 bushwick <- network_calculator("data/bike_service_network/Bushwick_Ridgewood/edges", "data/subway_service_network/Bushwick_Ridgewood/edges")
@@ -122,8 +134,6 @@ spbr <- network_calculator("data/bike_service_network/Sunset_Park_Bay_Ridge/edge
 umanhattan <- network_calculator("data/bike_service_network/Upper_Manhattan/edges", "data/subway_service_network/Upper_Manhattan/edges", man_clip = TRUE)
 
 wbronx <- network_calculator("data/bike_service_network/West_Bronx/edges", "data/subway_service_network/West_Bronx/edges", man_erase = TRUE)
-
-
 
 
 swbronx_catchment <- wbronx[[1]][2,] %>% st_union(sbronx[[1]][2,]) %>% 
@@ -207,6 +217,27 @@ bike_total_catchment <-
     population = pop_total,
     sum_vars = vars(pop_white, education, poverty),
     mean_vars = vars(med_income, vulnerability_index))
+
+
+neighbourhoods_network_demographics <- tibble(
+      nbhd = c("bushwick", "cbronx", "chb", "ebronx", 
+              "enyc", "rockaway", "jhf", "jamaica", 
+              "sbronx", "spbr", "umanhattan", "wbronx"), 
+      geom = c(bushwick[[4]], cbronx[[4]], chb[[4]], ebronx[[4]], 
+                enyc[[4]], rockaway[[4]], jhf[[4]], jamaica[[4]], 
+                sbronx[[4]], spbr[[4]], umanhattan[[4]], wbronx[[4]])) %>%
+  st_as_sf() %>%
+  st_set_crs(26918) %>%
+  st_intersect_summarize(
+    CTs,
+    .,
+    group_vars = vars(nbhd),
+    population = pop_total,
+    sum_vars = vars(pop_white, education, poverty),
+    mean_vars = vars(med_income, vulnerability_index))
+
+
+st_buffer(st_intersection(jhf[[2]], subway_total_catchment), dist = 30)
 
 
 

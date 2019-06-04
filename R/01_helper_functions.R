@@ -18,6 +18,8 @@ library(grid)
 library(gridExtra)
 library(scales)
 library(ggpubr)
+library(reticulate)
+
 
 options(tigris_use_cache = TRUE)
 suppressWarnings(font_import(paths = "data/fonts", prompt = FALSE))
