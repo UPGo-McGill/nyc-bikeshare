@@ -140,7 +140,7 @@ voronoi_2018 <-
       st_voronoi() %>%
       st_collection_extract() %>% 
       st_erase(nyc_water) %>% 
-      st_intersection(bike_service_filled)) %>% 
+      st_intersection(bike_service_areas_no_holes$geometry[3])) %>% 
   st_as_sf()
 
 voronoi_2013 <-
@@ -152,7 +152,7 @@ voronoi_2013 <-
       st_voronoi() %>%
       st_collection_extract() %>% 
       st_erase(nyc_water) %>% 
-      st_intersection(bike_service_filled_2013)) %>% 
+      st_intersection(bike_service_areas_no_holes$geometry[1])) %>% 
   st_as_sf()
 
 

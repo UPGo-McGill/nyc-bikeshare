@@ -25,7 +25,7 @@ total_stationlist <- subway_stations %>%
 write.csv(total_stationlist, "data/total_stationlist.csv")
 
 
-py_discover_config()
+py_discover_config(required_module = "osmnx")
 use_python("C:/Users/hanna/AppData/Local/Programs/Python/Python37", required = T)
 py_config()
 source_python("data/subway_network.py")
