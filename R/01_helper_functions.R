@@ -89,3 +89,72 @@ service_create <- function(year, distance) {
                      st_erase(nyc_water))
 }
 
+
+## Map and find demographics for bike and subway access by neighbourhood
+
+network_calculator <- function(bike_path, subway_path, man_erase = FALSE,
+                               man_clip = FALSE) {
+  
+  bike_network <-
+    st_read(bike_path, stringsAsFactors = FALSE) %>%
+    as_tibble() %>%
+    st_as_sf() %>%
+    st_transform(26918) %>%
+    st_union()
+  
+  if (man_erase) {
+    bike_network <- bike_network %>% 
+      st_erase(manhattan %>% st_erase(filter(clusters, nbhd == "West Bronx")))
+  }
+  
+  if (man_clip) {
+    bike_network <- bike_network %>% 
+      st_erase(filter(clusters, nbhd == "West Bronx")) %>% 
+      st_erase(bronx) 
+  }
+  
+  subway_network <-
+    st_read(subway_path, stringsAsFactors = FALSE) %>%
+    as_tibble() %>%
+    st_as_sf() %>%
+    st_transform(26918) %>%
+    st_union()
+  
+  bike_catchment <-
+    bike_network %>%
+    st_polygonize() %>%
+    st_buffer(dist = 50)
+  
+  if (man_clip) {
+    bike_catchment <- bike_catchment %>% 
+      st_cast("POLYGON") %>% 
+      as_tibble() %>% 
+      st_as_sf() %>% 
+      filter(st_area(.) > set_units(100000, m^2)) %>% 
+      st_union()
+  }
+  
+  subway_catchment <-
+    subway_network %>%
+    st_polygonize() %>%
+    st_buffer(dist = 50)
+  
+  comparison <-
+    tibble(service = c("bike_total", "bike_only"),
+           geometry = c(bike_catchment,
+                        st_erase(bike_catchment, subway_catchment))) %>%
+    st_as_sf() %>%
+    st_set_crs(26918) %>%
+    st_intersect_summarize(
+      CTs,
+      .,
+      group_vars = vars(service),
+      population = pop_total,
+      sum_vars = vars(pop_white, education, poverty),
+      mean_vars = vars(med_income, vulnerability_index)) %>%
+    st_drop_geometry()
+  
+  list(comparison, bike_network, subway_network, bike_catchment)
+}
+
+
