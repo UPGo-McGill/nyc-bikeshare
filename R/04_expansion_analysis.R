@@ -2,9 +2,6 @@
 
 ## Generate potential expansion service areas
 
-bike_service_filled <- fill_holes(bike_service_areas$geometry[3], 20000)
-bike_service_filled_2013 <- fill_holes(bike_service_areas$geometry[1], 20000)
-
 expansion_subway_service_areas <- 
   suppressWarnings(subway_stations %>%
                      st_buffer(expansion_distance) %>%
@@ -18,14 +15,15 @@ expansion_bike_service_areas <-
   filter(Year == 2018) %>%
   st_buffer(expansion_distance) %>%
   st_union() %>%
-  st_erase(bike_service_filled) %>%
+  st_erase(bike_service_areas_no_holes$geometry[3]) %>%
   st_intersection(nyc_city) %>% 
   st_collection_extract("POLYGON")
 
 subway_buffers <-
   subway_stations %>%
   st_buffer(expansion_distance) %>%
-  mutate(bike_proximity = st_distance(subway_stations, bike_service_filled))
+  mutate(bike_proximity = st_distance(subway_stations,
+                                      bike_service_areas_no_holes$geometry[3]))
 
 subway_buffer_comparison <- st_intersect_summarize(
   CTs,
@@ -51,7 +49,7 @@ target_neighbourhoods <-
   suppressWarnings(subway_stations_vulnerability %>%
                      st_buffer(expansion_distance) %>% 
                      st_intersection(nyc_city) %>% 
-                     st_erase(bike_service_filled) %>%
+                     st_erase(bike_service_areas_no_holes$geometry[3]) %>%
                      st_union() %>%
                      st_cast("POLYGON") %>%
                      as_tibble() %>% 
@@ -137,4 +135,3 @@ target_neighbourhoods <-
                                          "pop_no_subway")]),
     by = "nbhd") %>% 
   mutate(vulnerability_index = as.vector(vulnerability_index)) 
-

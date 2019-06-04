@@ -311,7 +311,7 @@ figure[[10]] <-
   tm_shape(CTs) +
   tm_fill("vulnerability_index", palette = "-RdYlGn", border.alpha = 0, n = 8,
           title = "") +
-  tm_shape(bike_service_filled) +
+  tm_shape(bike_service_areas_no_holes$geometry[3]) +
   tm_borders(col = "black", lwd = 2) +
   tm_layout(frame = TRUE,
             title = "Figure 10. Vulnerability index",
@@ -339,7 +339,7 @@ figure[[11]] <-
                       "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a",
                       "#ffff99", "#b15928")) +
   tm_borders(col = "white", lwd = 2) +
-  tm_shape(bike_service_filled) +
+  tm_shape(bike_service_areas_no_holes$geometry[3]) +
   tm_fill(col = "grey40") +
   tm_shape(subway_lines) +
   tm_lines(col = "grey90", alpha = 0.75) +

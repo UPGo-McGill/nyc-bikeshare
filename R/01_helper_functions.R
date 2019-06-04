@@ -2,24 +2,21 @@
 
 ## Load libraries and fonts
 
-library(extrafont)
 library(osmdata)
-library(sf)
 library(smoothr)
 library(tidycensus)
-library(tidyverse)
 library(tigris)
 library(tmap)
 library(tmaptools)
 library(units)
-library(dodgr)
-library(stplanr)
 library(grid)
 library(gridExtra)
 library(scales)
-library(ggpubr)
 library(reticulate)
-
+library(ggpubr)
+library(tidyverse)
+library(sf)
+library(extrafont)
 
 options(tigris_use_cache = TRUE)
 suppressWarnings(font_import(paths = "data/fonts", prompt = FALSE))
@@ -56,7 +53,10 @@ st_intersect_summarize <- function(data, poly, group_vars, population, sum_vars,
     summarize(!! pop := sum(population_int, na.rm = TRUE))
   
   sums <- intersects %>%
-    summarize_at(sum_vars, ~{sum(. * int_area_pct, na.rm = TRUE) / sum(population_int, na.rm = TRUE)})
+    summarize_at(
+      sum_vars,
+      ~{sum(. * int_area_pct, na.rm = TRUE) / sum(population_int,
+                                                  na.rm = TRUE)})
   
   means <- intersects %>% 
     summarize_at(mean_vars, ~{

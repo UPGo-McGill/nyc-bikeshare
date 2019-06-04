@@ -57,11 +57,8 @@ nyc_city <- nyc_msa %>%
   filter(NAME %in% c("New York", "Kings", "Queens", "Bronx", "Richmond")) %>% 
   st_union()
 
-manhattan <- nyc_msa %>% 
-  filter(NAME == "New York")
-
-bronx <- nyc_msa %>% 
-  filter(NAME == "Bronx")
+manhattan <- nyc_msa %>% filter(NAME == "New York")
+bronx <- nyc_msa %>% filter(NAME == "Bronx")
 
 nyc_msa <- st_union(nyc_msa)
 
@@ -76,7 +73,6 @@ nyc_pumas <- pumas(36, class = "sf") %>%
   select(-GEOID10, -NAMELSAD10, -STATEFP10, -MTFCC10, -FUNCSTAT10, -ALAND10,
          -AWATER10, -INTPTLAT10, -INTPTLON10) %>%
   filter(str_detect(PUMA_name, "NYC-"))
-
 
 
 ### Import bike and subway data ####
@@ -137,18 +133,14 @@ CTs <- get_acs(
   geometry = TRUE) %>% 
   as_tibble() %>%
   st_as_sf() %>% 
-  st_transform(26918)
-
-names(CTs) <- c("GEOID", "NAME", "Variable", "Estimate", "MOE", "pop_total",
-                "pop_total_MOE", "geometry")
-
-CTs <-
-  CTs %>%
+  st_transform(26918) %>% 
+  set_names(c("GEOID", "NAME", "Variable", "Estimate", "MOE", "pop_total",
+                "pop_total_MOE", "geometry")) %>% 
   select(-MOE, -pop_total_MOE) %>% 
   spread(key = Variable, value = Estimate) %>% 
-  mutate(pop_density = pop_total/st_area(geometry)) 
-
-CTs <- CTs %>% filter(pop_total > 100) %>% na.omit()
+  mutate(pop_density = pop_total/st_area(geometry)) %>% 
+  filter(pop_total > 100) %>%
+  na.omit()
 
 
 ## Create vulnerability index
@@ -185,7 +177,7 @@ CTs <- suppressWarnings(st_erase(CTs, nyc_water))
 
 ## Create service and no-service areas, with holes filled in for maps
 
-service_years <- do.call(c,map(2013:2018, service_create, bike_distance))
+service_years <- do.call(c, map(2013:2018, service_create, bike_distance))
 
 bike_service_areas <-
   tibble(year = c(2013, 2013, 2018, 2018),
