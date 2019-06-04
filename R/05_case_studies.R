@@ -223,6 +223,12 @@ neighbourhoods_network_demographics <- tibble(
       nbhd = c("bushwick", "cbronx", "chb", "ebronx", 
               "enyc", "rockaway", "jhf", "jamaica", 
               "sbronx", "spbr", "umanhattan", "wbronx"), 
+      pop_no_subway_access = c((bushwick[[1]][1,2]/bushwick[[1]][2,2]), (cbronx[[1]][1,2]/cbronx[[1]][2,2]),  
+                               (chb[[1]][1,2]/chb[[1]][2,2]), (ebronx[[1]][1,2]/ebronx[[1]][2,2]),  
+                               (enyc[[1]][1,2]/enyc[[1]][2,2]), (rockaway[[1]][1,2]/rockaway[[1]][2,2]), 
+                               (jhf[[1]][1,2]/jhf[[1]][2,2]), (jamaica[[1]][1,2]/jamaica[[1]][2,2]),
+                               (sbronx[[1]][1,2]/sbronx[[1]][2,2]), (spbr[[1]][1,2]/spbr[[1]][2,2]),
+                               (umanhattan[[1]][1,2]/umanhattan[[1]][2,2]), (wbronx[[1]][1,2]/wbronx[[1]][2,2])),
       geom = c(bushwick[[4]], cbronx[[4]], chb[[4]], ebronx[[4]], 
                 enyc[[4]], rockaway[[4]], jhf[[4]], jamaica[[4]], 
                 sbronx[[4]], spbr[[4]], umanhattan[[4]], wbronx[[4]])) %>%
@@ -235,9 +241,6 @@ neighbourhoods_network_demographics <- tibble(
     population = pop_total,
     sum_vars = vars(pop_white, education, poverty),
     mean_vars = vars(med_income, vulnerability_index))
-
-
-st_buffer(st_intersection(jhf[[2]], subway_total_catchment), dist = 30)
 
 
 
