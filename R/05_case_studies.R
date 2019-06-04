@@ -46,7 +46,7 @@ subway_total_catchment <-
 
 
 
-##create function to map and get demographics for bike and subway access by neighbourhood
+##create function to map and find demographics for bike and subway access by neighbourhood
 network_calculator <- function(bike_path, subway_path, man_erase = FALSE, man_clip = FALSE) {
   
   bike_network <-
@@ -111,6 +111,8 @@ network_calculator <- function(bike_path, subway_path, man_erase = FALSE, man_cl
   list(comparison, bike_network, subway_network, bike_catchment)
 }
 
+##create datasets for each neighbourhood with [[1]] demographic statistics; [[2]] bike access road network; [[3]] subway access road network; [[4]] bike catchment polygon for mapping
+
 bushwick <- network_calculator("data/bike_service_network/Bushwick_Ridgewood/edges", "data/subway_service_network/Bushwick_Ridgewood/edges")
 
 cbronx <- network_calculator("data/bike_service_network/Central_Bronx/edges", "data/subway_service_network/Central_Bronx/edges", man_erase = TRUE)
@@ -135,6 +137,9 @@ umanhattan <- network_calculator("data/bike_service_network/Upper_Manhattan/edge
 
 wbronx <- network_calculator("data/bike_service_network/West_Bronx/edges", "data/subway_service_network/West_Bronx/edges", man_erase = TRUE)
 
+
+
+####### Find demographic statistics for muliptle neighbourhoods ######################
 
 swbronx_catchment <- wbronx[[1]][2,] %>% st_union(sbronx[[1]][2,]) %>% 
   st_intersect_summarize(
