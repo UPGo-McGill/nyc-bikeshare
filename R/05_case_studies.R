@@ -7,22 +7,15 @@ bike_service_stationlist  <-subway_stations %>%
   st_intersection(target_neighbourhoods) %>% 
   st_transform(4326)
 
-write.csv(bike_service_stationlist, "data/bike_service_stationlist.csv")
-
-
 ##Create file with subway station data by neighbourhood to create subway access network in Python
 subway_service_stationlist <- subway_stations %>% 
   st_intersection(st_buffer(target_neighbourhoods, dist = 2400)) %>% 
   st_transform(4326)
 
-write.csv(subway_service_stationlist, "data/subway_service_stationlist.csv")
-
 
 ##Create file with coordinates of all subway stations to create total subway access network in Python
 total_stationlist <- subway_stations %>% 
   st_transform(4326)
-
-write.csv(total_stationlist, "data/total_stationlist.csv")
 
 
 py_discover_config(required_module = "osmnx")
@@ -37,7 +30,7 @@ wholecity <- cityNetwork("total_stationlist.csv")
 
 ##create total subway service network for all of NYC
 subway_total_catchment <-
-  st_read("data/whole_city/edges.shp", stringsAsFactors = FALSE) %>%
+  st_read("data/subway_total_network/edges.shp", stringsAsFactors = FALSE) %>%
   st_transform(26918) %>%
   st_union() %>%
   st_polygonize() %>%
@@ -148,7 +141,7 @@ table_2.2 <-   neighbourhoods_network_demographics %>% select(nbhd, perc_no_subw
 
 ####### Find demographic statistics for muliptle neighbourhoods ######################
 
-swbronx_catchment <- wbronx[[4]] %>% st_union(sbronx[[4]]) %>% 
+scbronx_catchment <- cbronx[[4]] %>% st_union(sbronx[[4]]) %>% 
   st_intersect_summarize(
     CTs,
     .,

@@ -106,7 +106,8 @@ subway_lines <-
   `$`("osm_lines") %>% 
   as_tibble() %>% 
   st_as_sf() %>% 
-  filter(str_detect(name, "Line"))
+  filter(str_detect(name, "Line")) %>% 
+  st_union ()
 
 
 
