@@ -106,21 +106,38 @@ jhf_stations <- subway_stations_vulnerability[
                         target_neighbourhoods %>% 
                           filter(nbhd == "Jackson Heights/Flushing"))) > 0,]
 
-figure[[2.4]] <- 
+
+jhf_1 <- jhf[[2]] %>%
+  st_buffer(dist = 30) %>% 
+  st_erase(subway_total_catchment)
+
+jhf_2 <- jhf[[3]] %>%
+  st_buffer(dist = 30) %>%
+  st_erase(jhf[[4]])
+
+jhf_3 <- jhf[[2]] %>%
+  st_buffer(dist = 30) %>%
+  st_intersection(subway_total_catchment)
+
+
+
+
+
+figure_2.4 <- 
   tm_shape(nyc_msa, bbox = bb(st_bbox(target_neighbourhoods[7,]), ext = 1.1)) +
   tm_fill(col = "#f0f0f0") +
-  tm_shape(nyc_water) +
-  tm_fill(col = "#a6cee3", alpha = 0.5)+
   tm_shape(nyc_city) +
   tm_fill(col = "grey80", title = "Base Map") +
   tm_shape(jhf_parks) + 
   tm_fill(col = "#a6d854", alpha = 0.5) +
-  tm_shape(jhf[[2]]%>% st_buffer(dist = 30) %>% st_erase(subway_total_catchment)) +
+  tm_shape(jhf_1) +
   tm_fill(col = "#fc8d62", alpha = 0.5) +
-  tm_shape(jhf[[3]]%>% st_buffer(dist = 30) %>% st_erase(jhf[[4]]) ) +
-  tm_fill(col= "#e5c494", alpha = 0.5) +
-  tm_shape(jhf[[2]]%>% st_buffer(dist = 30)%>%st_intersection(subway_total_catchment)) +
-  tm_fill(col= "##8da0cb", alpha =0.5) +
+  #tm_shape(jhf_2) +
+  #tm_fill(col= "#e5c494", alpha = 0.5) +
+  tm_shape(jhf_3) +
+  tm_fill(col= "#8da0cb", alpha = 0.5) +
+  tm_shape(nyc_water) +
+  tm_fill(col = "#a6cee3", alpha = 0.5)+
   tm_shape(jhf_streets %>% filter(!is.na(name))) +
   tm_lines(col = "grey50", alpha = 0.5) +
   tm_shape(subway_lines) +
@@ -144,7 +161,7 @@ figure[[2.4]] <-
             fontfamily = "Futura-Medium",
             main.title.fontfamily = "Futura-CondensedExtraBold")
 
-tmap_save(figure[[2.4]], "output/figure_2.4.png", width = 2400)
+tmap_save(figure_2.4, "output/figure_2.4.png", height = 2400)
 plot(figure[[2.4]])
 
 # Figure 5. South Bronx case study map
