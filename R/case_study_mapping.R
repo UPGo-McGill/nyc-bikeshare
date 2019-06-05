@@ -125,19 +125,20 @@ figure_2.4 <-
   tm_shape(nyc_msa, bbox = bb(st_bbox(target_neighbourhoods[7,]), ext = 1.1)) +
   tm_fill(col = "#f0f0f0") +
   tm_shape(nyc_city) +
-  tm_fill(col = "grey85", title = "Base Map") +
+  tm_fill(col = "grey92", title = "Base Map") +
   tm_shape(jhf_parks) + 
   tm_fill(col = "#BDD490") +
   tm_shape(jhf_1) +
-  tm_fill(col = "#E89777") +
+  tm_fill(col = "#F8BCA5") +
   tm_shape(jhf_2) +
-  tm_fill(col= "grey95") +
+  tm_fill(col= "grey75") +
   tm_shape(jhf_3) +
-  tm_fill(col= "#F8BCA5") +
+  tm_fill(col= "#E98463") + 
   tm_shape(nyc_water) +
   tm_fill(col = "#E5F7FF")+
+  tm_borders(col = "#326CAB", lwd = 1, alpha = 0.15) + 
   tm_shape(jhf_streets %>% filter(!is.na(name))) +
-  tm_lines(col = "grey50", alpha = 0.3) +
+  tm_lines(col = "black", alpha = 0.12) +
   tm_shape(subway_lines) +
   tm_lines(col = "grey35", lwd = 3, alpha = 0.5) +
   tm_shape(jhf_stations) +
@@ -146,11 +147,11 @@ figure_2.4 <-
           xmod = c(  0, -1.3,   0,    1,   0,  0.6, -0.4),
           ymod = c(0.8,  0.8, 0.8, -0.8, 0.8, -0.8,  0.8)) +
   tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50") +
-  tm_add_legend(type = "fill", labels = "Access to subway", col = "grey95", 
+  tm_add_legend(type = "fill", labels = "Access to subway", col = "grey80", 
                 alpha = 0.3, border.alpha = 0.1, border.col = ) +
-  tm_add_legend(type = "fill", labels = "Access to bike sharing", col = "#E87142", 
+  tm_add_legend(type = "fill", labels = "Access to bike sharing", col = "#FBAC8D", 
                 alpha = 0.3, border.alpha = 0.1, border.col = ) +
-  tm_add_legend(type = "fill", labels = "Access to both", col = "#FBAC8D", 
+  tm_add_legend(type = "fill", labels = "Access to both", col = "#E87142", 
                 alpha = 0.3, border.alpha = 0.1, border.col = ) +
   tm_layout(main.title = "Figure 4. Jackson Heights/Flushing case study",
             frame = TRUE, main.title.size = 1.5, legend.title.size = 1.2,
@@ -226,19 +227,20 @@ figure[[2.5]] <-
   tm_shape(nyc_msa, bbox = bb(st_bbox(target_neighbourhoods[9,]), ext = 1.1)) +
   tm_fill(col = "#f0f0f0") +
   tm_shape(nyc_city) +
-  tm_fill(col = "grey85", title = "Base Map") +
+  tm_fill(col = "grey92", title = "Base Map") +
   tm_shape(sbronx_parks) + 
   tm_fill(col = "#BDD490") +
   tm_shape(sbronx_1) +
-  tm_fill(col = "#E89777") +
+  tm_fill(col = "#F8BCA5") +
   tm_shape(sbronx_2) +
-  tm_fill(col= "grey95") +
+  tm_fill(col= "grey75") +
   tm_shape(sbronx_3) +
-  tm_fill(col= "#F8BCA5") +
+  tm_fill(col= "#E98463") + 
   tm_shape(nyc_water) +
   tm_fill(col = "#E5F7FF")+
+  tm_borders(col = "#326CAB", lwd = 1, alpha = 0.15) + 
   tm_shape(sbronx_streets %>% filter(!is.na(name))) +
-  tm_lines(col = "grey50", alpha = 0.3) +
+  tm_lines(col = "black", alpha = 0.12) +
   tm_shape(subway_lines) +
   tm_lines(col = "grey35", lwd = 3, alpha = 0.5) +
   tm_shape(sbronx_stations) +
@@ -249,9 +251,9 @@ figure[[2.5]] <-
   tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50") +
   tm_add_legend(type = "fill", labels = "Access to subway", col = "grey95", 
                 alpha = 0.3, border.alpha = 0.1, border.col = ) +
-  tm_add_legend(type = "fill", labels = "Access to bike sharing", col = "#E87142", 
+  tm_add_legend(type = "fill", labels = "Access to bike sharing", col = "#FBAC8D", 
                 alpha = 0.3, border.alpha = 0.1, border.col = ) +
-  tm_add_legend(type = "fill", labels = "Access to both", col = "#FBAC8D", 
+  tm_add_legend(type = "fill", labels = "Access to both", col = "#E87142", 
                 alpha = 0.3, border.alpha = 0.1, border.col = ) +
   tm_layout(main.title = "Figure 5. South Bronx case study",
             frame = TRUE, main.title.size = 1.5, legend.title.size = 1.2,

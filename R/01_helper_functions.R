@@ -100,7 +100,8 @@ network_calculator <- function(bike_path, subway_path, man_erase = FALSE,
     as_tibble() %>%
     st_as_sf() %>%
     st_transform(26918) %>%
-    st_union()
+    st_union() %>%
+    st_erase(nyc_water)
   
   if (man_erase) {
     bike_network <- bike_network %>% 
