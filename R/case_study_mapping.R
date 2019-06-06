@@ -66,6 +66,7 @@ tmap_save(figure[[2.3]], "output/figure_2.3.png", width = 2400, height = 2400)
 jhf_osm <- 
   target_neighbourhoods %>% 
   filter(nbhd == "Jackson Heights/Flushing") %>% 
+  st_buffer(dist = 3000) %>%
   st_transform(4326) %>% 
   st_bbox() %>% 
   bb(ext = 1.2) %>% 
@@ -122,7 +123,7 @@ jhf_3 <- jhf[[2]] %>%
 
 
 figure_2.4 <- 
-  tm_shape(nyc_msa, bbox = bb(st_bbox(target_neighbourhoods[7,]), ext = 1.1)) +
+  tm_shape(nyc_msa, bbox = bb(st_bbox(jhf[[4]]), ext = 1.2)) +
   tm_fill(col = "#f0f0f0") +
   tm_shape(nyc_city) +
   tm_fill(col = "grey92", title = "Base Map") +
@@ -165,11 +166,12 @@ plot(figure[[2.4]])
 
 # Figure 5. South Bronx case study map
 
-## Get Jackson Heights streets and subway stations
+## Get South Bronx streets and subway stations
 
 sbronx_osm <- 
   target_neighbourhoods %>% 
   filter(nbhd == "South Bronx") %>% 
+  st_buffer(dist = 2400) %>%
   st_transform(4326) %>% 
   st_bbox() %>% 
   bb(ext = 1.2) %>% 
@@ -224,7 +226,7 @@ sbronx_3 <- sbronx[[2]] %>%
 
 
 figure[[2.5]] <- 
-  tm_shape(nyc_msa, bbox = bb(st_bbox(target_neighbourhoods[9,]), ext = 1.1)) +
+  tm_shape(nyc_msa, bbox = bb(st_bbox(sbronx[[4]]), ext = 1.2)) +
   tm_fill(col = "#f0f0f0") +
   tm_shape(nyc_city) +
   tm_fill(col = "grey92", title = "Base Map") +
@@ -249,7 +251,7 @@ figure[[2.5]] <-
           xmod = c(  0, -1.3,   0,    1,   0,  0.6, -0.4),
           ymod = c(0.8,  0.8, 0.8, -0.8, 0.8, -0.8,  0.8)) +
   tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50") +
-  tm_add_legend(type = "fill", labels = "Access to subway", col = "grey95", 
+  tm_add_legend(type = "fill", labels = "Access to subway", col = "grey80", 
                 alpha = 0.3, border.alpha = 0.1, border.col = ) +
   tm_add_legend(type = "fill", labels = "Access to bike sharing", col = "#FBAC8D", 
                 alpha = 0.3, border.alpha = 0.1, border.col = ) +
@@ -263,3 +265,101 @@ figure[[2.5]] <-
             main.title.fontfamily = "Futura-CondensedExtraBold")
 
 tmap_save(figure[[2.5]], "output/figure_2.5.png", height = 2400)
+
+
+### UPPER MANHATTAN
+umanhattan_osm <- 
+  target_neighbourhoods %>% 
+  filter(nbhd == "Upper Manhattan") %>% 
+  st_buffer(dist = 2400) %>%
+  st_transform(4326) %>% 
+  st_bbox() %>% 
+  bb(ext = 1.2) %>% 
+  as.vector() %>%
+  opq() %>% 
+  add_osm_feature(key = "highway") %>% 
+  osmdata_sf()
+
+
+umanhattan_streets <- 
+  rbind(umanhattan_osm$osm_polygons %>% st_cast("LINESTRING"), umanhattan_osm$osm_lines) %>% 
+  as_tibble() %>% 
+  st_as_sf() %>% 
+  st_transform(26918) %>%
+  select(osm_id, name, geometry)
+
+umanhattan_parks <-
+  target_neighbourhoods %>%
+  filter(nbhd == "Upper Manhattan") %>% 
+  st_buffer(dist = 2400) %>%
+  st_transform(4326) %>%
+  st_bbox() %>%
+  bb(ext = 1.2) %>%
+  as.vector() %>%
+  opq() %>%
+  add_osm_feature(key = "leisure", value = "park") %>%
+  osmdata_sf()
+
+umanhattan_parks <- 
+  umanhattan_parks[[6]] %>%
+  as_tibble() %>% 
+  st_as_sf() %>% 
+  st_transform(26918) %>%
+  select(osm_id, name, geometry)
+
+umanhattan_stations <- subway_stations_vulnerability[
+  lengths(st_intersects(subway_stations_vulnerability,
+                        target_neighbourhoods %>% 
+                          filter(nbhd == "Upper Manhattan"))) > 0,]
+
+umanhattan_1 <- umanhattan[[2]] %>%
+  st_buffer(dist = 20) %>% 
+  st_erase(subway_total_catchment)
+
+umanhattan_2 <- umanhattan[[3]] %>%
+  st_buffer(dist = 20) %>%
+  st_erase(umanhattan[[4]])
+
+umanhattan_3 <- umanhattan[[2]] %>%
+  st_buffer(dist = 20) %>%
+  st_intersection(subway_total_catchment)
+
+
+figure_2.6 <- 
+  tm_shape(nyc_msa, bbox = bb(st_bbox(umanhattan[[4]]), ext = 1.2)) +
+  tm_fill(col = "#f0f0f0") +
+  tm_shape(nyc_city) +
+  tm_fill(col = "grey92", title = "Base Map") +
+  tm_shape(umanhattan_parks) + 
+  tm_fill(col = "#BDD490") +
+  tm_shape(umanhattan_1) +
+  tm_fill(col = "#F8BCA5") +
+  tm_shape(umanhattan_2) +
+  tm_fill(col= "grey75") +
+  tm_shape(umanhattan_3) +
+  tm_fill(col= "#E98463") + 
+  tm_shape(nyc_water) +
+  tm_fill(col = "#E5F7FF")+
+  tm_borders(col = "#326CAB", lwd = 1, alpha = 0.15) + 
+  tm_shape(umanhattan_streets %>% filter(!is.na(name))) +
+  tm_lines(col = "black", alpha = 0.12) +
+  tm_shape(subway_lines) +
+  tm_lines(col = "grey35", lwd = 3, alpha = 0.5) +
+  tm_shape(umanhattan_stations) +
+  tm_dots(col = "grey35", size = 0.5) +
+  tm_text("stop_name", size = 0.7, 
+          xmod = c(  0, -1.3,   0,    1,   0,  0.6, -0.4),
+          ymod = c(0.8,  0.8, 0.8, -0.8, 0.8, -0.8,  0.8)) +
+  tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50") +
+  tm_add_legend(type = "fill", labels = "Access to subway", col = "grey80", 
+                alpha = 0.3, border.alpha = 0.1, border.col = ) +
+  tm_add_legend(type = "fill", labels = "Access to bike sharing", col = "#FBAC8D", 
+                alpha = 0.3, border.alpha = 0.1, border.col = ) +
+  tm_add_legend(type = "fill", labels = "Access to both", col = "#E87142", 
+                alpha = 0.3, border.alpha = 0.1, border.col = ) +
+  tm_layout(main.title = "Figure 6. Upper Manhattan case study",
+            frame = TRUE, main.title.size = 1.5, legend.title.size = 1.2,
+            legend.title.fontfamily = "Futura-CondensedExtraBold",
+            legend.position = c("left", "top"),
+            fontfamily = "Futura-Medium",
+            main.title.fontfamily = "Futura-CondensedExtraBold")
