@@ -17,6 +17,7 @@ library(ggpubr)
 library(tidyverse)
 library(sf)
 library(extrafont)
+library(lwgeom)
 
 options(tigris_use_cache = TRUE)
 suppressWarnings(font_import(paths = "data/fonts", prompt = FALSE))
@@ -158,4 +159,114 @@ network_calculator <- function(bike_path, subway_path, man_erase = FALSE,
   list(comparison, bike_network, subway_network, bike_catchment)
 }
 
+
+map_creator <- function(nbhd_name) {
+  
+  # Get osm layer for line segments and maps
+  
+  nbhd_osm <- 
+    target_neighbourhoods %>% 
+    filter(nbhd == nbhd_name) %>% 
+    st_transform(4326) %>% 
+    st_bbox() %>% 
+    bb(ext = 2.5) %>% 
+    as.vector() %>%
+    opq() %>% 
+    add_osm_feature(key = "highway") %>% 
+    osmdata_sf()
+  
+  osm_points <- nbhd_osm$osm_points %>% as_tibble() %>% st_as_sf()
+  
+  osm_streets <- 
+    rbind(nbhd_osm$osm_polygons %>% st_cast("LINESTRING"),
+          nbhd_osm$osm_lines) %>% 
+    as_tibble() %>% 
+    st_as_sf() %>% 
+    #st_transform(26918) %>%
+    select(osm_id, name, geometry)
+  
+  osm_parks <-
+    target_neighbourhoods %>%
+    filter(nbhd == nbhd_name) %>% 
+    st_transform(4326) %>%
+    st_bbox() %>%
+    bb(ext = 2.5) %>%
+    as.vector() %>%
+    opq() %>%
+    add_osm_feature(key = "leisure", value = "park") %>%
+    osmdata_sf() %>% 
+    `$`(osm_polygons) %>% 
+    as_tibble() %>% 
+    st_as_sf() %>% 
+    st_transform(26918) %>%
+    select(osm_id, name, geometry)
+  
+  nbhd_stations <- 
+    subway_stations_vulnerability %>% 
+    st_join(filter(target_neighbourhoods, nbhd == nbhd_name), left = FALSE) %>% 
+    select(-vulnerability_index, - pop_no_subway)
+  
+  list(nbhd_osm, osm_points, osm_streets, osm_parks, nbhd_stations)
+}
+
+
+network_creator <- function(nbhd_list, network_dist, extra_subway = FALSE) {
+  
+  # Get graph in Python and convert to GDF
+  if (extra_subway) {
+    graph <-
+      nbhd_list[[5]] %>% 
+      st_buffer(4000) %>% 
+      st_union() %>% 
+      st_intersection(subway_stations, .) %>%
+      st_join(target_neighbourhoods) %>% 
+      select(-vulnerability_index, - pop_no_subway) %>%
+      st_transform(4326) %>%
+      st_geometry() %>%
+      map(~{
+        osmnx$graph_from_point(
+          c(st_coordinates(.)[2], st_coordinates(.)[1]), distance = network_dist,
+          distance_type = "network", network_type = "all", simplify = FALSE)
+      })
+  } else {
+    graph <- 
+      nbhd_list[[5]] %>% 
+      st_transform(4326) %>%
+      st_geometry() %>%
+      map(~{
+        osmnx$graph_from_point(
+          c(st_coordinates(.)[2], st_coordinates(.)[1]), distance = network_dist,
+          distance_type = "network", network_type = "all", simplify = FALSE)
+        })}
+  
+  graph <- networkx$compose_all(graph)
+  
+  graph_edges <- 
+    osmnx$graph_to_gdfs(graph, nodes = FALSE, edges = TRUE) %>%
+    as_tibble() %>% 
+    select(osmid, u, v)
+  
+  
+  # Connect GDF to osm layer
+  
+  graph_lines <- filter(nbhd_list[[3]], osm_id %in% graph_edges$osmid)
+  
+  
+  # Rebuild line segments
+  
+  edges <- 
+    map(graph_lines$osm_id,
+        function(x) filter(graph_edges, osmid %in% x)) %>%
+    bind_rows()
+  
+  points <- filter(nbhd_list[[2]], osm_id %in% c(edges$u, edges$v))
+  
+  final_edges <- st_split(st_union(graph_lines), points) %>%
+    st_collection_extract("LINESTRING")
+  
+  network <- final_edges[lengths(st_intersects(final_edges, points)) == 2] %>% 
+    st_union()
+  
+  network
+}
 
