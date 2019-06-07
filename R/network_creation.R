@@ -1,11 +1,5 @@
 ### Extract network buffers and assemble mapping components ####################
 
-# Initialize Python packages
-
-osmnx <- import("osmnx")
-networkx <- import("networkx")
-
-
 ## Generate osm networks
 
 osm_networks <- 
@@ -20,6 +14,9 @@ load("data/subway_networks.RData")
 
 
 ## Code to rebuild bike share and subway networks
+
+#osmnx <- import("osmnx")
+#networkx <- import("networkx")
 
 #bike_share_networks <-
 #  map(osm_networks, network_creator, 2400) %>% 
