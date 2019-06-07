@@ -1,7 +1,8 @@
 ### CASE STUDY EXTRAS ###########
 
 
-##create file with subway stations identified as vulnerable by neighbourhood to create bike service network by neighbourhood in Python
+## Create file with subway stations identified as vulnerable by neighbourhood to
+## create bike service network by neighbourhood in Python
 bike_service_stationlist  <-subway_stations %>%  
   filter(stop_id %in% subway_buffer_vulnerability$stop_id) %>%
   st_intersection(target_neighbourhoods) %>% 
@@ -38,31 +39,61 @@ subway_total_catchment <-
 
 
 
-##create datasets for each neighbourhood with [[1]] demographic statistics; [[2]] bike access road network; [[3]] subway access road network; [[4]] bike catchment polygon for mapping
+## Create datasets for each neighbourhood with [[1]] demographic statistics; 
+## [[2]] bike access road network; [[3]] subway access road network;
+## [[4]] bike catchment polygon for mapping
 
-bushwick <- network_calculator("data/bike_service_network/Bushwick_Ridgewood/edges", "data/subway_service_network/Bushwick_Ridgewood/edges")
+bushwick <-
+  network_calculator("data/bike_service_network/Bushwick_Ridgewood/edges",
+                     "data/subway_service_network/Bushwick_Ridgewood/edges")
 
-cbronx <- network_calculator("data/bike_service_network/Central_Bronx/edges", "data/subway_service_network/Central_Bronx/edges", man_erase = TRUE)
+cbronx <-
+  network_calculator("data/bike_service_network/Central_Bronx/edges",
+                     "data/subway_service_network/Central_Bronx/edges",
+                     man_erase = TRUE)
 
-chb <- network_calculator("data/bike_service_network/Crown_Heights_Brownsville/edges", "data/subway_service_network/Crown_Heights_Brownsville/edges")
+chb <-
+  network_calculator("data/bike_service_network/Crown_Heights_Brownsville/edges",
+                     "data/subway_service_network/Crown_Heights_Brownsville/edges")
 
-ebronx <- network_calculator("data/bike_service_network/East_Bronx/edges", "data/subway_service_network/East_Bronx/edges")
+ebronx <- 
+  network_calculator("data/bike_service_network/East_Bronx/edges", 
+                     "data/subway_service_network/East_Bronx/edges")
 
-enyc <- network_calculator("data/bike_service_network/East_New_York_Canarsie/edges", "data/subway_service_network/East_New_York_Canarsie/edges")
+enyc <- 
+  network_calculator("data/bike_service_network/East_New_York_Canarsie/edges", 
+                     "data/subway_service_network/East_New_York_Canarsie/edges")
 
-rockaway <- network_calculator("data/bike_service_network/Far_Rockaway/edges", "data/subway_service_network/Far_Rockaway/edges")
+rockaway <- 
+  network_calculator("data/bike_service_network/Far_Rockaway/edges", 
+                     "data/subway_service_network/Far_Rockaway/edges")
 
-jhf <- network_calculator("data/bike_service_network/Jackson_Heights_Flushing/edges", "data/subway_service_network/Jackson_Heights_Flushing/edges")
+jhf <- 
+  network_calculator("data/bike_service_network/Jackson_Heights_Flushing/edges", 
+                     "data/subway_service_network/Jackson_Heights_Flushing/edges")
 
-jamaica <- network_calculator("data/bike_service_network/Jamaica/edges", "data/subway_service_network/Jamaica/edges")
+jamaica <- 
+  network_calculator("data/bike_service_network/Jamaica/edges", 
+                     "data/subway_service_network/Jamaica/edges")
 
-sbronx <- network_calculator("data/bike_service_network/South_Bronx/edges", "data/subway_service_network/South_Bronx/edges", man_erase = TRUE)
+sbronx <- 
+  network_calculator("data/bike_service_network/South_Bronx/edges", 
+                     "data/subway_service_network/South_Bronx/edges",
+                     man_erase = TRUE)
 
-spbr <- network_calculator("data/bike_service_network/Sunset_Park_Bay_Ridge/edges", "data/subway_service_network/Sunset_Park_Bay_Ridge/edges")
+spbr <- 
+  network_calculator("data/bike_service_network/Sunset_Park_Bay_Ridge/edges",
+                     "data/subway_service_network/Sunset_Park_Bay_Ridge/edges")
 
-umanhattan <- network_calculator("data/bike_service_network/Upper_Manhattan/edges", "data/subway_service_network/Upper_Manhattan/edges", man_clip = TRUE)
+umanhattan <- 
+  network_calculator("data/bike_service_network/Upper_Manhattan/edges", 
+                     "data/subway_service_network/Upper_Manhattan/edges",
+                     man_clip = TRUE)
 
-wbronx <- network_calculator("data/bike_service_network/West_Bronx/edges", "data/subway_service_network/West_Bronx/edges", man_erase = TRUE)
+wbronx <- 
+  network_calculator("data/bike_service_network/West_Bronx/edges", 
+                     "data/subway_service_network/West_Bronx/edges",
+                     man_erase = TRUE)
 
 
 
@@ -116,30 +147,39 @@ neighbourhoods_network_demographics <- tibble(
     population = pop_total,
     sum_vars = vars(pop_white, education, poverty),
     mean_vars = vars(med_income, vulnerability_index)) %>%
-  mutate(perc_no_subway = c((bushwick[[1]][1,2]/bushwick[[1]][2,2]), (cbronx[[1]][1,2]/cbronx[[1]][2,2]),  
-                                 (chb[[1]][1,2]/chb[[1]][2,2]), (ebronx[[1]][1,2]/ebronx[[1]][2,2]),  
-                                 (enyc[[1]][1,2]/enyc[[1]][2,2]), (rockaway[[1]][1,2]/rockaway[[1]][2,2]), 
-                                 (jhf[[1]][1,2]/jhf[[1]][2,2]), (jamaica[[1]][1,2]/jamaica[[1]][2,2]),
-                                 (sbronx[[1]][1,2]/sbronx[[1]][2,2]), (spbr[[1]][1,2]/spbr[[1]][2,2]),
-                                 (umanhattan[[1]][1,2]/umanhattan[[1]][2,2]), (wbronx[[1]][1,2]/wbronx[[1]][2,2])), pop_no_subway = as.numeric(perc_no_subway) * as.numeric(pop_total),
-        pop_no_subway_per_mi = pop_no_subway / st_area(geometry) %>% set_units(mi^2)) %>% st_drop_geometry()
+  mutate(perc_no_subway = c(
+    (bushwick[[1]][1,2]/bushwick[[1]][2,2]), (cbronx[[1]][1,2]/cbronx[[1]][2,2]),
+    (chb[[1]][1,2]/chb[[1]][2,2]), (ebronx[[1]][1,2]/ebronx[[1]][2,2]), 
+    (enyc[[1]][1,2]/enyc[[1]][2,2]), (rockaway[[1]][1,2]/rockaway[[1]][2,2]), 
+    (jhf[[1]][1,2]/jhf[[1]][2,2]), (jamaica[[1]][1,2]/jamaica[[1]][2,2]),
+    (sbronx[[1]][1,2]/sbronx[[1]][2,2]), (spbr[[1]][1,2]/spbr[[1]][2,2]),
+    (umanhattan[[1]][1,2]/umanhattan[[1]][2,2]),
+    (wbronx[[1]][1,2]/wbronx[[1]][2,2])),
+    pop_no_subway = as.numeric(perc_no_subway) * as.numeric(pop_total),
+    pop_no_subway_per_mi = pop_no_subway / st_area(geometry) %>% 
+      set_units(mi^2)) %>% st_drop_geometry()
 
 
 
 
 # Table 1. Leading potential expansion areas based on vulnerability index
 
-table_2.1 <-  neighbourhoods_network_demographics %>% select(nbhd, vulnerability_index, pop_total, pop_no_subway, pop_no_subway_per_mi) %>% arrange(-vulnerability_index)
+table_2.1 <- 
+  neighbourhoods_network_demographics %>% 
+  select(nbhd, vulnerability_index, pop_total, pop_no_subway, pop_no_subway_per_mi) %>% 
+  arrange(-vulnerability_index)
 
 
 
 # Table 2. Leading potential expansion areas based on subway access
 
-table_2.2 <-   neighbourhoods_network_demographics %>% select(nbhd, perc_no_subway, pop_total, pop_no_subway, pop_no_subway_per_mi) %>% arrange(-as.numeric(pop_no_subway_per_mi))
+table_2.2 <- neighbourhoods_network_demographics %>% 
+  select(nbhd, perc_no_subway, pop_total, pop_no_subway, pop_no_subway_per_mi) %>% 
+  arrange(-as.numeric(pop_no_subway_per_mi))
 
 
 
-####### Find demographic statistics for muliptle neighbourhoods ######################
+####### Find demographic statistics for muliptle neighbourhoods ################
 
 scbronx_catchment <- cbronx[[4]] %>% st_union(sbronx[[4]]) %>% 
   st_intersect_summarize(
