@@ -175,7 +175,10 @@ map_creator <- function(nbhd_name) {
     add_osm_feature(key = "highway") %>% 
     osmdata_sf()
   
-  osm_points <- nbhd_osm$osm_points %>% as_tibble() %>% st_as_sf()
+  osm_points <- nbhd_osm$osm_points %>% 
+    as_tibble() %>% 
+    st_as_sf() %>% 
+    select(osm_id, geometry)
   
   osm_streets <- 
     rbind(nbhd_osm$osm_polygons %>% st_cast("LINESTRING"),
@@ -206,7 +209,9 @@ map_creator <- function(nbhd_name) {
     st_join(filter(target_neighbourhoods, nbhd == nbhd_name), left = FALSE) %>% 
     select(-vulnerability_index, - pop_no_subway)
   
-  list(nbhd_osm, osm_points, osm_streets, osm_parks, nbhd_stations)
+  list(osm_parks, osm_streets, nbhd_stations, osm_points) %>% 
+    set_names("parks", "streets", "stations", "nodes") %>%
+    map(st_transform, 26918)
 }
 
 
@@ -215,12 +220,12 @@ network_creator <- function(nbhd_list, network_dist, extra_subway = FALSE) {
   # Get graph in Python and convert to GDF
   if (extra_subway) {
     graph <-
-      nbhd_list[[5]] %>% 
+      nbhd_list$stations %>% 
       st_buffer(4000) %>% 
       st_union() %>% 
       st_intersection(subway_stations, .) %>%
       st_join(target_neighbourhoods) %>% 
-      select(-vulnerability_index, - pop_no_subway) %>%
+      select(-vulnerability_index, -pop_no_subway) %>%
       st_transform(4326) %>%
       st_geometry() %>%
       map(~{
@@ -230,7 +235,7 @@ network_creator <- function(nbhd_list, network_dist, extra_subway = FALSE) {
       })
   } else {
     graph <- 
-      nbhd_list[[5]] %>% 
+      nbhd_list$stations %>% 
       st_transform(4326) %>%
       st_geometry() %>%
       map(~{
@@ -249,7 +254,7 @@ network_creator <- function(nbhd_list, network_dist, extra_subway = FALSE) {
   
   # Connect GDF to osm layer
   
-  graph_lines <- filter(nbhd_list[[3]], osm_id %in% graph_edges$osmid)
+  graph_lines <- filter(nbhd_list$streets, osm_id %in% graph_edges$osmid)
   
   
   # Rebuild line segments
@@ -259,7 +264,7 @@ network_creator <- function(nbhd_list, network_dist, extra_subway = FALSE) {
         function(x) filter(graph_edges, osmid %in% x)) %>%
     bind_rows()
   
-  points <- filter(nbhd_list[[2]], osm_id %in% c(edges$u, edges$v))
+  points <- filter(nbhd_list$nodes, osm_id %in% c(edges$u, edges$v))
   
   final_edges <- st_split(st_union(graph_lines), points) %>%
     st_collection_extract("LINESTRING")
@@ -267,6 +272,7 @@ network_creator <- function(nbhd_list, network_dist, extra_subway = FALSE) {
   network <- final_edges[lengths(st_intersects(final_edges, points)) == 2] %>% 
     st_union()
   
-  network
+  network %>% 
+    st_transform(26918)
 }
 
