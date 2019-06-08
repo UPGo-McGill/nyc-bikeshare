@@ -1,40 +1,46 @@
 ### Extract network buffers and assemble mapping components ####################
 
-## Code to rebuild networks
-
-#osm_networks <- suppressMessages(
-#  map(target_neighbourhoods$nbhd, map_creator) %>% 
-#    set_names(target_neighbourhoods$nbhd))
-
-#osmnx <- import("osmnx")
-#networkx <- import("networkx")
-
-#pb <- progress_estimated(length(osm_networks))
-
-#bike_networks <- suppressWarnings(
-#  map(osm_networks, ~{
-#    network <- network_creator(., 2400)
-#    pb$tick()$print()
-#    network}) %>% 
-#    set_names(target_neighbourhoods$nbhd))
-
-#pb <- progress_estimated(length(osm_networks))
-
-#subway_networks <- suppressWarnings(
-#  map(osm_networks, ~{
-#    network <- network_creator(., 960, extra_subway = TRUE)
-#    pb$tick()$print()
-#    network}) %>% 
-#    set_names(target_neighbourhoods$nbhd))
-
-#rm(pb, osmnx, networkx)
-
 
 ## Import RData files to avoid rebuilding bike share and subway networks
 
 load("data/osm_networks.RData")
 load("data/bike_networks.RData")
 load("data/subway_networks.RData")
+load("data/networks.RData")
+
+
+
+
+
+## Code to rebuild networks
+
+osm_networks <- suppressMessages(
+  map(target_neighbourhoods$nbhd, map_creator) %>% 
+    set_names(target_neighbourhoods$nbhd))
+
+osmnx <- import("osmnx")
+networkx <- import("networkx")
+
+pb <- progress_estimated(length(osm_networks))
+
+bike_networks <- suppressWarnings(
+  map(osm_networks, ~{
+    network <- network_creator(., 2400)
+    pb$tick()$print()
+    network}) %>% 
+    set_names(target_neighbourhoods$nbhd))
+
+pb <- progress_estimated(length(osm_networks))
+
+subway_networks <- suppressWarnings(
+  map(osm_networks, ~{
+    network <- network_creator(., 960, extra_subway = TRUE)
+    pb$tick()$print()
+    network}) %>% 
+    set_names(target_neighbourhoods$nbhd))
+
+rm(pb, osmnx, networkx)
+
 
   
 ## Erase and clip Manhattan
@@ -106,5 +112,3 @@ networks <-
   set_names(target_neighbourhoods$nbhd)
 
 rm(pb)
-
-save(networks, file = "data/networks.RData")
