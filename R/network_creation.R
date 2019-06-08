@@ -1,22 +1,74 @@
 ### Extract network buffers and assemble mapping components ####################
 
+## Code to rebuild networks
+
+#osm_networks <- suppressMessages(
+#  map(target_neighbourhoods$nbhd, map_creator) %>% 
+#    set_names(target_neighbourhoods$nbhd))
+
+#osmnx <- import("osmnx")
+#networkx <- import("networkx")
+
+#pb <- progress_estimated(length(osm_networks))
+
+#bike_networks <- suppressWarnings(
+#  map(osm_networks, ~{
+#    network <- network_creator(., 2400)
+#    pb$tick()$print()
+#    network}) %>% 
+#    set_names(target_neighbourhoods$nbhd))
+
+#pb <- progress_estimated(length(osm_networks))
+
+#subway_networks <- suppressWarnings(
+#  map(osm_networks, ~{
+#    network <- network_creator(., 960, extra_subway = TRUE)
+#    pb$tick()$print()
+#    network}) %>% 
+#    set_names(target_neighbourhoods$nbhd))
+
+#rm(pb, osmnx, networkx)
+
+
 ## Import RData files to avoid rebuilding bike share and subway networks
 
 load("data/osm_networks.RData")
 load("data/bike_networks.RData")
 load("data/subway_networks.RData")
 
-# Temp
+  
+## Erase and clip Manhattan
 
-bike_networks <- 
-  bike_networks %>% 
-  map(st_transform, 26918)
+bike_networks[[2]] <- suppressWarnings(
+  bike_networks[[2]] %>% 
+  st_erase(manhattan %>% st_erase(filter(clusters, nbhd == "West Bronx"))) %>% 
+  st_erase(nyc_water) %>%
+  # Extra step to remove spurious network segments
+  st_erase(st_buffer(st_centroid(filter(CTs, GEOID == 36005000200)), 1500)))
 
-subway_networks <- 
-  subway_networks %>% 
-  map(st_transform, 26918)
+bike_networks[[4]] <-
+  bike_networks[[4]] %>% 
+  st_intersection(nyc_city) %>% 
+  st_collection_extract("LINESTRING") %>% 
+  st_union()
 
-bike_networks <- bike_share_networks
+bike_networks[[9]] <- suppressWarnings(
+  bike_networks[[9]] %>% 
+  st_erase(manhattan %>% st_erase(filter(clusters, nbhd == "West Bronx"))) %>% 
+  st_erase(nyc_water))
+
+bike_networks[[11]] <- 
+  bike_networks[[11]] %>% 
+  st_erase(filter(clusters, nbhd == "West Bronx")) %>% 
+  st_erase(bronx) %>% 
+  st_intersection(nyc_city) %>% 
+  st_collection_extract("LINESTRING") %>% 
+  st_union()
+
+bike_networks[[12]] <- suppressWarnings(
+  bike_networks[[12]] %>% 
+  st_erase(manhattan %>% st_erase(filter(clusters, nbhd == "West Bronx"))) %>% 
+  st_erase(nyc_water))
 
 
 ## Polygonize and buffer appropriately
@@ -52,59 +104,7 @@ networks <-
                 "subway_polygon")
   }) %>% 
   set_names(target_neighbourhoods$nbhd)
-  
+
 rm(pb)
-  
-  
-## Erase and clip Manhattan
 
-bike_networks[[2]] <-
-  bike_networks[[2]] %>% 
-  st_erase(manhattan %>% st_erase(filter(clusters, nbhd == "West Bronx"))) %>% 
-  st_erase(nyc_water) %>%
-  # Extra step to remove spurious network segments
-  st_erase(st_buffer(st_centroid(filter(CTs, GEOID == 36005000200)), 1500))
-
-bike_networks[[4]] <-
-  bike_networks[[4]] %>% 
-  st_intersection(nyc_city) %>% 
-  st_collection_extract("LINESTRING") %>% 
-  st_union()
-
-bike_networks[[9]] <-
-  bike_networks[[9]] %>% 
-  st_erase(manhattan %>% st_erase(filter(clusters, nbhd == "West Bronx"))) %>% 
-  st_erase(nyc_water)
-
-bike_networks[[11]] <- 
-  bike_networks[[11]] %>% 
-  st_erase(filter(clusters, nbhd == "West Bronx")) %>% 
-  st_erase(bronx) %>% 
-  st_intersection(nyc_city) %>% 
-  st_collection_extract("LINESTRING") %>% 
-  st_union()
-
-bike_networks[[12]] <-
-  bike_networks[[12]] %>% 
-  st_erase(manhattan %>% st_erase(filter(clusters, nbhd == "West Bronx"))) %>% 
-  st_erase(nyc_water)
-
-
-
-## Code to rebuild networks
-
-#osm_networks <- 
-#  map(target_neighbourhoods$nbhd, map_creator) %>% 
-#  set_names(target_neighbourhoods$nbhd)
-
-#osmnx <- import("osmnx")
-#networkx <- import("networkx")
-
-#bike_networks <-
-#  map(osm_networks, network_creator, 2400) %>% 
-#  set_names(target_neighbourhoods$nbhd)
-
-#subway_networks <-
-#  map(osm_networks, network_creator, 960, extra_subway = TRUE) %>% 
-#  set_names(target_neighbourhoods$nbhd)
-
+save(networks, file = "data/networks.RData")

@@ -9,19 +9,19 @@ source("R/01_helper_functions.R")
 
 ## Import water
 
-nyc_water <- rbind(
+nyc_water <- suppressMessages(rbind(
   area_water("NY", "New York", class = "sf"),
   area_water("NY", "Kings", class = "sf"),
   area_water("NY", "Queens", class = "sf"),
   area_water("NY", "Bronx", class = "sf"),
   area_water("NY", "Richmond", class = "sf")) %>% 
   st_transform(26918) %>% 
-  st_union()
+  st_union())
 
 
 ## Import CMA, city and county boundaries
 
-nyc_msa <- suppressWarnings(
+nyc_msa <- suppressMessages(suppressWarnings(
   counties(state = c("New York", "New Jersey"), class = "sf") %>% 
   as_tibble() %>% 
   st_as_sf() %>% 
@@ -51,7 +51,7 @@ nyc_msa <- suppressWarnings(
       area_water("NJ", "Passaic", class = "sf")) %>% 
       st_transform(26918) %>% 
       st_union()
-  ))
+  )))
 
 nyc_city <- nyc_msa %>%
   filter(NAME %in% c("New York", "Kings", "Queens", "Bronx", "Richmond")) %>% 
@@ -80,24 +80,26 @@ nyc_pumas <- pumas(36, class = "sf") %>%
 ## Import bike data
 
 bike_stations <-
-  st_read("data/station_list.csv", stringsAsFactors = FALSE) %>%
-  as_tibble() %>%
-  st_as_sf() %>% 
-  select(-WKT) %>% 
-  st_set_crs(26918) %>% 
-  mutate(ID = as.numeric(ID), Year = as.numeric(Year)) %>% 
-  st_erase(bronx)
+  suppressMessages(suppressWarnings(
+    st_read("data/station_list.csv", stringsAsFactors = FALSE) %>%
+      as_tibble() %>%
+      st_as_sf() %>% 
+      select(-WKT) %>% 
+      st_set_crs(26918) %>% 
+      mutate(ID = as.numeric(ID), Year = as.numeric(Year)) %>% 
+      st_erase(bronx)))
 
 
 ## Import subway data
 
 subway_stations <-
-  st_read("data", "stops_nyc_subway_nov2018", stringsAsFactors = FALSE) %>%  
-  st_transform(26918) %>% 
-  as_tibble() %>% 
-  st_as_sf() %>%
-  mutate(borough = NAMELSAD) %>% 
-  select(-NAMELSAD, -stop_id2, -GEOID, -stop_lat, -stop_lon)
+  suppressMessages(
+    st_read("data", "stops_nyc_subway_nov2018", stringsAsFactors = FALSE) %>%  
+      st_transform(26918) %>% 
+      as_tibble() %>% 
+      st_as_sf() %>%
+      mutate(borough = NAMELSAD) %>% 
+      select(-NAMELSAD, -stop_id2, -GEOID, -stop_lat, -stop_lon))
 
 subway_lines <-
   opq(bbox = "new york city") %>% 
@@ -115,7 +117,7 @@ subway_lines <-
 
 ## Import, clean up and spread census data
 
-CTs <- get_acs(
+CTs <- suppressMessages(get_acs(
   geography = "tract", 
   variables = c(med_income = "B19013_001",
                 poverty = "B17001_002",
@@ -141,7 +143,7 @@ CTs <- get_acs(
   spread(key = Variable, value = Estimate) %>% 
   mutate(pop_density = pop_total/st_area(geometry)) %>% 
   filter(pop_total > 100) %>%
-  na.omit()
+  na.omit())
 
 
 ## Create vulnerability index

@@ -251,14 +251,10 @@ network_creator <- function(nbhd_list, network_dist, extra_subway = FALSE) {
     as_tibble() %>% 
     select(osmid, u, v)
   
-  
   # Connect GDF to osm layer
-  
   graph_lines <- filter(nbhd_list$streets, osm_id %in% graph_edges$osmid)
   
-  
   # Rebuild line segments
-  
   edges <- 
     map(graph_lines$osm_id,
         function(x) filter(graph_edges, osmid %in% x)) %>%
