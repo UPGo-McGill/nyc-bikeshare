@@ -21,15 +21,48 @@ broadway <-
 
 ## Table rides per station, by season
 
-rider_201806 <-
-  read_csv("data/201806-citibike-tripdata.csv") %>% 
+temp <- tempfile()
+
+download.file(
+  "https://s3.amazonaws.com/tripdata/201306-citibike-tripdata.zip", temp)
+
+rider_201306 <-
+  unz(temp, "201306-citibike-tripdata.csv") %>% 
+  read_csv() %>% 
   select(4) %>% 
   set_names("ID") %>%
   group_by(ID) %>% 
   summarize(rides_jun = n())
 
+download.file(
+  "https://s3.amazonaws.com/tripdata/201312-citibike-tripdata.zip", temp)
+
+rider_201312 <-
+  unz(temp, "2013-12 - Citi Bike trip data.csv") %>% 
+  read_csv() %>% 
+  select(4) %>% 
+  set_names("ID") %>%
+  group_by(ID) %>% 
+  summarize(rides_dec = n()) %>% 
+  mutate(ID = as.numeric(ID))
+
+download.file(
+  "https://s3.amazonaws.com/tripdata/201806-citibike-tripdata.csv.zip", temp)
+
+rider_201806 <-
+  unz(temp, "201806-citibike-tripdata.csv") %>% 
+  read_csv() %>% 
+  select(4) %>% 
+  set_names("ID") %>%
+  group_by(ID) %>% 
+  summarize(rides_jun = n())
+
+download.file(
+  "https://s3.amazonaws.com/tripdata/201812-citibike-tripdata.csv.zip", temp)
+
 rider_201812 <-
-  read_csv("data/201812-citibike-tripdata.csv") %>%
+  unz(temp, "201812-citibike-tripdata.csv") %>% 
+  read_csv() %>% 
   select(4) %>% 
   set_names("ID") %>%
   group_by(ID) %>% 
@@ -50,21 +83,6 @@ stations_2018 <-
   filter(!st_is_empty(geometry)) %>% 
   st_as_sf()
 
-rider_201306 <-
-  read_csv("data/201306-citibike-tripdata.csv") %>% 
-  select(4) %>% 
-  set_names("ID") %>%
-  group_by(ID) %>% 
-  summarize(rides_jun = n())
-
-rider_201312 <-
-  read_csv("data/201312-citibike-tripdata.csv") %>%
-  select(4) %>% 
-  set_names("ID") %>%
-  group_by(ID) %>% 
-  summarize(rides_dec = n()) %>% 
-  mutate(ID = as.numeric(ID))
-
 rider_2013 <- full_join(rider_201306, rider_201312)
 rider_2013[is.na(rider_2013)] <- 0
 rider_2013 <- 
@@ -79,9 +97,9 @@ stations_2013 <-
   filter(!st_is_empty(geometry)) %>% 
   st_as_sf()
 
-
+unlink(temp)
 rm(rider_201806, rider_201812, rider_2018, rider_201306, rider_201312,
-   rider_2013)
+   rider_2013, temp)
 
 
 ## Find duplicates 
