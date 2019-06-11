@@ -61,13 +61,34 @@ nbhd_network_demographics <-
 
 nbhd_network_demographics <- 
   nbhd_network_demographics %>% 
-  mutate(pop_density = pop_total / st_area(geometry),
-         pop_density = set_units(pop_density, 1/mi^2) %>% drop_units) %>% 
+  mutate(area = st_area(geometry),
+         area = set_units(area, mi^2) %>% drop_units) %>% 
   st_drop_geometry() %>%
   gather(variable, value, -(nbhd:service)) %>% 
   unite(temp, service, variable) %>%
   spread(temp, value) %>% 
-  select(-total_pop_density)
+  mutate(perc_no_subway = bike_only_pop_total / total_pop_total,
+         bike_only_pop_density = bike_only_pop_total/total_area,
+         total_pop_density = total_pop_total/total_area) %>%
+  select(-bike_only_area, -total_area)
+
+
+
+#Table 0. for executive summary
+table_2_0 <- 
+  nbhd_network_demographics %>% 
+  mutate (bike_only_non_white = 1- bike_only_pop_white) %>%
+  select(nbhd, total_pop_total, total_pop_density, bike_only_pop_total, 
+         perc_no_subway, bike_only_non_white, bike_only_med_income) %>%
+  mutate_at(vars(total_pop_total, total_pop_density, bike_only_pop_total, bike_only_med_income), 
+            round, -2) %>% 
+  mutate_at(vars( perc_no_subway, bike_only_non_white), 
+            round, 3)  %>%
+  set_names("Neighborhood", "Population", "Population per sq mi",
+            "Total population without subway access",
+            "Percentage of the population without subway access",
+           "Non-white without subway access",
+           "Median income without subway access")
 
 
 # Table 1. Leading potential expansion areas based on vulnerability index
@@ -88,34 +109,22 @@ table_2_1 <-
 
 table_2_2 <-
   nbhd_network_demographics %>% 
-  select(nbhd, total_pop_total, bike_only_pop_total, bike_only_pop_density) %>% 
-  mutate(perc_no_subway = round(bike_only_pop_total / total_pop_total, 3)) %>% 
+  select(nbhd, perc_no_subway, total_pop_total, bike_only_pop_total, 
+         bike_only_pop_density) %>% 
   mutate_at(vars(total_pop_total, bike_only_pop_total, bike_only_pop_density), 
             round, -2) %>% 
-  arrange(-bike_only_pop_total) %>% 
-  select(nbhd, total_pop_total, bike_only_pop_total, perc_no_subway,
-         bike_only_pop_density) %>% 
-  set_names("Neighborhood", "Total population", 
-            "Population without subway access",
-            "Percentage of population without subway access",
+  mutate(perc_no_subway = round(perc_no_subway, 3)) %>%
+  arrange(-bike_only_pop_density) %>% 
+  set_names("Neighborhood", "Percentage of population without subway access", 
+            "Total population", "Population without subway access",
             "Population without subway access per square mile")
 
-
-####### Find demographic statistics for multiple neighbourhoods ################
-
-scbronx_catchment <- cbronx[[4]] %>% st_union(sbronx[[4]]) %>% 
-  st_intersect_summarize(
-    CTs,
-    .,
-    group_vars = vars(NA),
-    population = pop_total,
-    sum_vars = vars(pop_white, education, poverty),
-    mean_vars = vars(med_income, vulnerability_index))
 
 
 ## Find summary demographics for expansion areas based on vulnerability index
 
 vulnerability_catchment <- 
+  
   st_intersect_summarize(
     CTs,
     tibble(service = c("bike_total", "bike_only"),
