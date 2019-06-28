@@ -1,7 +1,19 @@
-##Case studies report mapping
+### CASE STUDY MAPPING #########################################################
 
+base_map <- tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), xlim=c(-0.02, 1.02),
+                                        ylim=c(0.01, 1.05), relative = TRUE),
+                     unit = "mi") +
+  tm_fill(col = "#f0f0f0") +
+  tm_shape(nyc_city) +
+  tm_fill(col = "grey80", title = "Base Map") +
+  tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50") +
+  tm_layout(frame = TRUE, main.title.size = 1.5, legend.title.size = 1.2,
+            legend.title.fontfamily = "Futura-CondensedExtraBold",
+            legend.position = c("left", "top"),
+            fontfamily = "Futura-Medium",
+            title.fontfamily = "Futura-CondensedExtraBold")
 
-#########  Figure 1. Expansion areas
+## Figure 1. Expansion areas
 
 figure_2_01 <- 
   base_map +
@@ -19,10 +31,11 @@ figure_2_01 <-
   tm_add_legend(type = "fill", labels = "Existing Citi Bike service area",
                 col = "grey40", border.lwd = 0)
 
-tmap_save(figure_2_01, "output/figure_2_01.png", width = 2400, height = 2400)
+tmap_save(figure_2_01, "output/report-2/figure_2_01.png", width = 2400, 
+          height = 2400)
 
 
-#########  Figure 2. Vulnerability of proposed bike sharing expansion areas
+## Figure 2. Vulnerability of proposed bike sharing expansion areas
 
 figure_2_02 <- 
   base_map +
@@ -33,14 +46,17 @@ figure_2_02 <-
   tm_fill(col = "grey80", alpha = 0.6) +
   tm_shape(target_neighbourhoods) +
   tm_borders(col = "white", lwd = 2) +
-  tm_layout(title = "Figure 2. Vulnerability of proposed bike sharing expansion areas") +
+  tm_layout(
+    title = "Figure 2. Vulnerability of proposed bike sharing expansion areas"
+    ) +
   tm_add_legend(type = "fill", labels = "No data", col = "#e0e0e0")
 
-tmap_save(figure_2_02, "output/figure_2_02.png", width = 2400, height = 2400)
+tmap_save(figure_2_02, "output/report-2/figure_2_02.png", width = 2400, 
+          height = 2400)
 
 
 
-#########  Figure 3. Subway accessibility of proposed bike sharing expansion areas
+## Figure 3. Subway accessibility of proposed bike sharing expansion areas
 
 figure_2_03 <- 
   base_map +
@@ -56,16 +72,17 @@ figure_2_03 <-
   tm_add_legend(type = "fill", labels = "Access to subway", col = "grey50", 
                 alpha = 0.3)
 
-tmap_save(figure_2_03, "output/figure_2_03.png", width = 2400, height = 2400)
+tmap_save(figure_2_03, "output/report-2/figure_2_03.png", width = 2400,
+          height = 2400)
 
 
 
-######### Figure 4. Jackson Heights case study map
+## Figure 4. Jackson Heights case study map
 
 
 nbhd_value <- 7
 
-figure_2_4 <- 
+figure_2_04 <- 
   tm_shape(nyc_msa, bbox = bb(st_bbox(networks[[nbhd_value]][[4]]), ext = 1.1), unit = "mi") +
   tm_fill(col = "#f0f0f0") +
   tm_shape(nyc_city) +
@@ -279,8 +296,9 @@ figure_2_08 <-
   tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50") +
   tm_add_legend(type = "fill", labels = "Access to subway", col = "grey65", 
                 alpha = 0.3, border.alpha = 0.1, border.col = ) +
-  tm_add_legend(type = "fill", labels = "Access to bike sharing", col = "#FBAC8D", 
-                alpha = 0.3, border.alpha = 0.1, border.col = ) +
+  tm_add_legend(type = "fill", labels = "Access to bike sharing",
+                col = "#FBAC8D", alpha = 0.3, border.alpha = 0.1, 
+                border.col = ) +
   tm_add_legend(type = "fill", labels = "Access to both", col = "#E87142", 
                 alpha = 0.3, border.alpha = 0.1, border.col = ) +
   tm_layout(main.title = "Figure 8. Crown Heights / Brownsville",
@@ -487,7 +505,7 @@ tmap_save(figure_2_12, "output/figure_2_12.png", height = 2400)
 
 nbhd_value <- 10
 
-figure_2_12 <- 
+figure_2_13 <- 
   tm_shape(nyc_msa, bbox = bb(st_bbox(networks[[nbhd_value]][[4]]), ext = 1.25), unit = "mi") +
   tm_fill(col = "#f0f0f0") +
   tm_shape(nyc_city) +

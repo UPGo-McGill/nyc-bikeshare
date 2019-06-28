@@ -232,5 +232,3 @@ voronoi_comparison_2013 %>%
 lm(ride_density ~ dist_to_broadway + pop_total + pop_white + education +
      poverty + med_income, data = voronoi_comparison_2013) %>% 
   summary()
-
-pandoc(regression_html, )
