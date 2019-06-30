@@ -1,17 +1,5 @@
 ### Extract network buffers and assemble mapping components ####################
 
-
-## Import RData files to avoid rebuilding bike share and subway networks
-
-load("data/osm_networks.RData")
-load("data/bike_networks.RData")
-load("data/subway_networks.RData")
-load("data/networks.RData")
-
-
-
-
-
 ## Code to rebuild networks
 
 osm_networks <- suppressMessages(
