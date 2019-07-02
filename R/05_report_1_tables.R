@@ -1,6 +1,7 @@
-### TABLES AND CHARTS ##########################################################
+### REPORT 1 TABLES AND FACTS ##################################################
 
 ## NYC summary demographics
+
 nyc_demographics <- get_acs(
   geography = "county", 
   variables = c(pop_non_hisp_white = "B03002_003",
@@ -23,7 +24,6 @@ nyc_demographics <- get_acs(
   filter(pop_total > 100) %>%
   na.omit() %>% 
   summarize_all(sum)
-
 
 
 ### EXECUTIVE SUMMARY ####
@@ -71,7 +71,8 @@ subway_service_comparison %>%
 service_added <- 
   st_intersect_summarize(
   CTs,
-  st_intersection(bike_service_growth_comparison["service"], subway_service_areas),
+  st_intersection(bike_service_growth_comparison["service"], 
+                  subway_service_areas),
   group_vars = vars(service, subway_service),
   population = pop_total,
   sum_vars = vars(pop_white, education, poverty),
@@ -82,11 +83,9 @@ service_added %>%
   summarize(pop_total = sum(pop_total))
 
 
-
-
 ### 1. INTRODUCTION ####
 
-## Vulnerability index quantile
+## p. 7: Vulnerability index quantile
 
 quantile(CTs$vulnerability_index, seq(0, 1, .333333))
 
@@ -118,8 +117,6 @@ table_1 <-
 
 
 ### 3. WHO HAS ACCESS TO CITI BIKE, AND WHO DOESN'T?
-
-
 
 ## Table 2. Demographic differences in bike sharing access
 
@@ -154,11 +151,38 @@ table_3 <-
   select(service, pop_total, med_income, poverty, pop_white, education)
 
 
-### 5.How should New York’s bike sharing expand in the future?
+### 5. WHICH NEIGHBORHOODS USE CITI BIKE, AND WHICH DON'T?
 
-# Table 4. Leading potential expansion areas based on vulnerability index
+# p. 21: In the months of June and December of 2013, Citi Bike users took 1.02
+# million rides—an average of 16,750 per day. Five years later in 2018, the
+# equivalent numbers were 2.97 million rides in June and December, for an 
+# average of 48,700 rides per day. The bike sharing network expanded
+# substantially over these five years, but the average number of daily rides per
+# station increased by 24.1%.
+
+sum(stations_2018$rides) + sum(stations_2013$rides)
+sum(stations_2018$rides) / 61
+sum(stations_2013$rides) / 61
+
+mean(stations_2018$rides) / mean(stations_2013$rides)
+
+regression_2018 <-
+  lm(ride_density ~ dist_to_broadway + pop_total + pop_white + education +
+       poverty + med_income, data = voronoi_comparison_2018)
 
 table_4 <- 
+  summary(regression_2018)
+
+# Table formatted using stargazer, with standard notation replacing absolutes
+stargazer(regression_2018, type = "text")
+
+
+
+### 6. HOW SHOULD NEW YORK'S BIKE SHARING EXPAND IN THE FUTURE?
+
+# Table 5. Leading potential expansion areas based on vulnerability index
+
+table_5 <- 
   target_neighbourhoods_demographics %>% 
   st_collection_extract("POLYGON") %>%
   group_by(nbhd) %>% 
@@ -168,9 +192,9 @@ table_4 <-
             pop_no_subway = first(pop_no_subway) * first(pop_total))
 
 
-# Table 5. Leading potential expansion areas based on subway access
+# Table 6. Leading potential expansion areas based on subway access
 
-table_5 <- 
+table_6 <- 
   target_subway_access %>% 
   filter(subway_service == FALSE) %>%
   st_collection_extract("POLYGON") %>%
@@ -180,3 +204,4 @@ table_5 <-
   mutate(area = st_area(.) %>% set_units(mi^2),
          access_per_mi = pop_total / area) %>%
   st_drop_geometry()
+

@@ -32,7 +32,13 @@ base_map_gg <-
 
 ## Network map template
 
-network_template <- function(nbhd_value, x_values = 0, y_values = 0, col_scale = 1, bbox = c(0, 1, 0, 1), title) {
+network_template <-
+  function(nbhd_value, 
+           x_values = 0, 
+           y_values = 0, 
+           col_scale = 1, 
+           bbox = c(0, 1, 0, 1), 
+           title) {
   
   middle_colour_1 <- nbhd_colours[nbhd_value] %>% 
     str_sub(2, -5) %>% 

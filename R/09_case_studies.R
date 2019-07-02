@@ -80,7 +80,8 @@ table_2_0 <-
   mutate (bike_only_non_white = 1- bike_only_pop_white) %>%
   select(nbhd, total_pop_total, total_pop_density, bike_only_pop_total, 
          perc_no_subway, bike_only_non_white, bike_only_med_income) %>%
-  mutate_at(vars(total_pop_total, total_pop_density, bike_only_pop_total, bike_only_med_income), 
+  mutate_at(vars(total_pop_total, total_pop_density, bike_only_pop_total, 
+                 bike_only_med_income), 
             round, -2) %>% 
   mutate_at(vars( perc_no_subway, bike_only_non_white), 
             round, 3)  %>%
@@ -124,7 +125,6 @@ table_2_2 <-
 ## Find summary demographics for expansion areas based on vulnerability index
 
 vulnerability_catchment <- 
-  
   st_intersect_summarize(
     CTs,
     tibble(service = c("bike_total", "bike_only"),

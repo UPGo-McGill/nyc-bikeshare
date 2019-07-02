@@ -1,8 +1,8 @@
-### MAP MAKING #################################################################
+### REPORT 1 FIGURES ###########################################################
 
-## Initialize map list and base map
+## Initialize figure list and base map
 
-figure <- list()
+figure_1 <- list()
 base_map <- tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), xlim=c(-0.02, 1.02),
                                         ylim=c(0.01, 1.05), relative = TRUE),
                      unit = "mi") +
@@ -19,7 +19,7 @@ base_map <- tm_shape(nyc_msa, bbox = bb(st_bbox(nyc_city), xlim=c(-0.02, 1.02),
 
 ## Figure 1. Citi Bike service area expansion 2013-2018
 
-figure[[1]] <- 
+figure_1[[1]] <- 
     base_map +
     tm_shape(growth) +
     tm_polygons(col = "year", 
@@ -31,12 +31,13 @@ figure[[1]] <-
     tm_lines(col = "grey90", alpha = 0.75) +
     tm_layout(title = "Figure 1. Citi Bike service area expansion, 2013-2018")
 
-tmap_save(figure[[1]], "output/figure_1.png", width = 2400, height = 2400)
+tmap_save(figure_1[[1]], "output/report-1/figure_1_01.png", width = 2400, 
+          height = 2400)
 
 
 ## Figure 2. Median household income
 
-figure[[2]] <- 
+figure_1[[2]] <- 
   base_map +
   tm_shape(CTs) +
   tm_polygons("med_income", border.alpha = 0, palette = "Greens",
@@ -52,12 +53,13 @@ figure[[2]] <-
   tm_add_legend(type = "fill", labels = "Citi Bike service area", col = "white",
                 border.lwd = 2)
 
-tmap_save(figure[[2]], "output/figure_2.png", width = 2400, height = 2400)
+tmap_save(figure_1[[2]], "output/report-1/figure_1_02.png", width = 2400,
+          height = 2400)
 
 
 ## Figure 3. Poverty rate
 
-figure[[3]] <- 
+figure_1[[3]] <- 
   base_map +
   tm_shape(CTs) +
   tm_polygons("poverty_pct", border.alpha = 0, 
@@ -73,12 +75,13 @@ figure[[3]] <-
   tm_add_legend(type = "fill", labels = "Citi Bike service area", col = "white",
                 border.lwd = 2)
 
-tmap_save(figure[[3]], "output/figure_3.png", width = 2400, height = 2400)
+tmap_save(figure_1[[3]], "output/report-1/figure_1_03.png", width = 2400,
+          height = 2400)
 
 
 ## Figure 4. Non-hispanic white population
 
-figure[[4]] <- 
+figure_1[[4]] <- 
   base_map +
   tm_shape(CTs) +
   tm_polygons("pop_white_pct",
@@ -95,12 +98,13 @@ figure[[4]] <-
   tm_add_legend(type = "fill", labels = "Citi Bike service area", col = "white",
                 border.lwd = 2)
 
-tmap_save(figure[[4]], "output/figure_4.png", width = 2400, height = 2400)
+tmap_save(figure_1[[4]], "output/report-1/figure_1_04.png", width = 2400,
+          height = 2400)
 
 
 ## Figure 5. Population with a bachelor's degree or higher
 
-figure[[5]] <- 
+figure_1[[5]] <- 
   base_map +
   tm_shape(CTs) +
   tm_polygons("education_pct",
@@ -116,7 +120,8 @@ figure[[5]] <-
   tm_add_legend(type = "fill", labels = "Citi Bike service area", col = "white",
                 border.lwd = 2)
 
-tmap_save(figure[[5]], "output/figure_5.png", width = 2400, height = 2400)
+tmap_save(figure_1[[5]], "output/report-1/figure_1_05.png", width = 2400,
+          height = 2400)
 
 
 ## Figure 6. Bike sharing and subway access
@@ -127,14 +132,16 @@ fig_6_data <-
   mutate(service = c("Both", "Access to bike sharing", "Access to subway",
                       "Neither"))
 
-figure[[6]] <- 
+figure_1[[6]] <- 
   base_map +
   tm_shape(fig_6_data) +
   tm_polygons("service", title = "", border.col = "#f0f0f0", lwd = 2,
               palette = c("#b3cde3", "#decbe4", "#ccebc5", "#fbb4ae")) +
   tm_layout(title = "Figure 6. Bike sharing and subway access")
 
-tmap_save(figure[[6]], "output/figure_6.png", width = 2400, height = 2400)
+rm(fig_6_data)
+tmap_save(figure_1[[6]], "output/report-1/figure_1_06.png", width = 2400,
+          height = 2400)
 
 
 ## Figure 7. Bike sharing service expansion demographics, 2013-2018
@@ -173,8 +180,10 @@ tm4 <- panel_base_map +
               labels = c("19.0%", "44.5%", "52.1%")) +
   tm_layout(title = "Population with a bachelor's degree")
 
-figure[[7]] <- tmap_arrange(tm1, tm2, tm3, tm4)
-tmap_save(figure[[7]], "output/figure_7.png", width = 2400, height = 2400)
+figure_1[[7]] <- tmap_arrange(tm1, tm2, tm3, tm4)
+rm(panel_base_map, tm1, tm2, tm3, tm4)
+tmap_save(figure_1[[7]], "output/report-1/figure_1_07.png", width = 2400,
+          height = 2400)
 
 
 ## Figure 8. Sample ride density
@@ -222,11 +231,17 @@ ride_map_2018 <-
   tm_dots(col = "white", alpha = 0.2) +
   tm_layout(title = "2018")
 
-figure[[8]] <- tmap_arrange(ride_map_2013, ride_map_2018)
-tmap_save(figure[[8]], "output/figure_8.png", width = 2400)
+figure_1[[8]] <- tmap_arrange(ride_map_2013, ride_map_2018)
+rm(ride_base_map, ride_map_2013, ride_map_2018)
+tmap_save(figure_1[[8]], "output/report-1/figure_1_08.png", width = 2400)
 
 
 ## Figure 9. Ride density correlations
+
+# Correlations
+voronoi_comparison_2018 %>% 
+  st_drop_geometry() %>% 
+  map(~cor(.x, (voronoi_comparison_2018$ride_density)))
 
 scatter_base <- 
   voronoi_comparison_2018 %>% 
@@ -289,24 +304,24 @@ sp5 <-
   annotate("text", x = 0, y = 1e-05, label = "Correlation = -0.33", size = 3,
            colour = "black", family = "Futura-Medium", hjust = 0)
 
-
 legend <- get_legend(scatter_base + 
                        geom_point(aes(pop_density, size = rides), alpha = 0.3) +
                        scale_size(labels = comma) +
                        labs(size = "Ride count") +
                        theme(legend.position = "bottom"))
 
-figure[[9]] <-
+figure_1[[9]] <-
   grid.arrange(sp0, sp1, sp2, sp3, sp4, sp5, legend, heights = c(1, 1, 0.2), 
                layout_matrix = rbind(c(1, 2, 3), c(4, 5, 6), c(7, 7, 7)))
 
-ggsave("output/figure_9.png", plot = figure[[9]], width = 12.8, height = 8,
-       units = "in", dpi = 300)
+rm(scatter_base, sp0, sp1, sp2, sp3, sp4, sp5, legend)
+ggsave("output/report-1/figure_1_09.png", plot = figure_1[[9]], 
+       width = 12.8, height = 8, units = "in", dpi = 300)
 
 
 ## Figure 10. Vulnerability index
 
-figure[[10]] <- 
+figure_1[[10]] <- 
   base_map +
   tm_shape(CTs) +
   tm_fill("vulnerability_index", palette = "-RdYlGn", border.alpha = 0, n = 8,
@@ -326,17 +341,18 @@ figure[[10]] <-
                 border.lwd = 2) +
   tm_scale_bar(position = c("right", "bottom"), color.dark = "grey50")
 
-tmap_save(figure[[10]], "output/figure_10.png", width = 2400, height = 2400)
+tmap_save(figure_1[[10]], "output/report-1/figure_1_10.png", width = 2400, 
+          height = 2400)
 
 
 # Figure 11. Expansion areas
 
-figure[[11]] <- 
+figure_1[[11]] <- 
   base_map +
   tm_shape(target_neighbourhoods) +
   tm_fill(col = "nbhd", title = "",
-          palette = c("#a6cee3", "#1f78b4", "#b2df8a", "#33a02c", "#fb9a99",
-                      "#e31a1c", "#fdbf6f", "#ff7f00", "#cab2d6", "#6a3d9a",
+          palette = c("#6caed1", "#1f78b4", "#8acf4e", "#33a02c", "#fb9a99", 
+                      "#e31a1c", "#fdbf6f", "#ff7f00", "#a880bb", "#6a3d9a",
                       "#ffff99", "#b15928")) +
   tm_borders(col = "white", lwd = 2) +
   tm_shape(bike_service_areas_no_holes$geometry[3]) +
@@ -349,12 +365,13 @@ figure[[11]] <-
   tm_add_legend(type = "fill", labels = "Existing Citi Bike service area",
                 col = "grey40", border.lwd = 0)
 
-tmap_save(figure[[11]], "output/figure_11.png", width = 2400, height = 2400)
+tmap_save(figure_1[[11]], "output/report-1/figure_1_11.png", width = 2400,
+          height = 2400)
 
 
 # Figure 12. Vulnerability of proposed bike sharing expansion areas
 
-figure[[12]] <- 
+figure_1[[12]] <- 
   base_map +
   tm_shape(CTs) +
   tm_fill("vulnerability_index", palette = "-RdYlGn", border.alpha = 0,
@@ -363,15 +380,17 @@ figure[[12]] <-
   tm_fill(col = "grey80", alpha = 0.6) +
   tm_shape(target_neighbourhoods) +
   tm_borders(col = "white", lwd = 2) +
-  tm_layout(title = "Figure 12. Vulnerability of proposed bike sharing expansion areas") +
+  tm_layout(
+    title = "Figure 12. Vulnerability of proposed bike sharing expansion areas") +
   tm_add_legend(type = "fill", labels = "No data", col = "#e0e0e0")
 
-tmap_save(figure[[12]], "output/figure_12.png", width = 2400, height = 2400)
+tmap_save(figure_1[[12]], "output/report-1/figure_1_12.png", width = 2400,
+          height = 2400)
 
 
 # Figure 13. Subway accessibility of proposed bike sharing expansion areas
 
-figure[[13]] <- 
+figure_1[[13]] <- 
   base_map +
   tm_shape(target_neighbourhoods) +
   tm_fill(col = "pop_no_subway", palette = "viridis", alpha = 1,
@@ -379,11 +398,13 @@ figure[[13]] <-
   tm_borders(col = "white", lwd = 2) +
   tm_shape(subway_service_areas[1,]) +
   tm_fill(col = "grey50", alpha = 0.3) +
-  tm_layout(title = "Figure 13. Subway accessibility of proposed bike sharing expansion areas",
-            legend.format = list(fun = function(x) {
-              paste0(formatC(x * 100, digits = 0, format = "f"), "%")})) +
+  tm_layout(
+    title = "Figure 13. Subway accessibility of proposed bike sharing expansion areas",
+    legend.format = list(fun = function(x) {
+      paste0(formatC(x * 100, digits = 0, format = "f"), "%")})) +
   tm_add_legend(type = "fill", labels = "Access to subway", col = "grey50", 
                 alpha = 0.3)
 
-tmap_save(figure[[13]], "output/figure_13.png", width = 2400, height = 2400)
+tmap_save(figure_1[[13]], "output/report-1/figure_1_13.png", width = 2400, 
+          height = 2400)
 

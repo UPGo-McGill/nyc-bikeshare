@@ -235,6 +235,153 @@ subway_service_areas <-
   st_as_sf()
 
 
+## Get Broadway line
+
+broadway <- 
+  getbb("manhattan new york city") %>% 
+  opq() %>% 
+  add_osm_feature(key = "highway") %>% 
+  osmdata_sf()
+
+broadway <- 
+  rbind(broadway$osm_polygons %>% st_cast("LINESTRING"),
+        broadway$osm_lines) %>% 
+  as_tibble() %>% 
+  st_as_sf() %>% 
+  st_transform(26918) %>%
+  filter(name == "Broadway") %>%
+  st_intersection(manhattan) %>% 
+  st_union()
+
+
+## Table rides per station, by season
+
+temp <- tempfile()
+
+download.file(
+  "https://s3.amazonaws.com/tripdata/201306-citibike-tripdata.zip", temp)
+
+rider_201306 <-
+  unz(temp, "201306-citibike-tripdata.csv") %>% 
+  read_csv() %>% 
+  select(4) %>% 
+  set_names("ID") %>%
+  group_by(ID) %>% 
+  summarize(rides_jun = n())
+
+download.file(
+  "https://s3.amazonaws.com/tripdata/201312-citibike-tripdata.zip", temp)
+
+rider_201312 <-
+  unz(temp, "2013-12 - Citi Bike trip data.csv") %>% 
+  read_csv() %>% 
+  select(4) %>% 
+  set_names("ID") %>%
+  group_by(ID) %>% 
+  summarize(rides_dec = n()) %>% 
+  mutate(ID = as.numeric(ID))
+
+download.file(
+  "https://s3.amazonaws.com/tripdata/201806-citibike-tripdata.csv.zip", temp)
+
+rider_201806 <-
+  unz(temp, "201806-citibike-tripdata.csv") %>% 
+  read_csv() %>% 
+  select(4) %>% 
+  set_names("ID") %>%
+  group_by(ID) %>% 
+  summarize(rides_jun = n())
+
+download.file(
+  "https://s3.amazonaws.com/tripdata/201812-citibike-tripdata.csv.zip", temp)
+
+rider_201812 <-
+  unz(temp, "201812-citibike-tripdata.csv") %>% 
+  read_csv() %>% 
+  select(4) %>% 
+  set_names("ID") %>%
+  group_by(ID) %>% 
+  summarize(rides_dec = n()) %>% 
+  mutate(ID = as.numeric(ID))
+
+rider_2018 <- full_join(rider_201806, rider_201812)
+rider_2018[is.na(rider_2018)] <- 0
+rider_2018 <- 
+  rider_2018 %>% 
+  mutate(rides = rides_jun + rides_dec) %>% 
+  select(-rides_jun, -rides_dec)
+
+stations_2018 <- 
+  filter(bike_stations, Year == 2018) %>% 
+  select(-Year) %>% 
+  left_join(rider_2018, .) %>% 
+  filter(!st_is_empty(geometry)) %>% 
+  st_as_sf()
+
+rider_2013 <- full_join(rider_201306, rider_201312)
+rider_2013[is.na(rider_2013)] <- 0
+rider_2013 <- 
+  rider_2013 %>% 
+  mutate(rides = rides_jun + rides_dec) %>% 
+  select(-rides_jun, -rides_dec)
+
+stations_2013 <- 
+  filter(bike_stations, Year == 2013) %>% 
+  select(-Year) %>% 
+  left_join(rider_2013, .) %>% 
+  filter(!st_is_empty(geometry)) %>% 
+  st_as_sf()
+
+unlink(temp)
+rm(rider_201806, rider_201812, rider_2018, rider_201306, rider_201312,
+   rider_2013, temp)
+
+
+## Find duplicates 
+
+overlaps_2018 <-
+  stations_2018 %>% 
+  st_buffer(30) %>% 
+  st_intersection() %>% 
+  filter(n.overlaps > 1) %>% 
+  pull(origins)
+
+stations_2018 <- 
+  stations_2018 %>% 
+  filter(!(ID %in% stations_2018[unlist(overlaps_2018),]$ID)) %>% 
+  rbind(map(overlaps_2018, ~{
+    stations <- stations_2018[.x,]
+    tibble(ID = min(stations$ID),
+           rides = sum(stations$rides),
+           geometry = st_centroid(st_union(stations))) %>% 
+      st_as_sf()}) %>% 
+      do.call(rbind, .) %>% 
+      st_as_sf()) %>% 
+  arrange(ID)
+
+overlaps_2013 <-
+  stations_2013 %>% 
+  st_buffer(30) %>% 
+  st_intersection() %>% 
+  filter(n.overlaps > 1) %>% 
+  pull(origins)
+
+stations_2013 <- 
+  stations_2013 %>% 
+  filter(!(ID %in% stations_2013[unlist(overlaps_2013),]$ID)) %>% 
+  rbind(map(overlaps_2013, ~{
+    stations <- stations_2013[.x,]
+    tibble(ID = min(stations$ID),
+           rides = sum(stations$rides),
+           geometry = st_centroid(st_union(stations))) %>% 
+      st_as_sf()}) %>% 
+      do.call(rbind, .) %>% 
+      st_as_sf()) %>% 
+  arrange(ID)
+
+rm(overlaps_2018, overlaps_2013)
+
+
 ## Import RData files to avoid rebuilding bike share and subway networks
 
 load("data/osm_networks.RData")
