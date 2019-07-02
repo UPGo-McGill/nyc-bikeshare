@@ -174,6 +174,7 @@ table_4 <-
   summary(regression_2018)
 
 # Table formatted using stargazer, with standard notation replacing absolutes
+library(stargazer)
 stargazer(regression_2018, type = "text")
 
 

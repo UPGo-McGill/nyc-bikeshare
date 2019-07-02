@@ -1,6 +1,6 @@
-#### CASE STUDY EXTRAS ###########
+### BUILD CASE STUDIES #########################################################
 
-### Rebuilding previous objects using new networks
+### Rebuild previous objects using network geometries
 
 ## Create total subway service network for all of NYC
 

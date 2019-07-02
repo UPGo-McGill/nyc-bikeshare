@@ -1,12 +1,12 @@
 ### REPORT 2 MAPS (IN GGPLOT2) #################################################
 
-## Neighbourhood colours
+## Initialize objects
 
 nbhd_colours <- 
   c("#6caed1", "#1f78b4", "#8acf4e", "#33a02c", "#fb9a99", "#e31a1c",
     "#fdbf6f", "#ff7f00", "#a880bb", "#6a3d9a", "#ffff99", "#b15928")
 
-## NYC base map
+figure_2 <- list()
 
 base_map_gg <- 
   ggplot() +
@@ -29,8 +29,6 @@ base_map_gg <-
                                     size = 15),
         panel.border = element_rect(colour = "black", fill = NA, size = 0.5)) 
 
-
-## Network map template
 
 network_template <-
   function(nbhd_value, 
@@ -161,7 +159,7 @@ network_template <-
 
 ## Figure 1. Expansion areas
 
-figure_2_01 <- 
+figure_2[[01]] <- 
   base_map_gg +
   geom_sf(data = target_neighbourhoods, mapping = aes(fill = nbhd), 
           colour = "white") +
@@ -176,13 +174,13 @@ figure_2_01 <-
          colour = guide_legend(order = 2)) +
   gg_bbox(nyc_city, 0.01, .99, 0.04, 1.02)
   
-ggsave("output/report-2/figure_2_01.png", plot = figure_2_01, height = 8,
+ggsave("output/report-2/figure_2_01.png", plot = figure_2[[01]], height = 8,
        width = 8, units = "in", dpi = 300)
 
 
 ## Figure 2. Vulnerability of bike sharing expansion areas
 
-figure_2_02 <- 
+figure_2[[02]] <- 
   base_map_gg +
   geom_sf(data = CTs, mapping = aes(fill = vulnerability_index), lwd = 0) +
   geom_sf(data = st_erase(nyc_city, st_union(target_neighbourhoods)),
@@ -195,13 +193,13 @@ figure_2_02 <-
   guides(fill = guide_legend()) +
   gg_bbox(nyc_city, 0.01, .99, 0.04, 1.02)
 
-ggsave("output/report-2/figure_2_02.png", plot = figure_2_02, height = 8,
+ggsave("output/report-2/figure_2_02.png", plot = figure_2[[02]], height = 8,
        width = 8, units = "in", dpi = 300)
 
 
 ## Figure 3. Subway accessibility of bike sharing expansion areas
 
-figure_2_03 <- 
+figure_2[[03]] <- 
   base_map_gg +
   geom_sf(data = target_neighbourhoods, mapping = aes(fill = pop_no_subway),
           colour = "white") +
@@ -217,27 +215,27 @@ figure_2_03 <-
                                override.aes = list(fill = "grey50"))) +
   gg_bbox(nyc_city, 0.01, .99, 0.04, 1.02)
 
-ggsave("output/report-2/figure_2_03.png", plot = figure_2_03, height = 8,
+ggsave("output/report-2/figure_2_03.png", plot = figure_2[[03]], height = 8,
        width = 8, units = "in", dpi = 300)
 
   
 ## Figure 4. Jackson Heights/Flushing
 
-figure_2_04 <- 
+figure_2[[04]] <- 
   network_template(nbhd_value = 7,
                    x_values = 0,
                    y_values = c(350, -300, 0, 0, 0, 0, 200),
                    col_scale = 1,
-                   bbox = c(0, 1, -0.05, 1.05),
+                   bbox = c(0, 1, -0.2, 1.2),
                    title = "Figure 4. Jackson Heights/Flushing bike sharing")
 
-ggsave("output/report-2/figure_2_04.png", plot = figure_2_04, width = 8,
+ggsave("output/report-2/figure_2_04.png", plot = figure_2[[04]], width = 8,
        height = 8, units = "in", dpi = 300)
 
 
 ##  Figure 5. South Bronx
 
-figure_2_05 <- 
+figure_2[[05]] <- 
   network_template(nbhd_value = 9, 
                    x_values = 0, 
                    y_values = 0, 
@@ -245,7 +243,7 @@ figure_2_05 <-
                    bbox = c(-0.13, 1.13, 0, 1),
                    title = "Figure 5. South Bronx bike sharing")
 
-figure_2_05$layers[[13]] <-
+figure_2[[05]]$layers[[13]] <-
   geom_text_repel(data = filter(osm_networks[[9]][[3]], 
                                 !(stop_id %in% c("414", "415"))), 
                   mapping = aes(x = map_dbl(geometry, ~st_coordinates(.)[1]),
@@ -260,21 +258,21 @@ figure_2_05$layers[[13]] <-
                   min.segment.length = 0,
                   point.padding = 1)
 
-ggsave("output/report-2/figure_2_05.png", plot = figure_2_05, width = 8, 
+ggsave("output/report-2/figure_2_05.png", plot = figure_2[[05]], width = 8, 
        height = 8, units = "in", dpi = 300)
 
 
 ## Figure 6. Bushwick/Ridgewood
 
-figure_2_06 <- 
+figure_2[[06]] <- 
   network_template(nbhd_value = 1, 
                    x_values = 0, 
                    y_values = c(0, 0, 0, 0, 300, 0, 0, 0),
-                   col_scale = 1.2,
+                   col_scale = 1,
                    bbox = c(0, 1, -0.05, 1.05),
                    title ="Figure 6. Bushwick/Ridgewood bike sharing")
 
-ggsave("output/report-2/figure_2_06.png", plot = figure_2_06, width = 8,
+ggsave("output/report-2/figure_2_06.png", plot = figure_2[[06]], width = 8,
        height = 8, units = "in", dpi = 300)
 
 
