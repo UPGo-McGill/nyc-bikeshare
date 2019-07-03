@@ -14,7 +14,11 @@ nyc_water <- suppressMessages(rbind(
   area_water("NY", "Kings", class = "sf"),
   area_water("NY", "Queens", class = "sf"),
   area_water("NY", "Bronx", class = "sf"),
-  area_water("NY", "Richmond", class = "sf")) %>% 
+  area_water("NY", "Richmond", class = "sf"),
+  area_water("NY", "Nassau", class = "sf"),
+  area_water("NY", "Westchester", class = "sf"),
+  area_water("NJ", "Bergen", class = "sf"),
+  area_water("NJ", "Hudson", class = "sf")) %>% 
   st_transform(26918) %>% 
   st_union())
 

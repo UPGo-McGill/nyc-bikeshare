@@ -278,7 +278,7 @@ ggsave("output/report-2/figure_2_06.png", plot = figure_2[[06]], width = 8,
 
 ## Figure 7. Central Bronx
 
-figure_2_07 <- 
+figure_2[[07]] <- 
   network_template(nbhd_value = 2,
                    x_values = c(300, -300, rep(0, 4), -1600, -300, 0, 0, 0, 500,
                                 -300),
@@ -287,43 +287,44 @@ figure_2_07 <-
                    bbox = c(-0.02, 1.02, -0.02, 1.02),
                    title = "Figure 7. Central Bronx bike sharing")
 
-ggsave("output/report-2/figure_2_07.png", plot = figure_2_07, width = 8,
+ggsave("output/report-2/figure_2_07.png", plot = figure_2[[07]], width = 8,
        height = 8, units = "in", dpi = 300)
 
 
 ## Figure 8. Crown Heights/Brownsville
 
-figure_2_08 <- 
+figure_2[[08]] <- 
   network_template(nbhd_value = 3, 
                    x_values = c(0, -300, 0, 0, 0, 300, -300, 0, 0, 0, 0, 300, 0,
                                 0), 
                    y_values = 0,
                    col_scale = 0.5,
-                   bbox = c(0, 1, -0.05, 1.05),
+                   bbox = c(0, 1, -0.07, 1.07),
                    title = "Figure 8. Crown Heights/Brownsville bike sharing")
 
-ggsave("output/report-2/figure_2_08.png", plot = figure_2_08, width = 8,
+ggsave("output/report-2/figure_2_08.png", plot = figure_2[[08]], width = 8,
        height = 8, units = "in", dpi = 300)
 
 
 ## Figure 9. East Bronx
-## Add missing water
 
-figure_2_09 <- 
+figure_2[[09]] <- 
   network_template(nbhd_value = 4, 
-                   x_values = c(rep(0, 7), -2500, 0, 800, rep(0, 9)),
-                   y_values = c(rep(0, 6), -500, 0, -600, 700, rep(0, 9)),
+                   x_values = c(0, 2000, rep(0, 5), -2500, 0, 800, 0, 3000, 0, 
+                                0, 3000, rep(0, 4)),
+                   y_values = c(rep(0, 6), -500, 0, -600, 700, 0, -300,
+                                rep(0, 7)),
                    col_scale = 1,
                    bbox = c(-0.15, 1.15, 0, 1),
                    title = "Figure 9. East Bronx bike sharing")
 
-ggsave("output/report-2/figure_2_09.png", plot = figure_2_09, width = 8,
+ggsave("output/report-2/figure_2_09.png", plot = figure_2[[09]], width = 8,
        height = 8, units = "in", dpi = 300)
 
 
 ## Figure 10. East New York/Canarsie
 
-figure_2_10 <- 
+figure_2[[10]] <- 
   network_template(nbhd_value = 5,
                    x_values = c(rep(0, 4), 300, rep(0, 6), 1000, rep(0, 6)),
                    y_values = c(rep(0, 4), -200, 0, 0, 400, 0, 500, rep(0, 8)),
@@ -331,42 +332,41 @@ figure_2_10 <-
                    bbox = c(0, 1, -0.03, 1.03),
                    title = "Figure 10. East New York/Canarsie bike sharing")
 
-ggsave("output/report-2/figure_2_10.png", plot = figure_2_10, width = 8,
+ggsave("output/report-2/figure_2_10.png", plot = figure_2[[10]], width = 8,
        height = 8, units = "in", dpi = 300)
 
 
 ## Figure 11. Far Rockaway
-## Need to figure out water
 
-figure_2_11 <- 
+figure_2[[11]] <- 
   network_template(nbhd_value = 6,
                    x_values = c(0, -200, 0, 200, -400, 0),
-                   y_values = c(-800, 1300, 0, -600, -100, 100),
+                   y_values = c(-800, 1300, 0, -600, -100, 2500),
                    col_scale = 1,
                    bbox = c(-0.1, 1.1, -0.2, 1.3),
                    title = "Figure 11. Far Rockaway bike sharing")
 
-ggsave("output/report-2/figure_2_11.png", plot = figure_2_11, width = 8,
+ggsave("output/report-2/figure_2_11.png", plot = figure_2[[11]], width = 8,
        height = 8, units = "in", dpi = 300)
 
 
 ## Figure 12. Jackson Heights/Flushing
 
-figure_2_12 <- 
+figure_2[[12]] <- 
   network_template(nbhd_value = 7,
                    x_values = 0,
                    y_values = c(350, -300, 0, 0, 0, 0, 200),
                    col_scale = 1,
-                   bbox = c(0, 1, -0.05, 1.05),
-                   title = "Figure 4. Jackson Heights/Flushing bike sharing")
+                   bbox = c(0, 1, -0.2, 1.2),
+                   title = "Figure 12. Jackson Heights/Flushing bike sharing")
 
-ggsave("output/report-2/figure_2_12.png", plot = figure_2_12, width = 8,
-       height = 6, units = "in", dpi = 300)
+ggsave("output/report-2/figure_2_12.png", plot = figure_2[[12]], width = 8,
+       height = 8, units = "in", dpi = 300)
 
 
 ## Figure 13. Jamaica
 
-figure_2_13 <- 
+figure_2[[13]] <- 
   network_template(nbhd_value = 8,
                    x_values = 0,
                    y_values = 0,
@@ -374,13 +374,13 @@ figure_2_13 <-
                    bbox = c(-0.1, 1.1, -0.18, 1.18),
                    title = "Figure 13. Jamaica bike sharing")
 
-ggsave("output/report-2/figure_2_13.png", plot = figure_2_13, width = 8,
+ggsave("output/report-2/figure_2_13.png", plot = figure_2[[13]], width = 8,
        height = 8, units = "in", dpi = 300)
 
 
 ##  Figure 14. South Bronx
 
-figure_2_14 <- 
+figure_2[[14]] <- 
   network_template(nbhd_value = 9, 
                    x_values = 0, 
                    y_values = 0, 
@@ -388,7 +388,7 @@ figure_2_14 <-
                    bbox = c(-0.13, 1.13, 0, 1),
                    title = "Figure 14. South Bronx bike sharing")
 
-figure_2_14$layers[[13]] <-
+figure_2[[14]]$layers[[13]] <-
   geom_text_repel(data = filter(osm_networks[[9]][[3]], 
                                 !(stop_id %in% c("414", "415"))), 
                   mapping = aes(x = map_dbl(geometry, ~st_coordinates(.)[1]),
@@ -403,14 +403,13 @@ figure_2_14$layers[[13]] <-
                   min.segment.length = 0,
                   point.padding = 1)
 
-ggsave("output/report-2/figure_2_14.png", plot = figure_2_14, width = 8, 
+ggsave("output/report-2/figure_2_14.png", plot = figure_2[[14]], width = 8, 
        height = 8, units = "in", dpi = 300)
 
 
 ## Figure 15. Sunset Park/Bay Ridge
-## NEED TO FIX WATER
 
-figure_2_15 <- 
+figure_2[[15]] <- 
   network_template(nbhd_value = 10,
                    x_values = c(-200, 200),
                    y_values = 0,
@@ -418,84 +417,34 @@ figure_2_15 <-
                    bbox = c(-0.2, 1.2, -0.1, 1.1),
                    title = "Figure 15. Sunset Park/Bay Ridge bike sharing")
 
-ggsave("output/report-2/figure_2_15.png", plot = figure_2_15, width = 8,
+ggsave("output/report-2/figure_2_15.png", plot = figure_2[[15]], width = 8,
        height = 8, units = "in", dpi = 300)
 
 
 ## Figure 16. Upper Manhattan
-## NEED TO SWAP OUT NYC WATER WITH MSA WATER
 
-
-figure_2_16 <- 
+figure_2[[16]] <- 
   network_template(nbhd_value = 11,
-                   x_values = c(rep(0, 9), 600, 0, 300, rep(0, 11)),
+                   x_values = c(rep(0, 3), 300, rep(0, 5), 600, 0, 300, 0, 0, 
+                                -300, -300, rep(0, 7)),
                    y_values = c(rep(0, 9), -300, rep(0, 11), -300, 0),
                    col_scale = 1,
-                   bbox = c(-.2, 1.3, 0, 1),
+                   bbox = c(-.2, 1.4, 0, 1),
                    title = "Figure 16. Upper Manhattan bike sharing")
 
-ggsave("output/report-2/figure_2_16.png", plot = figure_2_16, width = 8,
+ggsave("output/report-2/figure_2_16.png", plot = figure_2[[16]], width = 8,
        height = 8, units = "in", dpi = 300)
 
 
 ## Figure 17. West Bronx
-## NEED TO SWAP OUT NYC WATER WITH MSA WATER
 
-
-figure_2_17 <- 
+figure_2[[17]] <- 
   network_template(nbhd_value = 12,
                    x_values = c(rep(0, 6), 300, 0, 0, 0, -500),
-                   y_values = c(200, 0, 200, 200, rep(0, 7)),
+                   y_values = c(200, 0, 200, 200, 0, -300, rep(0, 5)),
                    col_scale = 1,
                    bbox = c(-0.2, 1.2, -0.01, 1.01),
                    title = "Figure 17. West Bronx bike sharing")
 
-ggsave("output/report-2/figure_2_17.png", plot = figure_2_17, width = 8,
+ggsave("output/report-2/figure_2_17.png", plot = figure_2[[17]], width = 8,
        height = 8, units = "in", dpi = 300)
-
-
-
-
-
-
-## Report 1 test map
-
-rbind(mutate(voronoi_2013, year = 2013), mutate(voronoi_2018, year = 2018)) %>% 
-  mutate(area = set_units(st_area(geometry), mi^2),
-         rides_per_sq_mi = rides / area) %>% 
-  ggplot() +
-  geom_sf(data = nyc_msa, fill = "#F0F0F0", lwd = 0) +
-  geom_sf(data = nyc_city, fill = "grey80", lwd = 0) +
-  geom_sf(data = subway_lines, colour = "white", alpha = 0.75) +
-  geom_sf(aes(fill = drop_units(rides_per_sq_mi)),
-          colour = alpha("white", 0.2)) +
-  geom_sf(data = rbind(mutate(stations_2013, year = 2013), 
-                       mutate(stations_2018, year = 2018)), 
-          colour = "white", size = 0.5, alpha = 0.2) +
-  annotation_scale(location = "br", width_hint = 0.4, line_col = "grey50",
-                   bar_cols = c("grey50", "white"), unit_category = "imperial",
-                   style = "ticks") +
-  scale_fill_viridis(name = "Daily rides per square mile",
-                     limits = c(0, 6000), oob = scales::squish) +
-  coord_sf(xlim = st_bbox(voronoi_2018)[c(1,3)], 
-           ylim = st_bbox(voronoi_2018)[c(2,4)]) +
-  ggtitle("Figure 8. Citi Bike ride density") +
-  facet_wrap(vars(year)) +
-  theme(legend.position = c(0, 1),
-        legend.justification = c(0, 1),
-        axis.ticks = element_blank(),
-        axis.text.x = element_blank(),
-        axis.text.y = element_blank(),
-        rect = element_blank(),
-        text = element_text(family = "Futura-Medium"),
-        title = element_text(family = "Futura-CondensedExtraBold", size = 15),
-        strip.text = element_text(family = "Futura-Bold", size = 12),
-        legend.title = element_text(family = "Futura-Bold", size = 10),
-        panel.border = element_rect(colour = "black", fill = NA, size = 1)) 
-
-
-
-plot_gg(ggmap, multicore = TRUE, width = 5, height = 5, scale = 250)
-
-
-st_bbox(voronoi_2018)[c(1,3)]

@@ -408,3 +408,42 @@ figure_1[[13]] <-
 tmap_save(figure_1[[13]], "output/report-1/figure_1_13.png", width = 2400, 
           height = 2400)
 
+
+
+
+
+
+# Test ggplot2 implementation of Figure 8
+
+rbind(mutate(voronoi_2013, year = 2013), mutate(voronoi_2018, year = 2018)) %>% 
+  mutate(area = set_units(st_area(geometry), mi^2),
+         rides_per_sq_mi = rides / area) %>% 
+  ggplot() +
+  geom_sf(data = nyc_msa, fill = "#F0F0F0", lwd = 0) +
+  geom_sf(data = nyc_city, fill = "grey80", lwd = 0) +
+  geom_sf(data = subway_lines, colour = "white", alpha = 0.75) +
+  geom_sf(aes(fill = drop_units(rides_per_sq_mi)),
+          colour = alpha("white", 0.2)) +
+  geom_sf(data = rbind(mutate(stations_2013, year = 2013), 
+                       mutate(stations_2018, year = 2018)), 
+          colour = "white", size = 0.5, alpha = 0.2) +
+  annotation_scale(location = "br", width_hint = 0.4, line_col = "grey50",
+                   bar_cols = c("grey50", "white"), unit_category = "imperial",
+                   style = "ticks") +
+  scale_fill_viridis(name = "Daily rides per square mile",
+                     limits = c(0, 6000), oob = scales::squish) +
+  coord_sf(xlim = st_bbox(voronoi_2018)[c(1,3)], 
+           ylim = st_bbox(voronoi_2018)[c(2,4)]) +
+  ggtitle("Figure 8. Citi Bike ride density") +
+  facet_wrap(vars(year)) +
+  theme(legend.position = c(0, 1),
+        legend.justification = c(0, 1),
+        axis.ticks = element_blank(),
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        rect = element_blank(),
+        text = element_text(family = "Futura-Medium"),
+        title = element_text(family = "Futura-CondensedExtraBold", size = 15),
+        strip.text = element_text(family = "Futura-Bold", size = 12),
+        legend.title = element_text(family = "Futura-Bold", size = 10),
+        panel.border = element_rect(colour = "black", fill = NA, size = 1)) 
