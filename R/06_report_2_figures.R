@@ -197,53 +197,17 @@ ggsave("output/report-2/figure_2_02.png", plot = figure_2[[02]], height = 8,
        width = 8, units = "in", dpi = 300)
 
 
-## Figure 3. Subway accessibility of bike sharing expansion areas
+##  Figure 3. South Bronx
 
 figure_2[[03]] <- 
-  base_map_gg +
-  geom_sf(data = target_neighbourhoods, mapping = aes(fill = pop_no_subway),
-          colour = "white") +
-  geom_sf(data = mutate(subway_service_areas[1,], label = "Access to subway"), 
-          mapping = aes(colour = label),
-          fill = alpha("grey50", 0.3), lwd = 0) +
-  scale_fill_viridis(
-    limits = c(0, .4), labels = c("0%", "< 10%", "< 20%", "< 30%", "< 40%"),
-    name = "Figure 3. Subway accessibility of bike sharing expansion areas") +
-  scale_colour_manual(name = NULL, values = "grey50") +
-  guides(fill = guide_legend(order = 1),
-         colour = guide_legend(order = 2, 
-                               override.aes = list(fill = "grey50"))) +
-  gg_bbox(nyc_city, 0.01, .99, 0.04, 1.02)
-
-ggsave("output/report-2/figure_2_03.png", plot = figure_2[[03]], height = 8,
-       width = 8, units = "in", dpi = 300)
-
-  
-## Figure 4. Jackson Heights/Flushing
-
-figure_2[[04]] <- 
-  network_template(nbhd_value = 7,
-                   x_values = 0,
-                   y_values = c(350, -300, 0, 0, 0, 0, 200),
-                   col_scale = 1,
-                   bbox = c(0, 1, -0.2, 1.2),
-                   title = "Figure 4. Jackson Heights/Flushing bike sharing")
-
-ggsave("output/report-2/figure_2_04.png", plot = figure_2[[04]], width = 8,
-       height = 8, units = "in", dpi = 300)
-
-
-##  Figure 5. South Bronx
-
-figure_2[[05]] <- 
   network_template(nbhd_value = 9, 
                    x_values = 0, 
                    y_values = 0, 
                    col_scale = 1.3,
                    bbox = c(-0.13, 1.13, 0, 1),
-                   title = "Figure 5. South Bronx bike sharing")
+                   title = "Figure 3. South Bronx bike sharing")
 
-figure_2[[05]]$layers[[13]] <-
+figure_2[[03]]$layers[[13]] <-
   geom_text_repel(data = filter(osm_networks[[9]][[3]], 
                                 !(stop_id %in% c("414", "415"))), 
                   mapping = aes(x = map_dbl(geometry, ~st_coordinates(.)[1]),
@@ -258,7 +222,44 @@ figure_2[[05]]$layers[[13]] <-
                   min.segment.length = 0,
                   point.padding = 1)
 
-ggsave("output/report-2/figure_2_05.png", plot = figure_2[[05]], width = 8, 
+ggsave("output/report-2/figure_2_03.png", plot = figure_2[[03]], width = 8, 
+       height = 8, units = "in", dpi = 300)
+
+
+
+## Figure 4. Subway accessibility of bike sharing expansion areas
+
+figure_2[[04]] <- 
+  base_map_gg +
+  geom_sf(data = target_neighbourhoods, mapping = aes(fill = pop_no_subway),
+          colour = "white") +
+  geom_sf(data = mutate(subway_service_areas[1,], label = "Access to subway"), 
+          mapping = aes(colour = label),
+          fill = alpha("grey50", 0.3), lwd = 0) +
+  scale_fill_viridis(
+    limits = c(0, .4), labels = c("0%", "< 10%", "< 20%", "< 30%", "< 40%"),
+    name = "Figure 4. Subway accessibility of bike sharing expansion areas") +
+  scale_colour_manual(name = NULL, values = "grey50") +
+  guides(fill = guide_legend(order = 1),
+         colour = guide_legend(order = 2, 
+                               override.aes = list(fill = "grey50"))) +
+  gg_bbox(nyc_city, 0.01, .99, 0.04, 1.02)
+
+ggsave("output/report-2/figure_2_04.png", plot = figure_2[[04]], height = 8,
+       width = 8, units = "in", dpi = 300)
+
+  
+## Figure 5. Jackson Heights/Flushing
+
+figure_2[[05]] <- 
+  network_template(nbhd_value = 7,
+                   x_values = 0,
+                   y_values = c(350, -300, 0, 0, 0, 0, 200),
+                   col_scale = 1,
+                   bbox = c(0, 1, -0.2, 1.2),
+                   title = "Figure 5. Jackson Heights/Flushing bike sharing")
+
+ggsave("output/report-2/figure_2_05.png", plot = figure_2[[05]], width = 8,
        height = 8, units = "in", dpi = 300)
 
 
