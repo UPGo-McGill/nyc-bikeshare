@@ -1,6 +1,6 @@
 ### HELPER FUNCTIONS
 
-## Load libraries and fonts
+## Load libraries
 
 library(osmdata)
 library(smoothr)
@@ -23,7 +23,17 @@ library(viridis)
 library(ggrepel)
 
 options(tigris_use_cache = TRUE)
+
+## Load fonts
+
 suppressWarnings(font_import(paths = "data/fonts", prompt = FALSE))
+
+read_csv(system.file("fontmap", "fonttable.csv", package="extrafontdb")) %>% 
+  mutate(FamilyName = if_else(str_detect(FontName, "Condensed") == TRUE,
+                              "Futura Condensed", FamilyName)) %>% 
+  write_csv(system.file("fontmap", "fonttable.csv", package="extrafontdb"))
+
+extrafont::loadfonts()
 
 
 ## Set buffer values
