@@ -4,8 +4,9 @@
 # which use the font Futura and have a mixture of vector and raster layers to 
 # optimize text legibility while preserving image quality. They require the user
 # to have the Futura fonts installed and exposed to R (by default, the start-up 
-# script will look in /data/fonts to find them), and require the magick and 
-# cowplot libraries, which are loaded or called below.
+# script will look in /data/fonts to find them), require the magick and cowplot
+# libraries, which are loaded or called below, and require the Ghostscript
+# utility to be installed separately.
 
 # For simpler maps which use default fonts and output PNGs, use the script
 # `08_report_2_figures_simple.R`.
@@ -50,7 +51,7 @@ network_template <- function(nbhd_value, x_values = 0, y_values = 0,
                              col_scale = 1, bbox = c(0, 1, 0, 1), title) {
   
   ## Temp file
-  path <- tempfile(fileext = ".png")
+  path <- tempfile(fileext = ".tiff")
   
   ## Colours
   
@@ -208,7 +209,7 @@ network_template <- function(nbhd_value, x_values = 0, y_values = 0,
   ## Save raster layer to temporary location then combine with vector layer
   
   ggsave(path, plot = raster_layer, width = 8, height = 8, units = "in",
-         dpi = 200)
+         dpi = 450)
   
   cowplot::ggdraw() +
     cowplot::draw_image(path) +
@@ -270,8 +271,8 @@ figure_2[[03]] <-
                    title = "Figure 3. South Bronx bike sharing")
 
 ggsave("output/report-2/figure_2_03.pdf", plot = figure_2[[03]], width = 8, 
-       height = 8, units = "in")
-
+       height = 8, units = "in", useDingbats = FALSE)
+embed_fonts("output/report-2/figure_2_03.pdf")
 
 
 ## Figure 4. Subway accessibility of bike sharing expansion areas
@@ -307,7 +308,8 @@ figure_2[[05]] <-
                    title = "Figure 5. Jackson Heights/Flushing bike sharing")
 
 ggsave("output/report-2/figure_2_05.pdf", plot = figure_2[[05]], width = 8,
-       height = 8, units = "in")
+       height = 8, units = "in", useDingbats = FALSE)
+embed_fonts("output/report-2/figure_2_05.pdf")
 
 
 ## Figure 6. Bushwick/Ridgewood
@@ -321,7 +323,8 @@ figure_2[[06]] <-
                    title ="Figure 6. Bushwick/Ridgewood bike sharing")
 
 ggsave("output/report-2/figure_2_06.pdf", plot = figure_2[[06]], width = 8,
-       height = 8, units = "in")
+       height = 8, units = "in", useDingbats = FALSE)
+embed_fonts("output/report-2/figure_2_06.pdf")
 
 
 ## Figure 7. Central Bronx
@@ -336,7 +339,8 @@ figure_2[[07]] <-
                    title = "Figure 7. Central Bronx bike sharing")
 
 ggsave("output/report-2/figure_2_07.pdf", plot = figure_2[[07]], width = 8,
-       height = 8, units = "in")
+       height = 8, units = "in", useDingbats = FALSE)
+embed_fonts("output/report-2/figure_2_07.pdf")
 
 
 ## Figure 8. Crown Heights/Brownsville
@@ -351,7 +355,8 @@ figure_2[[08]] <-
                    title = "Figure 8. Crown Heights/Brownsville bike sharing")
 
 ggsave("output/report-2/figure_2_08.pdf", plot = figure_2[[08]], width = 8,
-       height = 8, units = "in")
+       height = 8, units = "in", useDingbats = FALSE)
+embed_fonts("output/report-2/figure_2_08.pdf")
 
 
 ## Figure 9. East Bronx
@@ -367,7 +372,8 @@ figure_2[[09]] <-
                    title = "Figure 9. East Bronx bike sharing")
 
 ggsave("output/report-2/figure_2_09.pdf", plot = figure_2[[09]], width = 8,
-       height = 8, units = "in")
+       height = 8, units = "in", useDingbats = FALSE)
+embed_fonts("output/report-2/figure_2_09.pdf")
 
 
 ## Figure 10. East New York/Canarsie
@@ -382,7 +388,8 @@ figure_2[[10]] <-
                    title = "Figure 10. East New York/Canarsie bike sharing")
 
 ggsave("output/report-2/figure_2_10.pdf", plot = figure_2[[10]], width = 8,
-       height = 8, units = "in")
+       height = 8, units = "in", useDingbats = FALSE)
+embed_fonts("output/report-2/figure_2_10.pdf")
 
 
 ## Figure 11. Far Rockaway
@@ -392,11 +399,12 @@ figure_2[[11]] <-
                    x_values = c(0, -200, 0, 200, -400, 0),
                    y_values = c(-800, 1300, 0, -600, -100, 2500),
                    col_scale = 1,
-                   bbox = c(-0.1, 1.1, -0.2, 1.3),
+                   bbox = c(-0.1, 1.1, -0.25, 1.45),
                    title = "Figure 11. Far Rockaway bike sharing")
 
 ggsave("output/report-2/figure_2_11.pdf", plot = figure_2[[11]], width = 8,
-       height = 8, units = "in")
+       height = 8, units = "in", useDingbats = FALSE)
+embed_fonts("output/report-2/figure_2_11.pdf")
 
 
 ## Figure 12. Jackson Heights/Flushing
@@ -410,7 +418,8 @@ figure_2[[12]] <-
                    title = "Figure 12. Jackson Heights/Flushing bike sharing")
 
 ggsave("output/report-2/figure_2_12.pdf", plot = figure_2[[12]], width = 8,
-       height = 8, units = "in")
+       height = 8, units = "in", useDingbats = FALSE)
+embed_fonts("output/report-2/figure_2_12.pdf")
 
 
 ## Figure 13. Jamaica
@@ -424,7 +433,8 @@ figure_2[[13]] <-
                    title = "Figure 13. Jamaica bike sharing")
 
 ggsave("output/report-2/figure_2_13.pdf", plot = figure_2[[13]], width = 8,
-       height = 8, units = "in")
+       height = 8, units = "in", useDingbats = FALSE)
+embed_fonts("output/report-2/figure_2_13.pdf")
 
 
 ##  Figure 14. South Bronx
@@ -440,7 +450,8 @@ figure_2[[14]] <-
                    title = "Figure 14. South Bronx bike sharing")
 
 ggsave("output/report-2/figure_2_14.pdf", plot = figure_2[[14]], width = 8, 
-       height = 8, units = "in")
+       height = 8, units = "in", useDingbats = FALSE)
+embed_fonts("output/report-2/figure_2_14.pdf")
 
 
 ## Figure 15. Sunset Park/Bay Ridge
@@ -454,7 +465,8 @@ figure_2[[15]] <-
                    title = "Figure 15. Sunset Park/Bay Ridge bike sharing")
 
 ggsave("output/report-2/figure_2_15.pdf", plot = figure_2[[15]], width = 8,
-       height = 8, units = "in")
+       height = 8, units = "in", useDingbats = FALSE)
+embed_fonts("output/report-2/figure_2_15.pdf")
 
 
 ## Figure 16. Upper Manhattan
@@ -469,7 +481,8 @@ figure_2[[16]] <-
                    title = "Figure 16. Upper Manhattan bike sharing")
 
 ggsave("output/report-2/figure_2_16.pdf", plot = figure_2[[16]], width = 8,
-       height = 8, units = "in")
+       height = 8, units = "in", useDingbats = FALSE)
+embed_fonts("output/report-2/figure_2_16.pdf")
 
 
 ## Figure 17. West Bronx
@@ -483,4 +496,5 @@ figure_2[[17]] <-
                    title = "Figure 17. West Bronx bike sharing")
 
 ggsave("output/report-2/figure_2_17.pdf", plot = figure_2[[17]], width = 8,
-       height = 8, units = "in")
+       height = 8, units = "in", useDingbats = FALSE)
+embed_fonts("output/report-2/figure_2_17.pdf")
